@@ -9,8 +9,7 @@ export const request = createFlatRequest<App.Service.Response>(
   {
     baseURL,
     headers: {
-      apifoxToken: 'XL299LiMEDZ0H5h3A29PxwQXdMJqWyY2',
-      token: localStg.get('token')
+      apifoxToken: 'XL299LiMEDZ0H5h3A29PxwQXdMJqWyY2'
     }
   },
   {
@@ -19,15 +18,16 @@ export const request = createFlatRequest<App.Service.Response>(
 
       // set token
       const token = localStg.get('token');
-      const Authorization = token ? `Bearer ${token}` : null;
-      Object.assign(headers, { Authorization });
+      // const Authorization = token ? `Bearer ${token}` : null;
+      // Object.assign(headers, { Authorization });
+      Object.assign(headers, { token });
 
       return config;
     },
     isBackendSuccess(response) {
       // when the backend response code is "0000", it means the request is success
       // you can change this logic by yourself
-      return response.data.code === '0000';
+      return response.data.code === 0;
     },
     async onBackendFail(_response) {
       // when the backend response code is not "0000", it means the request is fail

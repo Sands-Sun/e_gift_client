@@ -187,7 +187,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'legal_receving-hospitality',
           i18nKey: 'route.legal_receving-hospitality',
           icon: 'mdi:hamburger-plus',
-          order: 4
+          order: 4,
+          hideInMenu: true
         }
       }
     ]
@@ -212,7 +213,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.manage',
       icon: 'carbon:cloud-service-management',
       order: 4,
-      roles: ['R_ADMIN']
+      // roles: ['R_ADMIN']
     },
     children: [
       {
@@ -246,7 +247,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.manage_role',
           icon: 'carbon:user-role',
           order: 2,
-          roles: ['R_ADMIN']
+          // roles: ['R_ADMIN']
         }
       },
       {
@@ -268,7 +269,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.manage_user',
           icon: 'ic:round-manage-accounts',
           order: 1,
-          roles: ['R_ADMIN']
+          // roles: ['R_ADMIN']
         }
       },
       {
@@ -280,7 +281,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'manage_user-detail',
           i18nKey: 'route.manage_user-detail',
           hideInMenu: true,
-          roles: ['R_ADMIN'],
+          // roles: ['R_ADMIN'],
           activeMenu: 'manage_user'
         }
       }

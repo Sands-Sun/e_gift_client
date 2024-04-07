@@ -16,7 +16,8 @@ export default defineConfig(
         {
           ignores: ['/^icon-/']
         }
-      ]
+      ],
+      'no-debugger': 'off'
     }
   }
 );

@@ -249,7 +249,7 @@ const formState_apply = reactive({
 </script>
 
 <template>
-  <a-drawer title="给予礼品申请表" :size="size" :open="open" @close="onClose">
+  <a-drawer title="接受礼品申请" :size="size" width="800" :open="open" @close="onClose">
     <a-descriptions title="申请人信息">
       <a-descriptions-item label="填表人">Anna Lee</a-descriptions-item>
       <a-descriptions-item label="员工号">06568804</a-descriptions-item>
@@ -284,29 +284,32 @@ const formState_apply = reactive({
         </a-col>
       </a-row>
     </a-form>
-    <a-descriptions title="政策提示" layout="vertical">
-      <a-descriptions-item label="请注意，此处用于登记和记录：" :span="3">
-        - 此处仅登记及记录提供给第三方的礼品
+    <a-descriptions title="礼品信息" layout="vertical">
+      <a-descriptions-item label="礼品必须符合以下所有情况" :span="3">
+        - 有形的
         <br />
-        - 此处仅登记及记录除品牌提示物、医用物品和消费者促销礼品以外的其他礼品
+        - 象征性的
         <br />
-        -
-        此处用于登记和记录向第三方提供公司合规政策明确允许的针对处方药事业部、健康消费品事业部的品牌提示物、医用物品，以及仅针对健康消费品事业部的消费者促销礼品、风俗礼品（少数情形）之外的其他礼品。该类其他礼品可以视个例的具体情形（如出于礼节提供象征性、非贵重的礼品）给予允许，但必须得到拜耳中国合规总监的事先批准。请注意销售、市场团队一般不得提供该类其他礼品。
+        - 偶尔的 (每年最多从每个客户接受2次)
         <br />
+        - 符合惯例的
       </a-descriptions-item>
-      <a-descriptions-item label="原则： " :span="3">
-        员工提供给第三方礼品，应禁止索取、禁止不当影响、避免利益冲突、禁止现金或现金等价物、禁止私人利益
+      <a-descriptions-item label="礼品不能包含以下任意一种情况" :span="3">
+        - 现金
         <br />
-        （第三方包括但不限于医疗卫生专业人士、政府官员、经销商及其他业务合作方）
+        - 现金券或现金等价物
         <br />
+        - 通过中间人赠予
+        <br />
+        - 为了换取好处而赠予
+        <br />
+        - 影响或意图影响Bayer员工做出决策/给予优待或好处
       </a-descriptions-item>
     </a-descriptions>
-
-    <a-descriptions title="提供礼品信息 "></a-descriptions>
     <a-form>
       <a-row :gutter="24">
         <a-col span="14">
-          <a-form-item :name="['apply', 'gift_reson']" label="提供礼物原因" :rules="[{ required: true }]">
+          <a-form-item :name="['apply', 'gift_reson']" label="提为什么要给你送礼? " :rules="[{ required: true }]">
             <a-input v-model:value="formState_apply.apply.gift_reson" placeholder="提供礼物原因..."></a-input>
           </a-form-item>
         </a-col>
@@ -345,51 +348,23 @@ const formState_apply = reactive({
       </a-row>
       <a-row :gutter="24">
         <a-col span="24">
-          <a-form-item name="['apply', 'given_company']" label="接收单位名称" :rules="[{ required: true }]">
-            <a-select
-              ref="select"
-              v-model:value="formState_apply.apply.given_company"
-              @focus="focus"
-              @change="handleChange"
-            >
-              <a-select-option value="fs">Dachengxiaoshi Guanggao</a-select-option>
-              <a-select-option value="lucy">Beijign Heping Hotel Co.,Ltd</a-select-option>
-              <!-- <a-select-option value="disabled" disabled>Disabled</a-select-option> -->
-              <!-- <a-select-option value="Yiminghe">yiminghe</a-select-option> -->
-            </a-select>
+          <a-form-item name="['apply', 'given_person']" label="谁给你送的礼品" :rules="[{ required: true }]">
+            <a-input placeholder="请输入谁给你送的礼品..."></a-input>
           </a-form-item>
         </a-col>
       </a-row>
       <a-row :gutter="24">
         <a-col span="24">
-          <a-form-item name="['apply', 'given_person']" label="接收者姓名" :rules="[{ required: true }]">
-            <a-select
-              mode="multiple"
-              style="width: 100%"
-              placeholder="请选择"
-              :options="given_person_options"
-              @change="cc_handleChange"
-            ></a-select>
+          <a-form-item name="['apply', 'given_company']" label="公司/实体" :rules="[{ required: true }]">
+            <a-input placeholder="请输入公司/实体..."></a-input>
           </a-form-item>
         </a-col>
       </a-row>
       <a-row :gutter="24">
-        <a-col span="14">
-          <a-form-item name="['apply', 'go_soc']" label="礼品接受者的类别？" :rules="[{ required: true }]">
-            <a-select ref="select" v-model:value="formState_apply.apply.go_soc" @focus="focus" @change="handleChange">
-              <a-select-option value="fs">医疗卫生专业人士（HCP）</a-select-option>
-              <a-select-option value="lucy">政府官员</a-select-option>
-              <a-select-option value="lucy">经销商</a-select-option>
-              <a-select-option value="lucy">其他</a-select-option>
-              <!-- <a-select-option value="disabled" disabled>Disabled</a-select-option> -->
-              <!-- <a-select-option value="Yiminghe">yiminghe</a-select-option> -->
-            </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col span="10">
+        <a-col span="24">
           <a-form-item
             name="['apply', 'bayer_coustomer']"
-            label="礼品接收者是否是拜耳现有客户? "
+            label=" 你打算把这件礼品交给子集团合规负责人吗?  一件或一套价值RMB300元以上的礼品必须交给他/她。"
             :rules="[{ required: true }]"
           >
             <a-select
@@ -532,5 +507,10 @@ const formState_apply = reactive({
 }
 .table_list:hover {
   overflow-x: scroll;
+}
+
+.ant-form-item-label {
+  word-wrap: break-word;
+  word-break: break-all;
 }
 </style>

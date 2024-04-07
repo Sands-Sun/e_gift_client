@@ -7,7 +7,7 @@ import { request } from '../request';
  * @param password Password
  */
 export function fetchLogin(CWID: string, password: string) {
-  return request<App.Service.Response<Api.Auth.LoginToken>>({
+  return request<Api.Auth.LoginToken>({
     url: '/sys/login',
     method: 'post',
     data: {

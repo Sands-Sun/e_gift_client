@@ -41,11 +41,11 @@ const options1 = ref<SelectProps['options']>([
 const columns: TableColumnsType = [
   { title: '申请者', width: 100, dataIndex: 'apply', key: 'apply', fixed: 'left' },
   { title: '申请日期', width: 100, dataIndex: 'date', key: 'date', fixed: 'left' },
-  { title: 'CWID', dataIndex: 'cwid', key: '1', width: 100 },
-  { title: '部门', dataIndex: 'dept', key: '2', width: 150 },
-  { title: '公司编号', dataIndex: 'leCode', key: '3', width: 150 },
-  { title: '申请类型', dataIndex: 'type', key: '4', width: 150 },
-  { title: '状态', dataIndex: 'status', key: '5', width: 150 },
+  { title: 'CWID', dataIndex: 'cwid', key: 'cwid', width: 100 },
+  { title: '部门', dataIndex: 'dept', key: 'dept', width: 150 },
+  { title: '公司编号', dataIndex: 'leCode', key: 'leCode', width: 150 },
+  { title: '申请类型', dataIndex: 'type', key: 'type', width: 150 },
+  { title: '状态', dataIndex: 'status', key: 'status', width: 150 },
   {
     title: '操作',
     key: 'operation',
@@ -86,6 +86,18 @@ for (let i = 0; i < 10; i++) {
     leCode: '0882',
     type: 'Submit',
     status: 'Approved'
+  });
+}
+
+for (let i = 0; i < 10; i++) {
+  data.push({
+    apply: 'Wenhui Ma',
+    date: '2024-03-12',
+    cwid: 'CTMXI',
+    dept: `Ag Policy & N China Gov Liaison Lead. ${i}`,
+    leCode: '0813',
+    type: 'Submit',
+    status: 'Rejected'
   });
 }
 
@@ -250,7 +262,7 @@ const formState_apply = reactive({
 </script>
 
 <template>
-  <a-drawer title="给予礼品申请表" :size="size" :open="open" @close="onClose">
+  <a-drawer title="给予礼品申请表" :size="size" width="800" :open="open" @close="onClose">
     <a-descriptions title="申请人信息">
       <a-descriptions-item label="填表人">Anna Lee</a-descriptions-item>
       <a-descriptions-item label="员工号">06568804</a-descriptions-item>
@@ -508,9 +520,15 @@ const formState_apply = reactive({
   <a-card title="列表">
     <template #extra><a-button type="link" @click="showDrawer('large')">新建申请</a-button></template>
     <a-table :columns="columns" :data-source="data" :scroll="{ x: 1500 }" class="table-list">
-      <template #bodyCell="{ column }">
+      <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'operation'">
           <a-button type="link">查看详细信息</a-button>
+        </template>
+
+        <template v-if="column.key === 'status'">
+          <a-tag :color="record.status === 'Rejected' ? 'volcano' : 'Approved' ? 'geekblue' : 'green'">
+            {{ record.status }}
+          </a-tag>
         </template>
       </template>
     </a-table>

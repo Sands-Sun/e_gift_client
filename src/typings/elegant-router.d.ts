@@ -41,6 +41,7 @@ declare module "@elegant-router/types" {
     "legal_receving-hospitality": "/legal/receving-hospitality";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
     "manage": "/manage";
+    "manage_function": "/manage/function";
     "manage_group": "/manage/group";
     "manage_role": "/manage/role";
     "manage_route": "/manage/route";
@@ -133,6 +134,7 @@ declare module "@elegant-router/types" {
     | "legal_giving-hospitality"
     | "legal_receving-gifts"
     | "legal_receving-hospitality"
+    | "manage_function"
     | "manage_group"
     | "manage_role"
     | "manage_route"

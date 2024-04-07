@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'SoybeanAdmin'
+    title: 'E-Grift System'
   },
   common: {
     tip: 'Tip',
@@ -130,6 +130,7 @@ const local: App.I18n.Schema = {
     manage_role: 'Role Manage',
     manage_group: 'Group Manage',
     manage_route: 'Route Manage',
+    manage_function: 'Function Manage',
     'multi-menu': 'Multi Menu',
     'multi-menu_first': 'Menu One',
     'multi-menu_first_child': 'Menu One Child',
@@ -200,7 +201,7 @@ const local: App.I18n.Schema = {
       devDep: 'Development Dependency'
     },
     home: {
-      greeting: 'Good morning, {userName}, today is another day full of vitality!',
+      greeting: '{userName}, welcome to use e-gifts system !',
       weatherDesc: 'Today is cloudy to clear, 20℃ - 25℃!',
       projectCount: 'Project Count',
       todo: 'Todo',

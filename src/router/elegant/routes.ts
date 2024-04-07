@@ -36,7 +36,6 @@ export const generatedRoutes: GeneratedRoute[] = [
       constant: true
     }
   },
-  /*
   {
     name: 'about',
     path: '/about',
@@ -44,8 +43,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'about',
       i18nKey: 'route.about',
-      icon: 'fluent:book-information-24-regular',
-      order: 10
+      hideInMenu: true
     }
   },
   {
@@ -55,8 +53,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'function',
       i18nKey: 'route.function',
-      icon: 'icon-park-outline:all-application',
-      order: 6
+      hideInMenu: true
     },
     children: [
       {
@@ -64,10 +61,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/function/hide-child',
         meta: {
           title: 'function_hide-child',
-          i18nKey: 'route.function_hide-child',
-          icon: 'material-symbols:filter-list-off'
+          i18nKey: 'route.function_hide-child'
         },
-        redirect: '/function/hide-child/one',
         children: [
           {
             name: 'function_hide-child_one',
@@ -75,10 +70,7 @@ export const generatedRoutes: GeneratedRoute[] = [
             component: 'view.function_hide-child_one',
             meta: {
               title: 'function_hide-child_one',
-              i18nKey: 'route.function_hide-child_one',
-              icon: 'material-symbols:filter-list-off',
-              hideInMenu: true,
-              activeMenu: 'function_hide-child'
+              i18nKey: 'route.function_hide-child_one'
             }
           },
           {
@@ -87,9 +79,7 @@ export const generatedRoutes: GeneratedRoute[] = [
             component: 'view.function_hide-child_three',
             meta: {
               title: 'function_hide-child_three',
-              i18nKey: 'route.function_hide-child_three',
-              hideInMenu: true,
-              activeMenu: 'function_hide-child'
+              i18nKey: 'route.function_hide-child_three'
             }
           },
           {
@@ -98,9 +88,7 @@ export const generatedRoutes: GeneratedRoute[] = [
             component: 'view.function_hide-child_two',
             meta: {
               title: 'function_hide-child_two',
-              i18nKey: 'route.function_hide-child_two',
-              hideInMenu: true,
-              activeMenu: 'function_hide-child'
+              i18nKey: 'route.function_hide-child_two'
             }
           }
         ]
@@ -111,11 +99,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.function_multi-tab',
         meta: {
           title: 'function_multi-tab',
-          i18nKey: 'route.function_multi-tab',
-          icon: 'ic:round-tab',
-          multiTab: true,
-          hideInMenu: true,
-          activeMenu: 'function_tab'
+          i18nKey: 'route.function_multi-tab'
         }
       },
       {
@@ -124,12 +108,11 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.function_tab',
         meta: {
           title: 'function_tab',
-          i18nKey: 'route.function_tab',
-          icon: 'ic:round-tab'
+          i18nKey: 'route.function_tab'
         }
       }
     ]
-  },*/
+  },
   {
     name: 'home',
     path: '/home',
@@ -147,7 +130,9 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base$view.inbox',
     meta: {
       title: 'inbox',
-      i18nKey: 'route.inbox'
+      i18nKey: 'route.inbox',
+      icon: 'mdi:store-cog-outline',
+      order: 3
     }
   },
   {
@@ -156,7 +141,9 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base',
     meta: {
       title: 'legal',
-      i18nKey: 'route.legal'
+      i18nKey: 'route.legal',
+      icon: 'ic:baseline-gavel',
+      order: 2
     },
     children: [
       {
@@ -165,7 +152,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.legal_giving-gifts',
         meta: {
           title: 'legal_giving-gifts',
-          i18nKey: 'route.legal_giving-gifts'
+          i18nKey: 'route.legal_giving-gifts',
+          icon: 'mdi:cart-variant',
+          order: 1
         }
       },
       {
@@ -174,7 +163,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.legal_giving-hospitality',
         meta: {
           title: 'legal_giving-hospitality',
-          i18nKey: 'route.legal_giving-hospitality'
+          i18nKey: 'route.legal_giving-hospitality',
+          icon: 'material-symbols-light:lunch-dining',
+          order: 3
         }
       },
       {
@@ -183,7 +174,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.legal_receving-gifts',
         meta: {
           title: 'legal_receving-gifts',
-          i18nKey: 'route.legal_receving-gifts'
+          i18nKey: 'route.legal_receving-gifts',
+          icon: 'material-symbols:text-select-move-back-word-outline',
+          order: 2
         }
       },
       {
@@ -192,7 +185,9 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.legal_receving-hospitality',
         meta: {
           title: 'legal_receving-hospitality',
-          i18nKey: 'route.legal_receving-hospitality'
+          i18nKey: 'route.legal_receving-hospitality',
+          icon: 'mdi:hamburger-plus',
+          order: 4
         }
       }
     ]
@@ -216,17 +211,30 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'manage',
       i18nKey: 'route.manage',
       icon: 'carbon:cloud-service-management',
-      order: 9,
+      order: 4,
       roles: ['R_ADMIN']
     },
     children: [
+      {
+        name: 'manage_function',
+        path: '/manage/function',
+        component: 'view.manage_function',
+        meta: {
+          title: 'manage_function',
+          i18nKey: 'route.manage_function',
+          icon: 'material-symbols:format-indent-increase-rounded',
+          order: 4
+        }
+      },
       {
         name: 'manage_group',
         path: '/manage/group',
         component: 'view.manage_group',
         meta: {
           title: 'manage_group',
-          i18nKey: 'route.manage_group'
+          i18nKey: 'route.manage_group',
+          icon: 'material-symbols:supervisor-account-outline-sharp',
+          order: 3
         }
       },
       {
@@ -247,7 +255,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.manage_route',
         meta: {
           title: 'manage_route',
-          i18nKey: 'route.manage_route'
+          i18nKey: 'route.manage_route',
+          hideInMenu: true
         }
       },
       {
@@ -277,7 +286,6 @@ export const generatedRoutes: GeneratedRoute[] = [
       }
     ]
   },
-  /*
   {
     name: 'multi-menu',
     path: '/multi-menu',
@@ -285,7 +293,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'multi-menu',
       i18nKey: 'route.multi-menu',
-      order: 8
+      hideInMenu: true
     },
     children: [
       {
@@ -293,8 +301,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/multi-menu/first',
         meta: {
           title: 'multi-menu_first',
-          i18nKey: 'route.multi-menu_first',
-          order: 1
+          i18nKey: 'route.multi-menu_first'
         },
         children: [
           {
@@ -313,8 +320,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         path: '/multi-menu/second',
         meta: {
           title: 'multi-menu_second',
-          i18nKey: 'route.multi-menu_second',
-          order: 2
+          i18nKey: 'route.multi-menu_second'
         },
         children: [
           {
@@ -339,7 +345,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         ]
       }
     ]
-  },*/
+  },
   {
     name: 'user-center',
     path: '/user-center',

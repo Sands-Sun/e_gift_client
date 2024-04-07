@@ -61,7 +61,7 @@ const headerMenus = computed(() => {
         :is-dark="themeStore.darkMode"
         @switch="themeStore.toggleThemeScheme"
       />
-      <ThemeButton />
+      <!-- <ThemeButton /> -->
       <UserAvatar />
     </div>
   </DarkModeContainer>

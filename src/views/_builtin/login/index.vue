@@ -62,7 +62,8 @@ const bgColor = computed(() => {
     <ACard class="relative z-4">
       <div class="w-400px <sm:w-300px">
         <header class="flex-y-center justify-between">
-          <SystemLogo class="text-64px text-primary <sm:text-48px" />
+          <!-- <SystemLogo class="text-64px text-primary <sm:text-48px" /> -->
+          <img src="@/assets/svg-icon/logo.svg" height="60px" width="60px" />
           <h3 class="text-28px text-primary font-500 <sm:text-22px">{{ $t('system.title') }}</h3>
           <div class="i-flex-vertical">
             <ThemeSchemaSwitch

@@ -31,6 +31,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   "legal_giving-hospitality": () => import("@/views/legal/giving-hospitality/index.vue"),
   "legal_receving-gifts": () => import("@/views/legal/receving-gifts/index.vue"),
   "legal_receving-hospitality": () => import("@/views/legal/receving-hospitality/index.vue"),
+  manage_function: () => import("@/views/manage/function/index.vue"),
   manage_group: () => import("@/views/manage/group/index.vue"),
   manage_role: () => import("@/views/manage/role/index.vue"),
   manage_route: () => import("@/views/manage/route/index.vue"),

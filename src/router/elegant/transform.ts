@@ -167,6 +167,7 @@ const routeMap: RouteMap = {
   "legal_receving-hospitality": "/legal/receving-hospitality",
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",
   "manage": "/manage",
+  "manage_function": "/manage/function",
   "manage_group": "/manage/group",
   "manage_role": "/manage/role",
   "manage_route": "/manage/route",

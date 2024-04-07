@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'Soybean 管理系统'
+    title: 'E-Grift 管理系统'
   },
   common: {
     tip: '提示',
@@ -130,6 +130,7 @@ const local: App.I18n.Schema = {
     manage_group: '用户组管理',
     manage_role: '角色管理',
     manage_route: '路由管理',
+    manage_function: '功能管理',
     'multi-menu': '多级菜单',
     'multi-menu_first': '菜单一',
     'multi-menu_first_child': '菜单一子菜单',
@@ -200,7 +201,7 @@ const local: App.I18n.Schema = {
       devDep: '开发依赖'
     },
     home: {
-      greeting: '早安，{userName}, 今天又是充满活力的一天!',
+      greeting: '{userName}, 欢迎使用 e-gifts 平台!',
       weatherDesc: '今日多云转晴，20℃ - 25℃!',
       projectCount: '项目数',
       todo: '待办',

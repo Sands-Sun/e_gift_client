@@ -9,15 +9,21 @@ declare namespace Api {
    *
    * Backend api module: "auth"
    */
+
   namespace Auth {
     interface LoginToken {
       token: string;
+      userId: number;
+      state: string;
+      createTime: string;
+      expireTime: string;
       refreshToken: string;
     }
 
     interface UserInfo {
-      userId: string;
-      userName: string;
+      sfUserId: string;
+      firstName: string;
+      lastName: string;
       roles: string[];
     }
   }

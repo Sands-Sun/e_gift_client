@@ -3,15 +3,15 @@ import { request } from '../request';
 /**
  * Login
  *
- * @param userName User name
+ * @param CWID User CWID
  * @param password Password
  */
-export function fetchLogin(userName: string, password: string) {
-  return request<Api.Auth.LoginToken>({
-    url: '/auth/login',
+export function fetchLogin(CWID: string, password: string) {
+  return request<App.Service.Response<Api.Auth.LoginToken>>({
+    url: '/sys/login',
     method: 'post',
     data: {
-      userName,
+      CWID,
       password
     }
   });
@@ -19,7 +19,7 @@ export function fetchLogin(userName: string, password: string) {
 
 /** Get user info */
 export function fetchGetUserInfo() {
-  return request<Api.Auth.UserInfo>({ url: '/auth/getUserInfo' });
+  return request<Api.Auth.UserInfo>({ url: '/sys/user/getUserInfo' });
 }
 
 /**

@@ -10,8 +10,9 @@ import CreativityBanner from './modules/creativity-banner.vue';
 <template>
   <ASpace direction="vertical" :size="16">
     <HeaderBanner />
-    <CardData />
-    <ARow :gutter="[16, 16]">
+    <!-- <CardData /> -->
+    <!--
+ <ARow :gutter="[16, 16]">
       <ACol :span="24" :lg="14">
         <LineChart />
       </ACol>
@@ -27,6 +28,7 @@ import CreativityBanner from './modules/creativity-banner.vue';
         <CreativityBanner />
       </ACol>
     </ARow>
+-->
   </ASpace>
 </template>
 

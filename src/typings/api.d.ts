@@ -11,6 +11,13 @@ declare namespace Api {
    */
 
   namespace Gifts {
+    interface GiftPerson {
+      id: number;
+      companyId: number;
+      personName: string;
+      description: string;
+    }
+
     interface GiftCompany {
       id: number;
       companyName: string;

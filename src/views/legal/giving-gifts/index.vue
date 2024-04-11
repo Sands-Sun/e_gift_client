@@ -9,7 +9,12 @@ import { cloneDeep, debounce } from 'lodash-es';
 import type { UnwrapRef } from 'vue';
 import { anyType } from 'ant-design-vue/es/_util/type';
 import { $t } from '@/locales';
-import { fetchGivingGiftsList, fuzzySearchGiftCompanyList, fuzzySearchUserList } from '@/service/api';
+import {
+  fetchGivingGiftsList,
+  fuzzySearchGiftCompanyList,
+  fuzzySearchGiftPersonList,
+  fuzzySearchUserList
+} from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
 import type { MentionsProps } from '..';
 const authStore = useAuthStore();
@@ -29,8 +34,31 @@ const showDrawer = (val: DrawerProps['size']) => {
 };
 const applySearch = ref<string>('');
 const giftCompanySearch = ref<string>('');
+const giftPersonSearch = ref<string>('');
 const userState = reactive({ data: [] as any, value: [] as any, ccValue: [] as any, fetching: true });
-const giftCompanyState = reactive({ data: [] as any, value: [] as any, fetching: true });
+const giftCompanyState = reactive({ data: [] as any, value: -1, fetching: true });
+const giftCompanyPersonState = reactive({ data: [] as any, value: [] as any, fetching: true });
+const loadGiftCompanyPersonData = debounce(async (keyword: string) => {
+  if (!keyword) {
+    giftCompanyPersonState.data = [];
+  }
+  if (!giftCompanyState.value && giftCompanyState.value === -1) {
+    giftCompanyPersonState.data.push({ personName: keyword });
+    return;
+  }
+  const { data: items, error } = await fuzzySearchGiftPersonList(giftCompanyState.value, keyword);
+  if (!error) {
+    console.log('fuzzySearchGiftPersonList:', items);
+    giftCompanyPersonState.data = items;
+    if (giftCompanyPersonState.data.length === 0) {
+      console.log('gift company person push new key:', keyword);
+      giftCompanyPersonState.data.push({ personName: keyword });
+    }
+
+    giftCompanyPersonState.fetching = false;
+    console.log('giftCompanyState: ', giftCompanyState);
+  }
+});
 const loadGiftCompanyData = debounce(async (keyword: string) => {
   if (!keyword) {
     giftCompanyState.data = [];
@@ -44,7 +72,7 @@ const loadGiftCompanyData = debounce(async (keyword: string) => {
     giftCompanyState.data = items;
     if (giftCompanyState.data.length === 0) {
       console.log('push new key:', keyword);
-      giftCompanyState.data.push({ companyName: keyword });
+      giftCompanyState.data.push({ companyName: keyword, id: -1 });
     }
 
     giftCompanyState.fetching = false;
@@ -76,12 +104,24 @@ const onApplySearch = (searchValue: string) => {
   loadUserData(searchValue);
 };
 
+const ongGiftPersonSearch = (searchValue: string) => {
+  giftPersonSearch.value = searchValue;
+  giftCompanyPersonState.data = [];
+  console.log('Search:', searchValue);
+  loadGiftCompanyPersonData(searchValue);
+};
+
 const onGiftCompanySearch = (searchValue: string) => {
   giftCompanySearch.value = searchValue;
   giftCompanyState.data = [];
   giftCompanyState.fetching = true;
   console.log('Search:', searchValue);
   loadGiftCompanyData(searchValue);
+};
+
+const onGiftCompanyChange = (value: any) => {
+  console.log(`selected ${value}`);
+  giftCompanyState.value = value;
 };
 
 const ccApplyOptions = computed<SelectProps['options']>(() =>
@@ -99,17 +139,20 @@ const applyOptions = computed<MentionsProps['options']>(() =>
 );
 
 watch(
-  () => [userState.value, giftCompanyState.value],
-  ([newVal1, newVal2], [oldVal1, oldVal2]) => {
-    debugger;
+  () => [userState.value, giftCompanyState.value, giftCompanyPersonState.value],
+  ([newVal1, newVal2, newVal3], [oldVal1, oldVal2, oldVal3]) => {
     console.log('newVal1:', newVal1);
     console.log('newVal2:', newVal2);
+    console.log('newVal3:', newVal2);
     console.log('oldVal1:', oldVal1);
     console.log('oldVal2:', oldVal2);
+    console.log('oldVal3:', oldVal2);
     userState.data = [];
     userState.fetching = false;
     giftCompanyState.data = [];
     giftCompanyState.fetching = false;
+    giftCompanyPersonState.data = [];
+    giftCompanyPersonState.fetching = false;
   }
 );
 
@@ -269,7 +312,7 @@ const formState_apply = reactive({
       <a-descriptions-item label="DIVISION">PH</a-descriptions-item>
     </a-descriptions>
 
-    <a-form :model="formState_apply" :validate-messages="validateMessages">
+    <a-form :model="formState_apply">
       <a-row :gutter="24">
         <a-col span="10">
           <a-form-item :name="['apply', 'name']" label="申请人" :rules="[{ required: true }]">
@@ -380,12 +423,11 @@ const formState_apply = reactive({
               :default-active-first-option="false"
               :filter-option="false"
               @search="onGiftCompanySearch"
+              @change="onGiftCompanyChange"
             >
-              <template v-for="item in giftCompanyState.data" :key="item.id">
-                <a-select-option value="{{item.companyName}}">
-                  {{ item.companyName }}
-                </a-select-option>
-              </template>
+              <a-select-option v-for="item in giftCompanyState.data" :key="item.id" :value="item.id">
+                {{ item.companyName }}
+              </a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -393,13 +435,11 @@ const formState_apply = reactive({
       <a-row :gutter="24">
         <a-col span="24">
           <a-form-item name="['apply', 'given_person']" label="接收者姓名" :rules="[{ required: true }]">
-            <a-select
-              mode="multiple"
-              style="width: 100%"
-              placeholder="请选择"
-              :options="given_person_options"
-              @change="cc_handleChange"
-            ></a-select>
+            <a-select mode="multiple" style="width: 100%" placeholder="请选择" @search="ongGiftPersonSearch">
+              <a-select-option v-for="item in giftCompanyPersonState.data" :key="item.id" :value="item.id">
+                {{ item.personName }}
+              </a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
       </a-row>

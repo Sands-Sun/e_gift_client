@@ -6,6 +6,13 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash-es';
 import type { UnwrapRef } from 'vue';
+import { useAuthStore } from '@/store/modules/auth';
+import { $t } from '@/locales';
+
+const authStore = useAuthStore();
+const userInfo = authStore.userInfo;
+const supervisorInfo = userInfo.supervisor;
+
 const open = ref<boolean>(false);
 const size = ref<DrawerProps['size']>('default');
 const showDrawer = (val: DrawerProps['size']) => {
@@ -251,11 +258,13 @@ const formState_apply = reactive({
 <template>
   <a-drawer title="接受礼品申请" :size="size" width="800" :open="open" @close="onClose">
     <a-descriptions title="申请人信息">
-      <a-descriptions-item label="填表人">Anna Lee</a-descriptions-item>
-      <a-descriptions-item label="员工号">06568804</a-descriptions-item>
-      <a-descriptions-item label="部门">SCM Compliance & Risk Mgmt</a-descriptions-item>
-      <a-descriptions-item label="主管">Zhuo Chen</a-descriptions-item>
-      <a-descriptions-item label="成本中心">HL20639010</a-descriptions-item>
+      <a-descriptions-item label="填表人">{{ userInfo.firstName }} {{ userInfo.lastName }}</a-descriptions-item>
+      <a-descriptions-item label="员工号">{{ userInfo.employeeId }}</a-descriptions-item>
+      <a-descriptions-item label="部门">{{ userInfo.orgTxt }}</a-descriptions-item>
+      <a-descriptions-item label="主管">
+        {{ supervisorInfo.firstName }} {{ supervisorInfo.lastName }}
+      </a-descriptions-item>
+      <a-descriptions-item label="成本中心">{{ userInfo.costCenter }}</a-descriptions-item>
       <a-descriptions-item label="DIVISION">PH</a-descriptions-item>
     </a-descriptions>
 
@@ -284,26 +293,23 @@ const formState_apply = reactive({
         </a-col>
       </a-row>
     </a-form>
-    <a-descriptions title="礼品信息" layout="vertical">
-      <a-descriptions-item label="礼品必须符合以下所有情况" :span="3">
-        - 有形的
-        <br />
-        - 象征性的
-        <br />
-        - 偶尔的 (每年最多从每个客户接受2次)
-        <br />
-        - 符合惯例的
-      </a-descriptions-item>
-      <a-descriptions-item label="礼品不能包含以下任意一种情况" :span="3">
-        - 现金
-        <br />
-        - 现金券或现金等价物
-        <br />
-        - 通过中间人赠予
-        <br />
-        - 为了换取好处而赠予
-        <br />
-        - 影响或意图影响Bayer员工做出决策/给予优待或好处
+    <a-descriptions :title="$t('page.receivingGifts.policy.title')" layout="vertical">
+      <a-descriptions-item
+        v-for="(item, index) in $tm(`page.receivingGifts.policy.desc_${userInfo.companyCode}`)"
+        :key="index"
+        :span="3"
+        :label="item.label"
+      >
+        <ul>
+          <li v-for="(detail, subIndex) in item.items">
+            - {{ detail.value }}
+            <template v-if="detail.items.length > 0">
+              <li v-for="(subDetail, subIndex) in detail.items">
+                &nbsp; &nbsp; {{ subIndex + 1 }} ) {{ subDetail.value }}
+              </li>
+            </template>
+          </li>
+        </ul>
       </a-descriptions-item>
     </a-descriptions>
     <a-form>

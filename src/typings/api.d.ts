@@ -10,6 +10,38 @@ declare namespace Api {
    * Backend api module: "auth"
    */
 
+  namespace Gifts {
+    interface GiftCompany {
+      id: number;
+      companyName: string;
+      description: string;
+    }
+
+    interface ReceivingGifts {
+      applicationId: string;
+      costCenter: string;
+      createdDate: string;
+      department: string;
+      employeeLe: string;
+      estimatedTotalValue: number;
+      isExcluded: string;
+      isHandedOver: string;
+      isInvolved: string;
+      markDeleted: string;
+    }
+
+    interface GivingGifts {
+      applicationId: string;
+      costCenter: string;
+      createdDate: string;
+      department: string;
+      employeeLe: string;
+      reference: string;
+      isExcluded: string;
+      markDeleted: string;
+    }
+  }
+
   namespace Auth {
     interface LoginToken {
       token: string;
@@ -24,6 +56,14 @@ declare namespace Api {
       sfUserId: string;
       firstName: string;
       lastName: string;
+      email: string;
+      cwid: string;
+      companyCode: string;
+      costCenter: string;
+      employeeId: string;
+      orgTxt: string;
+      positionTxt: string;
+      supervisor: UserInfo;
       roles: string[];
     }
   }

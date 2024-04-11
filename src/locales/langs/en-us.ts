@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'E-Grift System'
+    title: 'E-Gift System'
   },
   common: {
     tip: 'Tip',
@@ -226,6 +226,286 @@ const local: App.I18n.Schema = {
         desc5: 'Soybean just wrote some of the workbench pages casually, and it was enough to see!'
       },
       creativity: 'Creativity'
+    },
+    givingGifts: {
+      policy: {
+        title: 'Policy Reminder',
+        desc_1954: [
+          {
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'Pharmaceuticals to provide any gifts allowed by Compliance policy other than Promotional Aids and Medical Utility Items to a Third Party. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general.',
+                items: []
+              },
+              {
+                value:
+                  'Consumer Health to provide any gifts allowed by Compliance policy other than Promotional Aids, Medical Utility Items, Consumer Gifts and Cultural Courtesy Gifts for distributors. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general. ',
+                items: []
+              },
+              {
+                value:
+                  'Consumer Health to provide Cultural Courtesy Gifts allowed by Compliance policy to its distributors under exceptional situations. (In the case of providing Cultural Courtesy Gifts to several distributors at one time, the Requester should make records in the eGift system by each distributor.)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees giving Gift(s) to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                items: []
+              }
+            ]
+          }
+        ],
+        desc_1955: [
+          {
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'Pharmaceuticals to provide any gifts allowed by Compliance policy other than Promotional Aids and Medical Utility Items to a Third Party. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general.',
+                items: []
+              },
+              {
+                value:
+                  'Consumer Health to provide any gifts allowed by Compliance policy other than Promotional Aids, Medical Utility Items, Consumer Gifts and Cultural Courtesy Gifts for distributors. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general. ',
+                items: []
+              },
+              {
+                value:
+                  'Consumer Health to provide Cultural Courtesy Gifts allowed by Compliance policy to its distributors under exceptional situations. (In the case of providing Cultural Courtesy Gifts to several distributors at one time, the Requester should make records in the eGift system by each distributor.)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees giving Gift(s) to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                items: []
+              }
+            ]
+          }
+        ],
+        desc_1391: [
+          {
+            label: 'Note',
+            items: [
+              {
+                value: 'Only gifts and hospitality with non-promotion nature shall be pre-applied in eGift system.',
+                items: []
+              },
+              { value: 'If unit price is less than RMB 300, no approval is needed. ', items: [] },
+              {
+                value:
+                  'If unit price is more than RMB 300 (including 300), approvals from Department Head, BCS Country Head and Compliance are needed.',
+                items: []
+              },
+              {
+                value:
+                  'For gifts or hospitality offered to state personnel, approval from Compliance is always needed.',
+                items: []
+              }
+            ]
+          }
+        ],
+        desc_0813: [
+          {
+            label: 'Note',
+            items: [
+              { value: 'If total value is less than RMB 300, no approval is needed.', items: [] },
+              { value: "If total value is between RMB 300 and RMB 500, line manager's approval is needed.", items: [] },
+              {
+                value:
+                  'If total value is more than RMB 500 or recipient is government official or employee of state owned company, approval of line manager and subgroup compliance officer is needed. ',
+                items: []
+              },
+              { value: 'Please make one request for each company you are giving gifts to.', items: [] }
+            ]
+          }
+        ],
+        desc_0882: [
+          {
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'Pharmaceuticals to provide any gifts allowed by Compliance policy other than Promotional Aids and Medical Utility Items to a Third Party. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general.',
+                items: []
+              },
+              {
+                value:
+                  'Consumer Health to provide any gifts allowed by Compliance policy other than Promotional Aids, Medical Utility Items, Consumer Gifts and Cultural Courtesy Gifts for distributors. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general.',
+                items: []
+              },
+              {
+                value:
+                  'Consumer Health to provide Cultural Courtesy Gifts allowed by Compliance policy to its distributors under exceptional situations. (In the case of providing Cultural Courtesy Gifts to several distributors at one time, the Requester should make records in the eGift system by each distributor.) ',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees giving Gift(s) to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners) ',
+                items: []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    receivingGifts: {
+      policy: {
+        title: 'Policy Reminder',
+        desc_1954: [
+          {
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'Please noted, only Gift(s) received from a Third Party are registered and recorded in eGift system ',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees receiving Gift(s) from a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Regulation',
+            items: [
+              {
+                value:
+                  'Employees may accept and keep Gifts offered or granted by a Third Party when all the following conditions are met',
+                items: [
+                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)' },
+                  { value: 'On an occasional basis (<=2 times per year from one Third Party)' },
+                  { value: 'In accordance with local cultural courtesy customs' }
+                ]
+              },
+              {
+                value:
+                  'If an employee receives a Gift with > CNY 300 value or unknown value, he/she should politely refuse it. When failing to refuse the Gift due to courtesy reasons, the employee should follow the following process',
+                items: [
+                  { value: 'The employee should directly notify his/her supervisor and Compliance team' },
+                  {
+                    value:
+                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team'
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        desc_1955: [
+          {
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'Please noted, only Gift(s) received from a Third Party are registered and recorded in eGift system ',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees receiving Gift(s) from a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Regulation',
+            items: [
+              {
+                value:
+                  'Employees may accept and keep Gifts offered or granted by a Third Party when all the following conditions are met',
+                items: [
+                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)' },
+                  { value: 'On an occasional basis (<=2 times per year from one Third Party)' },
+                  { value: 'In accordance with local cultural courtesy customs' }
+                ]
+              },
+              {
+                value:
+                  'If an employee receives a Gift with > CNY 300 value or unknown value, he/she should politely refuse it. When failing to refuse the Gift due to courtesy reasons, the employee should follow the following process',
+                items: [
+                  { value: 'The employee should directly notify his/her supervisor and Compliance team' },
+                  {
+                    value:
+                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team'
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        desc_0882: [
+          {
+            label: '请注意，此处用于登记和记录',
+            items: [{ value: '此处仅登记及记录接受自第三方的礼品', items: [] }]
+          }
+        ],
+        desc_0813: [
+          {
+            label: '请注意，此处用于登记和记录',
+            items: [{ value: '此处仅登记及记录接受自第三方的礼品', items: [] }]
+          }
+        ],
+        desc_1391: [
+          {
+            label: '请注意，此处用于登记和记录',
+            items: [{ value: '此处仅登记及记录接受自第三方的礼品', items: [] }]
+          }
+        ]
+      }
     },
     function: {
       tab: {

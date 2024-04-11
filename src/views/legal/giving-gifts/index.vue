@@ -1,42 +1,121 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
+import { usePagination } from 'vue-request';
 import type { SelectProps } from '@ant-design/icons-vue';
 import type { DrawerProps, FormInstance, TableColumnsType } from 'ant-design-vue';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, debounce } from 'lodash-es';
 import type { UnwrapRef } from 'vue';
-const open = ref<boolean>(false);
-const size = ref<DrawerProps['size']>('default');
-const showDrawer = (val: DrawerProps['size']) => {
-  size.value = val;
-  open.value = true;
-};
-
-const onClose = () => {
-  open.value = false;
-};
+import { anyType } from 'ant-design-vue/es/_util/type';
+import { $t } from '@/locales';
+import { fetchGivingGiftsList, fuzzySearchGiftCompanyList, fuzzySearchUserList } from '@/service/api';
+import { useAuthStore } from '@/store/modules/auth';
+import type { MentionsProps } from '..';
+const authStore = useAuthStore();
+const userInfo = authStore.userInfo;
+const supervisorInfo = userInfo.supervisor;
 const expand = ref(true);
 const formRef = ref<FormInstance>();
 const formState = reactive({});
 const value1 = ref();
 const value2 = ref();
 const dateValue = ref<[Dayjs, Dayjs]>();
-const options1 = ref<SelectProps['options']>([
-  {
-    value: 'draft',
-    label: '草稿'
-  },
-  {
-    value: 'in-progress',
-    label: '处理中'
-  },
-  {
-    value: 'complete',
-    label: '完成'
-    // disabled: true
+const open = ref<boolean>(false);
+const size = ref<DrawerProps['size']>('default');
+const showDrawer = (val: DrawerProps['size']) => {
+  size.value = val;
+  open.value = true;
+};
+const applySearch = ref<string>('');
+const giftCompanySearch = ref<string>('');
+const userState = reactive({ data: [] as any, value: [] as any, ccValue: [] as any, fetching: true });
+const giftCompanyState = reactive({ data: [] as any, value: [] as any, fetching: true });
+const loadGiftCompanyData = debounce(async (keyword: string) => {
+  if (!keyword) {
+    giftCompanyState.data = [];
   }
-]);
+  const { data: items, error } = await fuzzySearchGiftCompanyList(keyword);
+  if (!error) {
+    console.log('giftCompanyInfo:', items);
+    if (giftCompanySearch.value !== keyword) {
+      return;
+    }
+    giftCompanyState.data = items;
+    if (giftCompanyState.data.length === 0) {
+      console.log('push new key:', keyword);
+      giftCompanyState.data.push({ companyName: keyword });
+    }
+
+    giftCompanyState.fetching = false;
+    console.log('giftCompanyState: ', giftCompanyState);
+  }
+});
+
+const loadUserData = debounce(async (keyword: string) => {
+  if (!keyword) {
+    userState.data = [];
+  }
+  const { data: items, error } = await fuzzySearchUserList(keyword);
+  if (!error) {
+    console.log('userInfo:', items);
+    if (applySearch.value !== keyword) {
+      return;
+    }
+    userState.data = items;
+    userState.fetching = false;
+    console.log('users: ', userState);
+  }
+}, 800);
+
+const onApplySearch = (searchValue: string) => {
+  applySearch.value = searchValue;
+  userState.data = [];
+  userState.fetching = true;
+  console.log('Search:', searchValue);
+  loadUserData(searchValue);
+};
+
+const onGiftCompanySearch = (searchValue: string) => {
+  giftCompanySearch.value = searchValue;
+  giftCompanyState.data = [];
+  giftCompanyState.fetching = true;
+  console.log('Search:', searchValue);
+  loadGiftCompanyData(searchValue);
+};
+
+const ccApplyOptions = computed<SelectProps['options']>(() =>
+  userState.data.map((user: any) => ({
+    label: `${user.firstName} ${user.lastName} <${user.email}>`,
+    value: user.email
+  }))
+);
+
+const applyOptions = computed<MentionsProps['options']>(() =>
+  userState.data.map((user: any) => ({
+    label: `${user.firstName} ${user.lastName} <${user.email}>`,
+    value: user.email
+  }))
+);
+
+watch(
+  () => [userState.value, giftCompanyState.value],
+  ([newVal1, newVal2], [oldVal1, oldVal2]) => {
+    debugger;
+    console.log('newVal1:', newVal1);
+    console.log('newVal2:', newVal2);
+    console.log('oldVal1:', oldVal1);
+    console.log('oldVal2:', oldVal2);
+    userState.data = [];
+    userState.fetching = false;
+    giftCompanyState.data = [];
+    giftCompanyState.fetching = false;
+  }
+);
+
+const onClose = () => {
+  open.value = false;
+};
 
 const columns: TableColumnsType = [
   { title: '申请者', width: 100, dataIndex: 'apply', key: 'apply', fixed: 'left' },
@@ -53,6 +132,20 @@ const columns: TableColumnsType = [
     width: 100
   }
 ];
+
+// const pagination = computed(() => ({
+//   total: 200,
+//   current: current.value,
+//   pageSize: pageSize.value
+// }));
+
+// type queryParam = {
+//   currentPage?:number;
+// }
+
+// const queryData = (params: queryParam){
+//   return await fetchGivingGiftsList(params);
+// }
 
 interface DataItem {
   apply: string;
@@ -120,89 +213,6 @@ const given_person_options = ref<SelectProps['options']>([
   }
 ]);
 
-const apply_cc_options = ref<SelectProps['options']>([
-  {
-    value: 'zs',
-    label: 'Zhuo Chen <chen.zhuo@bayer.com>'
-  },
-  {
-    value: 'sunz',
-    label: 'Sun Zhe <sun.zhe@bayer.com>'
-  },
-  {
-    value: 'CHTLL',
-    label: 'Taili Lin <taili.lin@bayer.com>'
-  },
-  {
-    value: 'sy',
-    label: 'Suqin Yang <suqin.yang@bayer.com>'
-  },
-  {
-    value: 'lz',
-    label: 'Li Zhang <LI.ZHANG7@BAYER.COM>'
-  },
-  {
-    value: 'zu',
-    label: 'Zhenguo	You <ZHENGUO.YOU@BAYER.COM>'
-  },
-  {
-    value: 'jg',
-    label: 'Jingquan Guo <jingquan.guo@bayer.com>'
-  }
-]);
-
-const apply_options = ref<SelectProps['options']>([
-  {
-    value: 'zs',
-    label: 'Zhuo Chen <chen.zhuo@bayer.com>'
-  },
-  {
-    value: 'sunz',
-    label: 'Sun Zhe <sun.zhe@bayer.com>'
-  },
-  {
-    value: 'CHTLL',
-    label: 'Taili Lin <taili.lin@bayer.com>'
-  },
-  {
-    value: 'sy',
-    label: 'Suqin Yang <suqin.yang@bayer.com>'
-  },
-  {
-    value: 'lz',
-    label: 'Li Zhang <LI.ZHANG7@BAYER.COM>'
-  },
-  {
-    value: 'zy',
-    label: 'Zhenguo	You <ZHENGUO.YOU@BAYER.COM>'
-  },
-  {
-    value: 'jg',
-    label: 'Jingquan Guo <jingquan.guo@bayer.com>'
-  }
-]);
-
-const options2 = ref<SelectProps['options']>([
-  {
-    value: 'rejected',
-    label: 'Rejected'
-  },
-  {
-    value: 'documented',
-    label: 'Documented'
-  },
-  {
-    value: 'cancelled',
-    label: 'Cancelled'
-    // disabled: true
-  },
-  {
-    value: 'approved',
-    label: 'Approved'
-    // disabled: true
-  }
-]);
-
 const onFinish = (values: any) => {
   console.log('Received values of form: ', values);
   console.log('formState: ', formState);
@@ -214,10 +224,6 @@ const focus = () => {
 
 const handleChange = (value: string) => {
   console.log(`selected ${value}`);
-};
-
-const apply_handleChange: SelectProps['onChange'] = value => {
-  console.log(value); // { key: "lucy", label: "Lucy (101)" }
 };
 
 const disabledDate = (current: Dayjs) => {
@@ -232,17 +238,6 @@ const cc_handleChange = (value: string[]) => {
 // const provide_date = ref<Dayjs>();
 
 const tex_value = ref<string>('');
-
-const validateMessages = {
-  required: '${label} is required!',
-  types: {
-    email: '${label} is not a valid email!',
-    number: '${label} is not a valid number!'
-  },
-  number: {
-    range: '${label} must be between ${min} and ${max}'
-  }
-};
 
 const formState_apply = reactive({
   apply: {
@@ -264,11 +259,13 @@ const formState_apply = reactive({
 <template>
   <a-drawer title="给予礼品申请表" :size="size" width="800" :open="open" @close="onClose">
     <a-descriptions title="申请人信息">
-      <a-descriptions-item label="填表人">Anna Lee</a-descriptions-item>
-      <a-descriptions-item label="员工号">06568804</a-descriptions-item>
-      <a-descriptions-item label="部门">SCM Compliance & Risk Mgmt</a-descriptions-item>
-      <a-descriptions-item label="主管">Zhuo Chen</a-descriptions-item>
-      <a-descriptions-item label="成本中心">HL20639010</a-descriptions-item>
+      <a-descriptions-item label="填表人">{{ userInfo.firstName }} {{ userInfo.lastName }}</a-descriptions-item>
+      <a-descriptions-item label="员工号">{{ userInfo.employeeId }}</a-descriptions-item>
+      <a-descriptions-item label="部门">{{ userInfo.orgTxt }}</a-descriptions-item>
+      <a-descriptions-item label="主管">
+        {{ supervisorInfo.firstName }} {{ supervisorInfo.lastName }}
+      </a-descriptions-item>
+      <a-descriptions-item label="成本中心">{{ userInfo.costCenter }}</a-descriptions-item>
       <a-descriptions-item label="DIVISION">PH</a-descriptions-item>
     </a-descriptions>
 
@@ -277,41 +274,57 @@ const formState_apply = reactive({
         <a-col span="10">
           <a-form-item :name="['apply', 'name']" label="申请人" :rules="[{ required: true }]">
             <a-select
-              v-model:value="formState_apply.apply.name"
+              placeholder="请选择"
+              show-search
               label-in-value
-              :options="apply_options"
-              @change="apply_handleChange"
-            ></a-select>
+              :allow-clear="true"
+              :not-found-content="userState.fetching ? null : undefined"
+              :options="applyOptions"
+              @search="onApplySearch"
+            >
+              <!--
+ <template v-for="item in userState.data" :key="item.sfUserId">
+                <a-select-option value="{{item.sfUserId}}">
+                  {{ item.firstName }} {{ item.lastName }} {{ item.email }}
+                </a-select-option>
+              </template>
+-->
+            </a-select>
           </a-form-item>
         </a-col>
         <a-col span="14">
           <a-form-item :name="['apply', 'cc_name']" label="抄送">
             <a-select
               mode="multiple"
-              style="width: 100%"
+              :default-active-first-option="false"
+              :allow-clear="true"
+              :not-found-content="userState.fetching ? null : undefined"
+              :filter-option="false"
               placeholder="请选择"
-              :options="apply_cc_options"
-              @change="cc_handleChange"
+              :options="ccApplyOptions"
+              @search="onApplySearch"
             ></a-select>
           </a-form-item>
         </a-col>
       </a-row>
     </a-form>
-    <a-descriptions title="政策提示" layout="vertical">
-      <a-descriptions-item label="请注意，此处用于登记和记录：" :span="3">
-        - 此处仅登记及记录提供给第三方的礼品
-        <br />
-        - 此处仅登记及记录除品牌提示物、医用物品和消费者促销礼品以外的其他礼品
-        <br />
-        -
-        此处用于登记和记录向第三方提供公司合规政策明确允许的针对处方药事业部、健康消费品事业部的品牌提示物、医用物品，以及仅针对健康消费品事业部的消费者促销礼品、风俗礼品（少数情形）之外的其他礼品。该类其他礼品可以视个例的具体情形（如出于礼节提供象征性、非贵重的礼品）给予允许，但必须得到拜耳中国合规总监的事先批准。请注意销售、市场团队一般不得提供该类其他礼品。
-        <br />
-      </a-descriptions-item>
-      <a-descriptions-item label="原则： " :span="3">
-        员工提供给第三方礼品，应禁止索取、禁止不当影响、避免利益冲突、禁止现金或现金等价物、禁止私人利益
-        <br />
-        （第三方包括但不限于医疗卫生专业人士、政府官员、经销商及其他业务合作方）
-        <br />
+    <a-descriptions :title="$t('page.givingGifts.policy.title')" layout="vertical">
+      <a-descriptions-item
+        v-for="(item, index) in $tm(`page.givingGifts.policy.desc_${userInfo.companyCode}`)"
+        :key="index"
+        :span="3"
+        :label="item.label"
+      >
+        <ul>
+          <li v-for="detail in item.items" :key="detail">
+            - {{ detail.value }}
+            <template v-if="detail.items.length > 0">
+              <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail">
+                &nbsp; &nbsp; {{ subIndex + 1 }} ) {{ subDetail.value }}
+              </li>
+            </template>
+          </li>
+        </ul>
       </a-descriptions-item>
     </a-descriptions>
 
@@ -342,12 +355,12 @@ const formState_apply = reactive({
         </a-col>
         <a-col span="5">
           <a-form-item :name="['apply', 'gift_unit_price']" label="单价" :rules="[{ required: true }]">
-            <a-input v-model:value="formState_apply.apply.gift_unit_price" placeholder="请输入申请编号..."></a-input>
+            <a-input v-model:value="formState_apply.apply.gift_unit_price" placeholder="请输入单价..."></a-input>
           </a-form-item>
         </a-col>
         <a-col span="5">
           <a-form-item name="['apply', 'gift_volume']" label="数量" :rules="[{ required: true }]">
-            <a-input v-model:value="formState_apply.apply.gift_volume" placeholder="请输入申请编号..."></a-input>
+            <a-input v-model:value="formState_apply.apply.gift_volume" placeholder="请输入数量..."></a-input>
           </a-form-item>
         </a-col>
         <a-col span="6">
@@ -360,15 +373,19 @@ const formState_apply = reactive({
         <a-col span="24">
           <a-form-item name="['apply', 'given_company']" label="接收单位名称" :rules="[{ required: true }]">
             <a-select
-              ref="select"
-              v-model:value="formState_apply.apply.given_company"
-              @focus="focus"
-              @change="handleChange"
+              placeholder="请选择"
+              show-search
+              :allow-clear="true"
+              :not-found-content="giftCompanyState.fetching ? null : undefined"
+              :default-active-first-option="false"
+              :filter-option="false"
+              @search="onGiftCompanySearch"
             >
-              <a-select-option value="fs">Dachengxiaoshi Guanggao</a-select-option>
-              <a-select-option value="lucy">Beijign Heping Hotel Co.,Ltd</a-select-option>
-              <!-- <a-select-option value="disabled" disabled>Disabled</a-select-option> -->
-              <!-- <a-select-option value="Yiminghe">yiminghe</a-select-option> -->
+              <template v-for="item in giftCompanyState.data" :key="item.id">
+                <a-select-option value="{{item.companyName}}">
+                  {{ item.companyName }}
+                </a-select-option>
+              </template>
             </a-select>
           </a-form-item>
         </a-col>
@@ -473,24 +490,21 @@ const formState_apply = reactive({
         <a-row :gutter="35">
           <a-col span="4">
             <a-form-item label="类型">
-              <a-select
-                ref="select"
-                v-model:value="value1"
-                :options="options1"
-                @focus="focus"
-                @change="handleChange"
-              ></a-select>
+              <a-select ref="select" v-model:value="value1" @focus="focus" @change="handleChange">
+                <a-select-option value="draft">草稿</a-select-option>
+                <a-select-option value="in-progress">处理钟</a-select-option>
+                <a-select-option value="complete">完成</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col span="5">
             <a-form-item label="状态">
-              <a-select
-                ref="select"
-                v-model:value="value2"
-                :options="options2"
-                @focus="focus"
-                @change="handleChange"
-              ></a-select>
+              <a-select ref="select" v-model:value="value2" @focus="focus" @change="handleChange">
+                <a-select-option value="rejected">Rejected</a-select-option>
+                <a-select-option value="documented">Documented</a-select-option>
+                <a-select-option value="cancelled">Cancelled</a-select-option>
+                <a-select-option value="approved">Approved</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col span="10">
@@ -541,5 +555,10 @@ const formState_apply = reactive({
 }
 .table_list:hover {
   overflow-x: scroll;
+}
+.antd-demo-dynamic-option img {
+  width: 20px;
+  height: 20px;
+  margin-right: 0px;
 }
 </style>

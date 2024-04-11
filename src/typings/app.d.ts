@@ -242,6 +242,16 @@ declare namespace App {
       invalid: string;
     };
 
+    type PolicyDesc = {
+      label: string;
+      items: Array<PolicyDescItem>;
+    };
+
+    type PolicyDescItem = {
+      value: string;
+      items: Array<any> | unknown;
+    };
+
     type Schema = {
       system: {
         title: string;
@@ -399,6 +409,26 @@ declare namespace App {
             desc5: string;
           };
           creativity: string;
+        };
+        givingGifts: {
+          policy: {
+            title: string;
+            desc_1954: Array<PolicyDesc>;
+            desc_1955: Array<PolicyDesc>;
+            desc_0813: Array<PolicyDesc>;
+            desc_0882: Array<PolicyDesc>;
+            desc_1391: Array<PolicyDesc>;
+          };
+        };
+        receivingGifts: {
+          policy: {
+            title: string;
+            desc_1954: Array<PolicyDesc>;
+            desc_1955: Array<PolicyDesc>;
+            desc_0813: Array<PolicyDesc>;
+            desc_0882: Array<PolicyDesc>;
+            desc_1391: Array<PolicyDesc>;
+          };
         };
         function: {
           tab: {

@@ -38,7 +38,7 @@ export function fetchReceivingGiftsList(queryParam: any) {
 }
 
 export function fetchGivingGiftsList(queryParam: any) {
-  return request<Api.Gifts.GivingGifts>({
+  return request<Api.Gifts.TableListResponse>({
     url: api_url.giving_gifts_list,
     method: 'post',
     data: queryParam

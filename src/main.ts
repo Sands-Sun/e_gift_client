@@ -6,6 +6,7 @@ import { setupRouter } from './router';
 import { setupI18n } from './locales';
 import App from './App.vue';
 
+
 async function setupApp() {
   setupLoading();
 
@@ -16,7 +17,6 @@ async function setupApp() {
   setupDayjs();
 
   const app = createApp(App);
-
   setupStore(app);
 
   await setupRouter(app);

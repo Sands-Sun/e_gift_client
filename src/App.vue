@@ -5,6 +5,7 @@ import { useAppStore } from './store/modules/app';
 import { useThemeStore } from './store/modules/theme';
 import { antdLocales } from './locales/antd';
 
+
 defineOptions({
   name: 'App'
 });
@@ -20,7 +21,10 @@ const antdLocale = computed(() => {
 <template>
   <ConfigProvider :theme="themeStore.antdTheme" :locale="antdLocale">
     <AppProvider>
-      <RouterView class="bg-layout" />
+      <suspense>
+        <RouterView class="bg-layout" />
+      </suspense>
+
     </AppProvider>
   </ConfigProvider>
 </template>

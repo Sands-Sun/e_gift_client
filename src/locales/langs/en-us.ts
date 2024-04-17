@@ -381,6 +381,48 @@ const local: App.I18n.Schema = {
       }
     },
     receivingGifts: {
+      applyForm: {
+        unitPrice: 'Unit Price',
+        unitPrice_validation: 'please input estimated unit price',
+        quantity: 'Quantity',
+        quantity_validation: 'please input quantity',
+        totalPrice: 'Total Value',
+        totalPrice_validation: 'please input estimated total value',
+        remark: 'Remark (Please fill in with the detailed Gift name)',
+        remark_validation: 'please input remark',
+        giftGiverCompanyName: 'Name of giver company',
+        giftGiverCompanyName_validation: 'please input name of giver company',
+        giftGiverEmployeeName: 'Name of giver',
+        giftGiverEmployeeName_validation: 'please input giver name',
+        giftGiverTitle: 'Title of giver',
+        giftGiverTitle_validation: 'please input title of giver',
+        giftApplyName_validation: 'please select applicant',
+        giftReceivingDate: 'Receiving Date',
+        giftReceivingDate_validation: 'please select receiving date',
+        giftOverallReason: 'Do you know the overall price of the gift(s)?',
+        giftOverallReason_validation: 'please select whether you know the overall price of the gift(s)',
+        giftOverallPrice: 'Overall price of the gift(s)',
+        giftReason_label_0813: 'Why was this gift given to you? ',
+        giftReason_label_1391: 'Why was this gift given to you? ',
+        giftReason_label_0882:
+          'Why was the gift(s) given to you?(e.g. daily business need, attend business activities etc.) ',
+        giftReason_label_1954:
+          'Why was the gift(s) given to you?(e.g. daily business need, attend business activities etc.) ',
+        giftReason_label_1955:
+          'Why was the gift(s) given to you?(e.g. daily business need, attend business activities etc.) ',
+        giftReason_label_validation: 'please input the reson',
+        giftDesc_label: 'Gift Description',
+        giftDesc_label_validation: 'please input gift description',
+        giftDesc_type_label: 'gift description type',
+        giftBayerCoustomer_label_0813:
+          'Are you going to hand over this gift to the Subgroup Compliance Officer? \n A gift or set of gifts valued in RMB300 or more must be handed over to him/her. Yes No Not Applicable',
+        giftBayerCoustomer_label_1391:
+          'Are you going to hand over this gift to the Subgroup Compliance Officer? \n A gift or set of gifts valued in RMB300 or more must be handed over to him/her. Yes No Not Applicable',
+        giftBayerCoustomer_label_0882: 'Are you going to hand over the gift to Compliance team?',
+        giftBayerCoustomer_label_1954: 'Are you going to hand over the gift to Compliance team?',
+        giftBayerCoustomer_label_1955: 'Are you going to hand over the gift to Compliance team?',
+        giftBayerCoustomer_validation: 'please select whethergoing to hand over the gift to Compliance team '
+      },
       policy: {
         title: 'Policy Reminder',
         desc_1954: [
@@ -489,20 +531,104 @@ const local: App.I18n.Schema = {
         ],
         desc_0882: [
           {
-            label: '请注意，此处用于登记和记录',
-            items: [{ value: '此处仅登记及记录接受自第三方的礼品', items: [] }]
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'Please noted, only Gift(s) received from a Third Party are registered and recorded in eGift system ',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees receiving Gift(s) from a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Regulation',
+            items: [
+              {
+                value:
+                  'Employees may accept and keep Gifts offered or granted by a Third Party when all the following conditions are met',
+                items: [
+                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)' },
+                  { value: 'On an occasional basis (<=2 times per year from one Third Party)' },
+                  { value: 'In accordance with local cultural courtesy customs' }
+                ]
+              },
+              {
+                value:
+                  'If an employee receives a Gift with > CNY 300 value or unknown value, he/she should politely refuse it. When failing to refuse the Gift due to courtesy reasons, the employee should follow the following process',
+                items: [
+                  { value: 'The employee should directly notify his/her supervisor and Compliance team' },
+                  {
+                    value:
+                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team'
+                  }
+                ]
+              }
+            ]
           }
         ],
         desc_0813: [
           {
-            label: '请注意，此处用于登记和记录',
-            items: [{ value: '此处仅登记及记录接受自第三方的礼品', items: [] }]
+            label: 'The gift shall fulfill all of the following criteria',
+            items: [
+              { value: 'Tangible', items: [] },
+              { value: 'Symbolic', items: [] },
+              { value: 'Occasional (MAX 2 per year from each client)', items: [] },
+              { value: 'Customary', items: [] }
+            ]
+          },
+          {
+            label: 'The Gift Must NOT be',
+            items: [
+              { value: 'Cash', items: [] },
+              { value: 'Cash Coupons or Cash Equivalents ', items: [] },
+              { value: 'Given by an Intermediary', items: [] },
+              { value: 'Given in return for a favor', items: [] },
+              {
+                value:
+                  'Influencing or designed to influence Bayer employee to make a decision/ grant an advantage or favour ',
+                items: []
+              }
+            ]
           }
         ],
         desc_1391: [
           {
-            label: '请注意，此处用于登记和记录',
-            items: [{ value: '此处仅登记及记录接受自第三方的礼品', items: [] }]
+            label: 'The gift shall fulfill all of the following criteria',
+            items: [
+              { value: 'Tangible', items: [] },
+              { value: 'Symbolic', items: [] },
+              { value: 'Occasional (MAX 2 per year from each client)', items: [] },
+              { value: 'Customary', items: [] }
+            ]
+          },
+          {
+            label: 'The Gift Must NOT be',
+            items: [
+              { value: 'Cash', items: [] },
+              { value: 'Cash Coupons or Cash Equivalents ', items: [] },
+              { value: 'Given by an Intermediary', items: [] },
+              { value: 'Given in return for a favor', items: [] },
+              {
+                value:
+                  'Influencing or designed to influence Bayer employee to make a decision/ grant an advantage or favour ',
+                items: []
+              }
+            ]
           }
         ]
       }
@@ -535,6 +661,17 @@ const local: App.I18n.Schema = {
     }
   },
   form: {
+    common: {
+      option_yes: 'Yes',
+      option_no: 'No',
+      option_not_Applicable: 'not Applicable',
+      option_giftReason_NewYear: 'Chinese New Year',
+      option_giftReason_Mid_Autumn: 'Mid-Autumn Festival',
+      option_giftReason_Other: 'Other',
+      option_giftDesc_Company_Branded_Gift: 'Company Branded Gift',
+      option_giftDesc_General_Gift: 'General Gift'
+    },
+
     userName: {
       required: 'Please enter user name',
       invalid: 'User name format is incorrect'

@@ -1,8 +1,5 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "never"
-  },
+
   "eslint.experimental.useFlatConfig": true,
   "editor.formatOnSave": false,
   "eslint.validate": ["html", "css", "scss", "json", "jsonc"],
@@ -13,5 +10,11 @@
   "i18n-ally.keystyle": "nested",
   "i18n-ally.localesPaths": ["src/locales/langs"],
   "prettier.enable": false,
-  "unocss.root": ["./"]
+  "editor.formatOnSave": true,
+  "editor.formatOnType": false,
+  "unocss.root": ["./"],
+  	"editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
+    }
 }

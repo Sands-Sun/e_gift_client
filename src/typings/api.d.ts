@@ -70,6 +70,7 @@ declare namespace Api {
       employeeId: string;
       orgTxt: string;
       positionTxt: string;
+      division: string;
       supervisor: UserInfo;
       roles: string[];
     }

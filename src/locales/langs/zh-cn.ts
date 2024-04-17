@@ -228,6 +228,46 @@ const local: App.I18n.Schema = {
       creativity: '创意'
     },
     receivingGifts: {
+      applyForm: {
+        unitPrice: '单价',
+        unitPrice_validation: '请输入单价',
+        quantity: '数量',
+        quantity_validation: '请输入数量',
+        totalPrice: '总价',
+        totalPrice_validation: '请输入总价',
+        remark: '备注（请填写具体礼品名称）',
+        remark_validation: '请输入礼品备注信息',
+        giftGiverCompanyName: '提供者单位名称',
+        giftGiverCompanyName_validation: '请输入提供者单位名称',
+        giftGiverEmployeeName: '提供者姓名',
+        giftGiverEmployeeName_validation: '请输入提供者姓名',
+        giftGiverTitle: '提供者职位',
+        giftGiverTitle_validation: '请输入提供者职位',
+        giftApplyName_validation: '请选择申请人',
+        giftReceivingDate: '接受日期',
+        giftReceivingDate_validation: '请选择接受日期',
+        giftOverallReason: '您是否知道礼品的价值? ',
+        giftOverallReason_validation: '请选择您是否知道礼品的价值',
+        giftOverallPrice: '礼品预估价值',
+        giftOverallPrice_validation: '请输入礼品预估价值',
+        giftReason_label_0813: '为什么要给你送礼? ',
+        giftReason_label_1391: '为什么要给你送礼? ',
+        giftReason_label_0882: '接受礼品原因?（如，日常商务往来，参加商务活动等）',
+        giftReason_label_1954: '接受礼品原因?（如，日常商务往来，参加商务活动等）',
+        giftReason_label_1955: '接受礼品原因?（如，日常商务往来，参加商务活动等）',
+        giftReason_label_validation: '请输入接受礼品原因',
+        giftDesc_label: '礼品描述',
+        giftDesc_label_validation: '请输入礼品描述',
+        giftDesc_type_label: '礼品描述类别',
+        giftBayerCoustomer_label_0813:
+          '你打算把这件礼品交给子集团合规负责人吗? 一件或一套价值RMB300元以上的礼品必须交给他/她。',
+        giftBayerCoustomer_label_1391:
+          '你打算把这件礼品交给子集团合规负责人吗? 一件或一套价值RMB300元以上的礼品必须交给他/她。',
+        giftBayerCoustomer_label_0882: '您将把接受到的礼品交予合规团队吗? ',
+        giftBayerCoustomer_label_1954: '您将把接受到的礼品交予合规团队吗? ',
+        giftBayerCoustomer_label_1955: '您将把接受到的礼品交予合规团队吗? ',
+        giftBayerCoustomer_validation: '请选择是否交予合规团队'
+      },
       policy: {
         title: '政策提示',
         desc_1954: [
@@ -308,26 +348,43 @@ const local: App.I18n.Schema = {
         ],
         desc_1391: [
           {
-            label: 'Note',
+            label: '礼品必须符合以下所有情况',
             items: [
-              { value: '仅非营销性质的礼品或招待须事先在eGift系统中申请。', items: [] },
-              { value: '如果单价小于人民币300元，无需审批。', items: [] },
-              { value: '如果单价高于人民币300元（含300元），须获得部门总监、国家经理及合规的审批。', items: [] },
-              { value: '向国家工作人员提供礼品和招待，均须获得合规的审批。', items: [] }
+              { value: '有形的', items: [] },
+              { value: '象征性的', items: [] },
+              { value: '偶尔的 (每年最多从每个客户接受2次) ', items: [] },
+              { value: '符合惯例的', items: [] }
+            ]
+          },
+          {
+            label: '礼品不能包含以下任意一种情况',
+            items: [
+              { value: '现金', items: [] },
+              { value: '现金券或现金等价物', items: [] },
+              { value: '通过中间人赠予', items: [] },
+              { value: '为了换取好处而赠予', items: [] },
+              { value: '影响或意图影响Bayer员工做出决策/给予优待或好处', items: [] }
             ]
           }
         ],
         desc_0813: [
           {
-            label: 'Note',
+            label: '礼品必须符合以下所有情况',
             items: [
-              { value: '如果礼品总价<300元，不需要批准', items: [] },
-              { value: '如果300元<=礼品总价<=500元之间，需要主管的批准。', items: [] },
-              {
-                value: '如果礼品总价>500元或者礼品接受者是政府官员或国有企业员工，需要主管和子集团和规官员的批准。',
-                items: []
-              },
-              { value: '如果需要为不同公司的人送礼的话，那么请另外起一个申请。', items: [] }
+              { value: '有形的', items: [] },
+              { value: '象征性的', items: [] },
+              { value: '偶尔的 (每年最多从每个客户接受2次) ', items: [] },
+              { value: '符合惯例的', items: [] }
+            ]
+          },
+          {
+            label: '礼品不能包含以下任意一种情况',
+            items: [
+              { value: '现金', items: [] },
+              { value: '现金券或现金等价物', items: [] },
+              { value: '通过中间人赠予', items: [] },
+              { value: '为了换取好处而赠予', items: [] },
+              { value: '影响或意图影响Bayer员工做出决策/给予优待或好处', items: [] }
             ]
           }
         ],
@@ -335,25 +392,38 @@ const local: App.I18n.Schema = {
         desc_0882: [
           {
             label: '请注意，此处用于登记和记录',
-            items: [
-              { value: '此处仅登记及记录提供给第三方的礼品', items: [] },
-              { value: '此处仅登记及记录除品牌提示物、医用物品和消费者促销礼品以外的其他礼品', items: [] },
-              {
-                value:
-                  '此处用于登记和记录向第三方提供公司合规政策明确允许的针对处方药事业部、健康消费品事业部的品牌提示物、医用物品，以及仅针对健康消费品事业部的消费者促销礼品、风俗礼品（少数情形）之外的其他礼品。该类其他礼品可以视个例的具体情形（如出于礼节提供象征性、非贵重的礼品）给予允许，但必须得到拜耳中国合规总监的事先批准。请注意销售、市场团队一般不得提供该类其他礼品。',
-                items: []
-              }
-            ]
+            items: [{ value: '此处仅登记及记录接受自第三方的礼品', items: [] }]
           },
           {
             label: '原则',
             items: [
               {
                 value:
-                  '员工提供给第三方礼品，应禁止索取、禁止不当影响、避免利益冲突、禁止现金或现金等价物、禁止私人利益',
+                  '员工接受来自第三方的礼品，应禁止索取、禁止不当影响、避免利益冲突、禁止现金或现金等价物、禁止私人利益',
                 items: []
               },
               { value: '（第三方包括但不限于医疗卫生专业人士、政府官员、经销商及其他业务合作方）', items: [] }
+            ]
+          },
+          {
+            label: '要求',
+            items: [
+              {
+                value: '员工接受和保留第三方提供的礼品必须满足以下所有条件：',
+                items: [
+                  { value: '名义或象征价值（单价 <= 300元人民币）' },
+                  { value: '偶尔接受（每年从同一个第三方接受礼品<=2次）' },
+                  { value: '符合当地文化风俗' }
+                ]
+              },
+              {
+                value:
+                  '如果员工收到价值>300元人民币或未知价值的礼品，应委婉谢绝。若由于礼节原因不便拒绝，应遵守以下要求',
+                items: [
+                  { value: '员工应通知其直接上级和合规团队' },
+                  { value: '员工应将礼品交给合规团队，或在得到合规团队确认后与所在部门或团队分享' }
+                ]
+              }
             ]
           }
         ]
@@ -493,6 +563,17 @@ const local: App.I18n.Schema = {
     }
   },
   form: {
+    common: {
+      option_yes: '是',
+      option_no: '否',
+      option_not_Applicable: '不适用',
+      option_giftReason_NewYear: '春节',
+      option_giftReason_Mid_Autumn: '中秋节',
+      option_giftReason_Other: '其他',
+      option_giftDesc_Company_Branded_Gift: '公司品牌宣传',
+      option_giftDesc_General_Gift: '一般物品'
+    },
+
     userName: {
       required: '请输入用户名',
       invalid: '用户名格式不正确'

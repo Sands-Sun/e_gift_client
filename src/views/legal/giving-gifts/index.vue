@@ -119,7 +119,9 @@ const onGiftCompanySearch = (searchValue: string) => {
   loadGiftCompanyData(searchValue);
 };
 
-const onGiftCompanyChange = (value: any) => {
+const onGiftCompanyChange = (value: any, option: any) => {
+  debugger;
+  console.log(option);
   console.log(`selected ${value}`);
   giftCompanyState.value = value;
 };
@@ -131,7 +133,7 @@ const ccApplyOptions = computed<SelectProps['options']>(() =>
   }))
 );
 
-const applyOptions = computed<MentionsProps['options']>(() =>
+const applyOptions = computed<SelectProps['options']>(() =>
   userState.data.map((user: any) => ({
     label: `${user.firstName} ${user.lastName} <${user.email}>`,
     value: user.email
@@ -143,10 +145,10 @@ watch(
   ([newVal1, newVal2, newVal3], [oldVal1, oldVal2, oldVal3]) => {
     console.log('newVal1:', newVal1);
     console.log('newVal2:', newVal2);
-    console.log('newVal3:', newVal2);
+    console.log('newVal3:', newVal3);
     console.log('oldVal1:', oldVal1);
     console.log('oldVal2:', oldVal2);
-    console.log('oldVal3:', oldVal2);
+    console.log('oldVal3:', oldVal3);
     userState.data = [];
     userState.fetching = false;
     giftCompanyState.data = [];
@@ -274,10 +276,6 @@ const disabledDate = (current: Dayjs) => {
   return current && current < dayjs().endOf('day');
 };
 
-const cc_handleChange = (value: string[]) => {
-  console.log(`selected ${value}`);
-};
-
 // const provide_date = ref<Dayjs>();
 
 const tex_value = ref<string>('');
@@ -309,7 +307,7 @@ const formState_apply = reactive({
         {{ supervisorInfo.firstName }} {{ supervisorInfo.lastName }}
       </a-descriptions-item>
       <a-descriptions-item label="成本中心">{{ userInfo.costCenter }}</a-descriptions-item>
-      <a-descriptions-item label="DIVISION">PH</a-descriptions-item>
+      <a-descriptions-item label="DIVISION">{{ userInfo.division }}</a-descriptions-item>
     </a-descriptions>
 
     <a-form :model="formState_apply">

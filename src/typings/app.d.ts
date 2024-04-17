@@ -421,6 +421,44 @@ declare namespace App {
           };
         };
         receivingGifts: {
+          applyForm: {
+            unitPrice: string;
+            unitPrice_validation: string;
+            quantity: string;
+            quantity_validation: string;
+            totalPrice: string;
+            totalPrice_validation: string;
+            remark: string;
+            remark_validation: string;
+            giftGiverCompanyName: string;
+            giftGiverCompanyName_validation: string;
+            giftGiverEmployeeName: string;
+            giftGiverEmployeeName_validation: string;
+            giftGiverTitle: string;
+            giftGiverTitle_validation: string;
+            giftApplyName_validation: string;
+            giftReceivingDate: string;
+            giftReceivingDate_validation: string;
+            giftOverallReason: string;
+            giftOverallReason_validation: string;
+            giftOverallPrice: string;
+            giftOverallPrice_validation: string;
+            giftReason_label_0813: string;
+            giftReason_label_1391: string;
+            giftReason_label_0882: string;
+            giftReason_label_1954: string;
+            giftReason_label_1955: string;
+            giftReason_label_validation: string;
+            giftDesc_label: string;
+            giftDesc_label_validation: string;
+            giftDesc_type_label: string;
+            giftBayerCoustomer_label_0813: string;
+            giftBayerCoustomer_label_1391: string;
+            giftBayerCoustomer_label_0882: string;
+            giftBayerCoustomer_label_1954: string;
+            giftBayerCoustomer_label_1955: string;
+            giftBayerCoustomer_validation: string;
+          };
           policy: {
             title: string;
             desc_1954: Array<PolicyDesc>;
@@ -458,6 +496,16 @@ declare namespace App {
         };
       };
       form: {
+        common: {
+          option_yes: string;
+          option_no: string;
+          option_not_Applicable: string;
+          option_giftReason_NewYear: string;
+          option_giftReason_Mid_Autumn: string;
+          option_giftReason_Other: string;
+          option_giftDesc_Company_Branded_Gift: string;
+          option_giftDesc_General_Gift: string;
+        };
         userName: FormMsg;
         phone: FormMsg;
         pwd: FormMsg;
@@ -481,8 +529,8 @@ declare namespace App {
 
     type GetI18nKey<T extends Record<string, unknown>, K extends keyof T = keyof T> = K extends string
       ? T[K] extends Record<string, unknown>
-        ? `${K}.${GetI18nKey<T[K]>}`
-        : K
+      ? `${K}.${GetI18nKey<T[K]>}`
+      : K
       : never;
 
     type I18nKey = GetI18nKey<Schema>;

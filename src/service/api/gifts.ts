@@ -3,10 +3,27 @@ import { request } from '../request';
 const api_url = {
   giving_gifts_list: '/gifts/giving/page',
   receiving_gifts_list: '/gifts/receiving/page',
+  receiving_gifts_save: 'gifts/receiving/save',
+  // receiving_gifts_getById: '',
   fuzzy_search_gift_company: 'gifts/company/search',
   // fuzzy_search_gift_company_person: 'gifts/company/person/search',
   fuzzy_search_user_list: '/sys/user/search'
 };
+
+export function getReceivingGiftsByApplicationId(id: any) {
+  return request<Api.Gifts.ReceivingGifts>({
+    url: `gifts/receiving/get/${id}`,
+    method: 'get'
+  });
+}
+
+export function saveReceivingGifts(param: any) {
+  return request({
+    url: api_url.receiving_gifts_save,
+    method: 'post',
+    data: param
+  });
+}
 
 export function fuzzySearchGiftPersonList(companyId: number, keyword: string) {
   return request<Array<Api.Gifts.GiftCompany>>({

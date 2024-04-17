@@ -47,6 +47,13 @@ declare namespace Api {
       isExcluded: string;
       markDeleted: string;
     }
+    interface TableListResponse {
+      list: Array<Object>;
+      pageSize: Number;
+      total: Number;
+      currentPage: Number;
+    }
+
   }
 
   namespace Auth {

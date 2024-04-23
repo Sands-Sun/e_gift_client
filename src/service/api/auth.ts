@@ -6,14 +6,10 @@ import { request } from '../request';
  * @param CWID User CWID
  * @param password Password
  */
-export function fetchLogin(CWID: string, password: string) {
-  return request<Api.Auth.LoginToken>({
-    url: '/sys/login',
-    method: 'post',
-    data: {
-      CWID,
-      password
-    }
+export function fetchLogin() {
+  return request<Api.Auth.SSO>({
+    url: '/sys/azureLogin',
+    method: 'get'
   });
 }
 

@@ -36,16 +36,47 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     routeStore.resetStore();
   }
 
-  /**
-   * Login
-   *
-   * @param userName User name
-   * @param password Password
-   */
-  async function login(userName: string, password: string) {
+  /** SSO Login */
+  async function login(loginType: string) {
     startLoading();
     // debugger;
-    const { data: loginToken, error } = await fetchLogin(userName, password);
+    if (loginType === 'handle') {
+      const { data: url, error } = await fetchLogin();
+      if (!error) {
+        location.href = url;
+      } else {
+        resetStore();
+      }
+    } else {
+      // 获取用户信息
+      const { pass, error } = await loginByToken(loginType);
+      if (!error) {
+        if (pass) {
+          await routeStore.initAuthRoute();
+
+          await redirectFromLogin();
+
+          if (routeStore.isInitAuthRoute) {
+            window.$notification?.success({
+              message: $t('page.login.common.loginSuccess'),
+              description: $t('page.login.common.welcomeBack', {
+                userName: `${userInfo.firstName}  ${userInfo.lastName}`
+              })
+            });
+          }
+        }
+      } else {
+        resetStore();
+      }
+    }
+
+    endLoading();
+  }
+
+  async function login1() {
+    startLoading();
+    // debugger;
+    const { data: loginToken, error } = await fetchLogin();
 
     if (!error) {
       const pass = await loginByToken(loginToken);
@@ -71,9 +102,9 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     endLoading();
   }
 
-  async function loginByToken(loginToken: Api.Auth.LoginToken) {
+  async function loginByToken(loginToken: string) {
     // 1. stored in the localStorage, the later requests need it in headers
-    localStg.set('token', loginToken.token);
+    localStg.set('token', loginToken);
     // localStg.set('refreshToken', loginToken.refreshToken);
 
     const { data: info, error } = await fetchGetUserInfo();
@@ -83,7 +114,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
       localStg.set('userInfo', info);
 
       // 3. update auth route
-      token.value = loginToken.token;
+      token.value = loginToken;
       Object.assign(userInfo, info);
 
       return true;

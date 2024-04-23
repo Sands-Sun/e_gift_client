@@ -49,14 +49,16 @@ declare namespace Api {
     }
     interface TableListResponse {
       list: Array<Object>;
-      pageSize: Number;
-      total: Number;
-      currentPage: Number;
+      pageSize: number;
+      total: number;
+      currentPage: number;
     }
-
   }
 
   namespace Auth {
+    interface SSO {
+      url: string;
+    }
     interface LoginToken {
       token: string;
       userId: number;
@@ -79,6 +81,7 @@ declare namespace Api {
       positionTxt: string;
       supervisor: UserInfo;
       roles: string[];
+      token: string;
     }
   }
 

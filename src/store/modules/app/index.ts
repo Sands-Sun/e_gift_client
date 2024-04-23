@@ -1,12 +1,12 @@
-import { effectScope, onScopeDispose, ref, watch } from 'vue';
-import { defineStore } from 'pinia';
-import { breakpointsTailwind, useBreakpoints, useTitle } from '@vueuse/core';
-import { useBoolean } from '@sa/hooks';
 import { SetupStoreId } from '@/enum';
-import { router } from '@/router';
 import { $t, setLocale } from '@/locales';
 import { setDayjsLocale } from '@/locales/dayjs';
+import { router } from '@/router';
 import { localStg } from '@/utils/storage';
+import { useBoolean } from '@sa/hooks';
+import { breakpointsTailwind, useBreakpoints, useTitle } from '@vueuse/core';
+import { defineStore } from 'pinia';
+import { effectScope, onScopeDispose, ref, watch } from 'vue';
 import { useRouteStore } from '../route';
 import { useTabStore } from '../tab';
 import { useThemeStore } from '../theme';
@@ -93,6 +93,7 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
 
     // watch locale
     watch(locale, () => {
+      // debugger;
       // update document title by locale
       updateDocumentTitleByLocale();
 

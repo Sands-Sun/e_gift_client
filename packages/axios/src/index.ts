@@ -1,9 +1,9 @@
-import axios, { AxiosError } from 'axios';
-import type { AxiosResponse, CancelTokenSource, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios';
-import axiosRetry from 'axios-retry';
 import { nanoid } from '@sa/utils';
-import { createAxiosConfig, createDefaultOptions, createRetryOptions } from './options';
+import type { AxiosResponse, CancelTokenSource, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError } from 'axios';
+import axiosRetry from 'axios-retry';
 import { BACKEND_ERROR_CODE, REQUEST_ID_KEY } from './constant';
+import { createAxiosConfig, createDefaultOptions, createRetryOptions } from './options';
 import type {
   CustomAxiosRequestConfig,
   FlatRequestInstance,
@@ -171,6 +171,7 @@ export function createFlatRequest<ResponseData = any>(
   return flatRequest;
 }
 
-export { BACKEND_ERROR_CODE, REQUEST_ID_KEY };
 export type * from './type';
-export type { CreateAxiosDefaults, AxiosError };
+export { BACKEND_ERROR_CODE, REQUEST_ID_KEY };
+export type { AxiosError, CreateAxiosDefaults };
+

@@ -6,13 +6,28 @@ const local: App.I18n.Schema = {
     tip: 'Tip',
     add: 'Add',
     addSuccess: 'Add Success',
+    list: 'List',
     edit: 'Edit',
+    search: 'Search',
+    expand: 'Expand',
+    shrink: 'Shrink',
+    enable: 'Enable',
+    disable: 'Disable',
+    status: 'Status',
+    submit: 'Submit',
+    saveDraft: 'Save Draft',
+    reset: 'Reset',
+    newGroupCreate: 'New Create User Group',
+    newApplyCreate: 'New Create Application',
+    viewDetail: 'View Detail',
     editSuccess: 'Edit Success',
     delete: 'Delete',
     deleteSuccess: 'Delete Success',
     batchDelete: 'Batch Delete',
     confirm: 'Confirm',
     cancel: 'Cancel',
+    createdDate: 'Created Date',
+    lastModifiedDate: 'Last Modified Date',
     pleaseCheckValue: 'Please check whether the value is valid',
     action: 'Action',
     backToHome: 'Back to home',
@@ -227,7 +242,45 @@ const local: App.I18n.Schema = {
       },
       creativity: 'Creativity'
     },
+    manageGroup: {
+      applyForm: {
+        groupRequestTitle: 'User Group Management',
+        groupName: 'Group Name',
+        groupName_validation: 'please input group name',
+        fullName: 'Full Name',
+        fullName_validation: 'please input full name',
+        groupCode: 'Group Code',
+        groupCode_validation: 'please input group code',
+        bindPerson: 'Bind Person',
+        bindPerson_validation: 'please select bind person',
+        remark: 'Remark',
+        remark_validation: 'please input remark'
+      }
+    },
     givingGifts: {
+      applyForm: {
+        givingGiftRequestTitle: 'Giving Gift Request Form',
+        remark: 'Remark (Please fill in with the detailed Gift name)',
+        remark_validation: 'please input remark',
+        givingGiftInfo: 'Giving Gift Information',
+        giftReason_label: 'Why was this gift giving to you? ',
+        giftReason_label_validation: 'please input the reson',
+        giftDesc_label: 'Gift Description',
+        giftDesc_label_validation: 'please input gift description',
+        giftDesc_type_label: 'gift description type',
+        giftGivingDate: 'Giving Date ',
+        giftGivingCompanyName: 'Name of empolyer of recipient',
+        giftGivingCompanyName_validation: 'please input Name of empolyer of recipient',
+        giftGivingEmployeeName: 'Name of recipient',
+        giftGivingEmployeeName_validation: 'please input Name of recipient',
+        giftRecipientCategory_1954: 'Recipient category? ',
+        giftRecipientCategory_1955: 'Recipient category? ',
+        giftRecipientCategory_0882: 'Recipient category? ',
+        giftRecipientCategory_0813: 'Is the recipient a government official or employee of a state owned company? ',
+        giftRecipientCategory_2614: 'Is the recipient a government official or employee of a state owned company? ',
+        giftRecipientCategory_1391: 'Is the recipient a government official or employee of a state owned company? ',
+        giftIsBayerCustomer: 'Is the recipient a current Bayer customer? '
+      },
       policy: {
         title: 'Policy Reminder',
         desc_1954: [
@@ -326,6 +379,28 @@ const local: App.I18n.Schema = {
             ]
           }
         ],
+        desc_2614: [
+          {
+            label: 'Note',
+            items: [
+              {
+                value: 'Only gifts and hospitality with non-promotion nature shall be pre-applied in eGift system.',
+                items: []
+              },
+              { value: 'If unit price is less than RMB 300, no approval is needed. ', items: [] },
+              {
+                value:
+                  'If unit price is more than RMB 300 (including 300), approvals from Department Head, BCS Country Head and Compliance are needed.',
+                items: []
+              },
+              {
+                value:
+                  'For gifts or hospitality offered to state personnel, approval from Compliance is always needed.',
+                items: []
+              }
+            ]
+          }
+        ],
         desc_0813: [
           {
             label: 'Note',
@@ -382,12 +457,8 @@ const local: App.I18n.Schema = {
     },
     receivingGifts: {
       applyForm: {
-        unitPrice: 'Unit Price',
-        unitPrice_validation: 'please input estimated unit price',
-        quantity: 'Quantity',
-        quantity_validation: 'please input quantity',
-        totalPrice: 'Total Value',
-        totalPrice_validation: 'please input estimated total value',
+        acceptGiftRequestTitle: 'Accpect Gift Request Form',
+        receivingGiftInfo: 'Receiving Gift Information',
         remark: 'Remark (Please fill in with the detailed Gift name)',
         remark_validation: 'please input remark',
         giftGiverCompanyName: 'Name of giver company',
@@ -396,20 +467,12 @@ const local: App.I18n.Schema = {
         giftGiverEmployeeName_validation: 'please input giver name',
         giftGiverTitle: 'Title of giver',
         giftGiverTitle_validation: 'please input title of giver',
-        giftApplyName_validation: 'please select applicant',
         giftReceivingDate: 'Receiving Date',
         giftReceivingDate_validation: 'please select receiving date',
         giftOverallReason: 'Do you know the overall price of the gift(s)?',
         giftOverallReason_validation: 'please select whether you know the overall price of the gift(s)',
         giftOverallPrice: 'Overall price of the gift(s)',
-        giftReason_label_0813: 'Why was this gift given to you? ',
-        giftReason_label_1391: 'Why was this gift given to you? ',
-        giftReason_label_0882:
-          'Why was the gift(s) given to you?(e.g. daily business need, attend business activities etc.) ',
-        giftReason_label_1954:
-          'Why was the gift(s) given to you?(e.g. daily business need, attend business activities etc.) ',
-        giftReason_label_1955:
-          'Why was the gift(s) given to you?(e.g. daily business need, attend business activities etc.) ',
+        giftReason_label: 'Why was this gift given to you? ',
         giftReason_label_validation: 'please input the reson',
         giftDesc_label: 'Gift Description',
         giftDesc_label_validation: 'please input gift description',
@@ -421,7 +484,8 @@ const local: App.I18n.Schema = {
         giftBayerCoustomer_label_0882: 'Are you going to hand over the gift to Compliance team?',
         giftBayerCoustomer_label_1954: 'Are you going to hand over the gift to Compliance team?',
         giftBayerCoustomer_label_1955: 'Are you going to hand over the gift to Compliance team?',
-        giftBayerCoustomer_validation: 'please select whethergoing to hand over the gift to Compliance team '
+        giftBayerCoustomer_validation: 'please select whethergoing to hand over the gift to Compliance team ',
+        giftOverallPrice_validation: ''
       },
       policy: {
         title: 'Policy Reminder',
@@ -664,14 +728,54 @@ const local: App.I18n.Schema = {
     common: {
       option_yes: 'Yes',
       option_no: 'No',
+      unitPrice: 'Unit Price',
+      unitPrice_validation: 'please input unit price',
+      quantity: 'Quantity',
+      quantity_validation: 'please input quantity',
+      totalPrice: 'Total Value',
+      reference: 'Reference No',
+      reference_placeHolder: 'please input reference no',
+      totalPrice_validation: 'please input total value',
+      option_draft: 'Draft',
+      option_inProcess: 'In-Process',
+      option_complete: 'Complete',
       option_not_Applicable: 'not Applicable',
       option_giftReason_NewYear: 'Chinese New Year',
       option_giftReason_Mid_Autumn: 'Mid-Autumn Festival',
-      option_giftReason_Other: 'Other',
+      option_Other: 'Other',
       option_giftDesc_Company_Branded_Gift: 'Company Branded Gift',
-      option_giftDesc_General_Gift: 'General Gift'
+      option_giftDesc_Cultural_Courtesy: 'Cultural Courtesy Gifts',
+      option_giftDesc_Other: 'Other Gifts',
+      option_giftDesc_General_Gift: 'General Gift',
+      option_giftDesc_Cash_Equivalents: 'Cash or Cash Equivalents',
+      option_giftDesc_Present: 'Present',
+      option_go_sco_Government_Official: 'Government Official',
+      option_go_sco_Distributor: 'Distributor',
+      option_go_sco_HCP: 'HCP',
+      select_validation: 'please select'
     },
-
+    applicateInfo: {
+      applicateInfoTitle: 'Applicant Information',
+      formFiller: 'Creator',
+      applyForCwid: 'CWID',
+      formFiller_placeHolder: 'please input creator',
+      applyFor: 'Apply For',
+      applyFor_validation: 'please select applicant',
+      applyFor_placeHolder: 'please input applicant',
+      applyCC: 'Copy to',
+      applyDate: 'Apply Date',
+      employeeNo: 'Employee No.',
+      employeeLe: 'Employee Le',
+      employeeLe_placeHolder: 'please input employee Le',
+      department: 'Dept.',
+      supervisor: 'Line Manager',
+      costCenter: 'Cost Center',
+      division: 'DIVISION'
+    },
+    searchFrom: {
+      applyStatus: 'Apply Status',
+      applyType: 'Apply Type'
+    },
     userName: {
       required: 'Please enter user name',
       invalid: 'User name format is incorrect'

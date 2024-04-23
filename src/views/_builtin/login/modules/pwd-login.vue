@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { $t } from '@/locales';
-import { loginModuleRecord } from '@/constants/app';
-import { useRouterPush } from '@/hooks/common/router';
 import { useAntdForm, useFormRules } from '@/hooks/common/form';
+import { useRouterPush } from '@/hooks/common/router';
+import { $t } from '@/locales';
 import { useAuthStore } from '@/store/modules/auth';
+import { reactive } from 'vue';
 
 defineOptions({
   name: 'PwdLogin'
@@ -56,7 +55,8 @@ async function handleSubmit() {
       <AButton type="primary" block size="large" shape="round" :loading="authStore.loginLoading" @click="handleSubmit">
         {{ $t('common.confirm') }}
       </AButton>
-      <div class="flex-y-center justify-between">
+      <!--
+ <div class="flex-y-center justify-between">
         <AButton class="flex-1" block @click="toggleLoginModule('code-login')">
           {{ $t(loginModuleRecord['code-login']) }}
         </AButton>
@@ -65,6 +65,7 @@ async function handleSubmit() {
           {{ $t(loginModuleRecord.register) }}
         </AButton>
       </div>
+-->
     </ASpace>
   </AForm>
 </template>

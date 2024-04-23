@@ -6,13 +6,28 @@ const local: App.I18n.Schema = {
     tip: '提示',
     add: '添加',
     addSuccess: '添加成功',
+    list: '列表',
     edit: '修改',
+    search: '搜索',
+    expand: '展开',
+    shrink: '收叠',
+    enable: '启用',
+    disable: '禁用',
+    status: '状态',
+    submit: '提交',
+    saveDraft: '保存草稿',
+    reset: '重置',
+    newGroupCreate: '新建用户组',
+    newApplyCreate: '新建申请',
+    viewDetail: '查看详细信息',
     editSuccess: '修改成功',
     delete: '删除',
     deleteSuccess: '删除成功',
     batchDelete: '批量删除',
     confirm: '确认',
     cancel: '取消',
+    createdDate: '创建日期',
+    lastModifiedDate: '修改日期',
     pleaseCheckValue: '请检查输入的值是否合法',
     action: '操作',
     backToHome: '返回首页',
@@ -227,14 +242,25 @@ const local: App.I18n.Schema = {
       },
       creativity: '创意'
     },
+    manageGroup: {
+      applyForm: {
+        groupRequestTitle: '用户组管理',
+        groupName: '组名称',
+        groupName_validation: '请输入组名称',
+        fullName: '组全称',
+        fullName_validation: '请输入组全称',
+        groupCode: '组编号',
+        groupCode_validation: '请输入组编号',
+        bindPerson: '绑定人员',
+        bindPerson_validation: '选择绑定人员',
+        remark: '备注信息',
+        remark_validation: '请输入备注信息'
+      }
+    },
     receivingGifts: {
       applyForm: {
-        unitPrice: '单价',
-        unitPrice_validation: '请输入单价',
-        quantity: '数量',
-        quantity_validation: '请输入数量',
-        totalPrice: '总价',
-        totalPrice_validation: '请输入总价',
+        acceptGiftRequestTitle: '接受礼品申请表',
+        receivingGiftInfo: '接受礼品信息',
         remark: '备注（请填写具体礼品名称）',
         remark_validation: '请输入礼品备注信息',
         giftGiverCompanyName: '提供者单位名称',
@@ -243,18 +269,13 @@ const local: App.I18n.Schema = {
         giftGiverEmployeeName_validation: '请输入提供者姓名',
         giftGiverTitle: '提供者职位',
         giftGiverTitle_validation: '请输入提供者职位',
-        giftApplyName_validation: '请选择申请人',
         giftReceivingDate: '接受日期',
         giftReceivingDate_validation: '请选择接受日期',
         giftOverallReason: '您是否知道礼品的价值? ',
         giftOverallReason_validation: '请选择您是否知道礼品的价值',
         giftOverallPrice: '礼品预估价值',
         giftOverallPrice_validation: '请输入礼品预估价值',
-        giftReason_label_0813: '为什么要给你送礼? ',
-        giftReason_label_1391: '为什么要给你送礼? ',
-        giftReason_label_0882: '接受礼品原因?（如，日常商务往来，参加商务活动等）',
-        giftReason_label_1954: '接受礼品原因?（如，日常商务往来，参加商务活动等）',
-        giftReason_label_1955: '接受礼品原因?（如，日常商务往来，参加商务活动等）',
+        giftReason_label: '接受礼品的原因? ',
         giftReason_label_validation: '请输入接受礼品原因',
         giftDesc_label: '礼品描述',
         giftDesc_label_validation: '请输入礼品描述',
@@ -430,6 +451,29 @@ const local: App.I18n.Schema = {
       }
     },
     givingGifts: {
+      applyForm: {
+        givingGiftRequestTitle: '给予礼品申请表',
+        remark: '备注（请填写具体礼品名称）',
+        remark_validation: '请输入礼品备注信息',
+        givingGiftInfo: '赠送礼品信息',
+        giftReason_label: '赠送礼品的原因? ',
+        giftReason_label_validation: '请输入提供礼品原因',
+        giftDesc_label: '礼品描述',
+        giftDesc_label_validation: '请输入礼品描述',
+        giftDesc_type_label: '礼品描述类别',
+        giftGivingDate: '提供日期',
+        giftGivingCompanyName: '接受者单位名称',
+        giftGivingCompanyName_validation: '请输入接受者单位名称',
+        giftGivingEmployeeName: '接受者姓名',
+        giftGivingEmployeeName_validation: '请输入接受者姓名',
+        giftRecipientCategory_1954: '礼品接受者的类别？',
+        giftRecipientCategory_1955: '礼品接受者的类别？',
+        giftRecipientCategory_0882: '礼品接受者的类别？',
+        giftRecipientCategory_0813: '礼品接受者是政府官员或国有企业员工吗？',
+        giftRecipientCategory_2614: '礼品接受者是政府官员或国有企业员工吗？',
+        giftRecipientCategory_1391: '礼品接受者是政府官员或国有企业员工吗？',
+        giftIsBayerCustomer: '礼品接收者是否是拜耳现有客户? '
+      },
       policy: {
         title: '政策提示',
         desc_1954: [
@@ -483,6 +527,17 @@ const local: App.I18n.Schema = {
           }
         ],
         desc_1391: [
+          {
+            label: 'Note',
+            items: [
+              { value: '仅非营销性质的礼品或招待须事先在eGift系统中申请。', items: [] },
+              { value: '如果单价小于人民币300元，无需审批。', items: [] },
+              { value: '如果单价高于人民币300元（含300元），须获得部门总监、国家经理及合规的审批。', items: [] },
+              { value: '向国家工作人员提供礼品和招待，均须获得合规的审批。', items: [] }
+            ]
+          }
+        ],
+        desc_2614: [
           {
             label: 'Note',
             items: [
@@ -567,11 +622,52 @@ const local: App.I18n.Schema = {
       option_yes: '是',
       option_no: '否',
       option_not_Applicable: '不适用',
+      unitPrice: '单价',
+      unitPrice_validation: '请输入单价',
+      quantity: '数量',
+      quantity_validation: '请输入数量',
+      totalPrice: '总价',
+      reference: '申请编号',
+      reference_placeHolder: '请输入申请编号',
+      totalPrice_validation: '请输入总价',
+      option_draft: '草稿',
+      option_inProcess: '处理中',
+      option_complete: '完成',
       option_giftReason_NewYear: '春节',
       option_giftReason_Mid_Autumn: '中秋节',
-      option_giftReason_Other: '其他',
+      option_Other: '其他',
       option_giftDesc_Company_Branded_Gift: '公司品牌宣传',
-      option_giftDesc_General_Gift: '一般物品'
+      option_giftDesc_General_Gift: '一般物品',
+      option_giftDesc_Cash_Equivalents: '现金或现金等价物',
+      option_giftDesc_Present: '礼品',
+      option_giftDesc_Cultural_Courtesy: '风俗礼品（只针对于健康消费品经销商）',
+      option_giftDesc_Other: '其他礼品',
+      option_go_sco_Government_Official: '政府官员',
+      option_go_sco_Distributor: '经销商',
+      option_go_sco_HCP: '医疗卫生专业人士（HCP）',
+      select_validation: '请选择'
+    },
+    searchFrom: {
+      applyStatus: '申请状态',
+      applyType: '申请类别'
+    },
+    applicateInfo: {
+      applicateInfoTitle: '申请人信息',
+      formFiller: '填表人',
+      applyForCwid: 'CWID',
+      formFiller_placeHolder: '请输入填表人',
+      applyFor: '申请者',
+      applyFor_validation: '请选择申请人',
+      applyFor_placeHolder: '请输入申请者',
+      applyCC: '抄送',
+      applyDate: '申请日期',
+      employeeNo: '员工号',
+      employeeLe: '公司编号',
+      employeeLe_placeHolder: '请输入公司编号',
+      department: '部门',
+      supervisor: '主管',
+      costCenter: '成本中心',
+      division: 'DIVISION'
     },
 
     userName: {

@@ -11,6 +11,16 @@ declare namespace Api {
    */
 
   namespace Gifts {
+    interface GiftGroup {
+      id: number;
+      groupCode: string;
+      groupName: string;
+      fullName: string;
+      markDeleted: string;
+      remark: string;
+      userToGroups: unknown[];
+    }
+
     interface GiftPerson {
       id: number;
       companyId: number;
@@ -26,8 +36,14 @@ declare namespace Api {
 
     interface ReceivingGifts {
       applicationId: string;
+      sfUserAppliedName: string;
+      sfUserAppliedCwid: string;
+      sfUserAppliedEmail: string;
+      sfUserIdAppliedFor: string;
+      copyToUsers: unknown[];
       costCenter: string;
       createdDate: string;
+      givingDate: string;
       department: string;
       employeeLe: string;
       estimatedTotalValue: number;
@@ -35,6 +51,38 @@ declare namespace Api {
       isHandedOver: string;
       isInvolved: string;
       markDeleted: string;
+      unitValue: number;
+      volume: number;
+      remark: string;
+      reason: string;
+      reasonType: string;
+      reference: string;
+      status: string;
+      giftsActivities: ReceivingActivity[];
+      giftsRef: ReceivingGiftRef;
+    }
+
+    interface ReceivingActivity {
+      action: string;
+      appActivityDataId: number;
+      applicationId: number;
+      createdDate: string;
+      lastModifiedDate: string;
+      userEmail: string;
+      userFirstName: string;
+      userLastName: string;
+      remark: string;
+    }
+
+    interface ReceivingGiftRef {
+      giftDesc: string;
+      giftDescType: string;
+      givingCompany: string;
+      unitValue: number;
+      volume: number;
+      givingDate: unknown;
+      giftsPersons: unknown[];
+      givingPerson: string;
     }
 
     interface GivingGifts {
@@ -48,12 +96,22 @@ declare namespace Api {
       markDeleted: string;
     }
     interface TableListResponse {
-      list: Array<Object>;
-      pageSize: Number;
-      total: Number;
-      currentPage: Number;
+      list: unknown[];
+      pageSize: number;
+      totalCount: number;
+      currPage: number;
     }
 
+    interface DataItem {
+      applicationId: string;
+      apply: string;
+      date: string;
+      cwid: string;
+      dept: string;
+      leCode: string;
+      type: string;
+      status: string;
+    }
   }
 
   namespace Auth {

@@ -1,10 +1,10 @@
-import { BACKEND_ERROR_CODE, createFlatRequest, createRequest } from '@sa/axios';
-import { localStg } from '@/utils/storage';
+// import { useRouterPush } from '@/hooks/common/router';
+import { useAuthStore } from '@/store/modules/auth';
 import { getServiceBaseURL } from '@/utils/service';
-
+import { localStg } from '@/utils/storage';
+import { BACKEND_ERROR_CODE, createFlatRequest, createRequest } from '@sa/axios';
 const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'N';
 const { baseURL, otherBaseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
-
 export const request = createFlatRequest<App.Service.Response>(
   {
     baseURL,
@@ -38,15 +38,19 @@ export const request = createFlatRequest<App.Service.Response>(
     },
     onError(error) {
       // when the request is fail, you can show error message
-
       let message = error.message;
 
       // show backend error message
-      if (error.code === BACKEND_ERROR_CODE) {
-        message = error.response?.data?.msg || message;
+      if (error.code === BACKEND_ERROR_CODE || error.response?.status === 401) {
+        message = error.response?.data?.message || message;
       }
-
       window.$message?.error(message);
+
+      if (error.response?.status === 401) {
+        console.log('no access', error);
+        const authStore = useAuthStore();
+        authStore.resetStore();
+      }
     }
   }
 );

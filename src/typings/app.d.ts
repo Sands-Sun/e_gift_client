@@ -280,6 +280,7 @@ declare namespace App {
         batchDelete: string;
         confirm: string;
         cancel: string;
+        conformCancel: string;
         createdDate: string;
         lastModifiedDate: string;
         pleaseCheckValue: string;
@@ -456,12 +457,7 @@ declare namespace App {
             giftGivingCompanyName_validation: string;
             giftGivingEmployeeName: string;
             giftGivingEmployeeName_validation: string;
-            giftRecipientCategory_1954: string;
-            giftRecipientCategory_1955: string;
-            giftRecipientCategory_0882: string;
-            giftRecipientCategory_0813: string;
-            giftRecipientCategory_2614: string;
-            giftRecipientCategory_1391: string;
+            giftRecipientCategory: string;
             giftIsBayerCustomer: string;
           };
           policy: {
@@ -480,6 +476,7 @@ declare namespace App {
             receivingGiftInfo: string;
             remark: string;
             remark_validation: string;
+            giftRecipient: string;
             giftGiverCompanyName: string;
             giftGiverCompanyName_validation: string;
             giftGiverEmployeeName: string;
@@ -488,12 +485,9 @@ declare namespace App {
             giftGiverTitle_validation: string;
             giftReceivingDate: string;
             giftReceivingDate_validation: string;
-            giftOverallReason: string;
-            giftOverallReason_validation: string;
-            giftOverallPrice: string;
-            giftOverallPrice_validation: string;
             giftReason_label: string;
             giftReason_label_validation: string;
+            giftReason_desc_label: string;
             giftDesc_label: string;
             giftDesc_label_validation: string;
             giftDesc_type_label: string;
@@ -552,10 +546,15 @@ declare namespace App {
           reference: string;
           reference_placeHolder: string;
           totalPrice_validation: string;
+          historyLog: string;
+          operationInfo: string;
+          remarkInfo: string;
           option_draft: string;
           option_inProcess: string;
           option_complete: string;
+          upload_file: string;
           option_not_Applicable: string;
+          upload_person_label: string;
           option_giftReason_NewYear: string;
           option_giftReason_Mid_Autumn: string;
           option_Other: string;
@@ -566,6 +565,7 @@ declare namespace App {
           option_giftDesc_Cultural_Courtesy: string;
           option_giftDesc_Other: string;
           option_go_sco_Government_Official: string;
+          option_go_sco_Government_Non_Official: string;
           option_go_sco_Distributor: string;
           option_go_sco_HCP: string;
           select_validation: string;

@@ -15,7 +15,7 @@ import type { Rule } from 'ant-design-vue/es/form';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
-import { computed, createVNode, onMounted, onUpdated, reactive, ref, toRaw, watch } from 'vue';
+import { computed, createVNode, onMounted, reactive, ref, toRaw, watch } from 'vue';
 import type { MentionsProps } from '..';
 let authStore: any;
 let userInfo: Api.Auth.UserInfo;
@@ -112,54 +112,64 @@ const formApplyRules: Record<string, Rule[]> = reactive({
   applyName: [
     {
       required: true,
-      message: $t('form.applicateInfo.applyFor_validation'),
-      tsmg: 'form.applicateInfo.applyFor_validation'
+      message: $t('form.applicateInfo.applyFor_validation')
+      // tsmg: 'form.applicateInfo.applyFor_validation'
     }
   ],
   reason: [
     {
       required: true,
-      message: $t('page.receivingGifts.applyForm.giftDesc_label_validation'),
-      tsmg: 'page.receivingGifts.applyForm.giftDesc_label_validation'
+      message: $t('page.receivingGifts.applyForm.giftDesc_label_validation')
+      // tsmg: 'page.receivingGifts.applyForm.giftDesc_label_validation'
     }
   ],
   reasonType: [
     {
       required: true,
-      message: $t('page.receivingGifts.applyForm.giftReason_label_validation'),
-      tsmg: 'page.receivingGifts.applyForm.giftReason_label_validation'
+      message: $t('page.receivingGifts.applyForm.giftReason_label_validation')
+      // tsmg: 'page.receivingGifts.applyForm.giftReason_label_validation'
     }
   ],
   giftDescType: [
     {
       required: true,
-      message: $t('page.receivingGifts.applyForm.giftDesc_label_validation'),
-      tsmg: 'page.receivingGifts.applyForm.giftDesc_label_validation'
+      message: $t('page.receivingGifts.applyForm.giftDesc_label_validation')
+      // tsmg: 'page.receivingGifts.applyForm.giftDesc_label_validation'
     }
   ],
   date: [
     {
       required: true,
-      message: $t('page.receivingGifts.applyForm.giftReceivingDate_validation'),
-      tsmg: 'page.receivingGifts.applyForm.giftReceivingDate_validation'
+      message: $t('page.receivingGifts.applyForm.giftReceivingDate_validation')
+      // tsmg: 'page.receivingGifts.applyForm.giftReceivingDate_validation'
     }
   ],
   unitValue: [
-    { required: true, message: $t('form.common.unitPrice_validation'), tsmg: 'form.common.unitPrice_validation' }
+    {
+      required: true,
+      message: $t('form.common.unitPrice_validation')
+      //  tsmg: 'form.common.unitPrice_validation'
+    }
   ],
-  volume: [{ required: true, message: $t('form.common.quantity_validation'), tsmg: 'form.common.quantity_validation' }],
+  volume: [
+    {
+      required: true,
+      message: $t('form.common.quantity_validation')
+      // tsmg: 'form.common.quantity_validation'
+    }
+  ],
   givenCompany: [
     {
       required: true,
-      message: $t('page.receivingGifts.applyForm.giftGiverCompanyName_validation'),
-      tsmg: 'page.receivingGifts.applyForm.giftGiverCompanyName_validation'
+      message: $t('page.receivingGifts.applyForm.giftGiverCompanyName_validation')
+      // tsmg: 'page.receivingGifts.applyForm.giftGiverCompanyName_validation'
     }
   ],
   givenPersons: [
     {
       required: true,
-      message: $t('page.receivingGifts.applyForm.giftGiverEmployeeName_validation'),
-      tsmg: 'page.receivingGifts.applyForm.giftGiverEmployeeName_validation'
+      message: $t('page.receivingGifts.applyForm.giftGiverEmployeeName_validation')
+      // tsmg: 'page.receivingGifts.applyForm.giftGiverEmployeeName_validation'
     }
   ]
   // givingTitle: [{ required: true, message: $t('page.receivingGifts.applyForm.giftGiverTitle_validation') }]
@@ -431,13 +441,13 @@ onMounted(async () => {
   }
 });
 
-onUpdated(() => {
-  // 切换语言后表单验证失效
-  Object.entries(formApplyRules).forEach(([key, value]) => {
-    console.log(`key: ${key}`);
-    value[0].message = $t(`${value[0].tsmg}`);
-  });
-});
+// onUpdated(() => {
+//   // 切换语言后表单验证失效
+//   Object.entries(formApplyRules).forEach(([key, value]) => {
+//     console.log(`key: ${key}`);
+//     value[0].message = $t(`${value[0].tsmg}`);
+//   });
+// });
 
 watch(
   () => [userState.value, giftCompanyState.value, giftCompanyPersonState.value],
@@ -524,29 +534,28 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
-      </a-form>
-      <a-descriptions :title="$t('page.givingGifts.policy.title')" layout="vertical">
-        <a-descriptions-item
-          v-for="(item, index) in $tm(`page.givingGifts.policy.desc_${userInfo.companyCode}`)"
-          :key="index"
-          :span="3"
-          :label="item.label"
-        >
-          <ul>
-            <li v-for="(detail, index) in item.items" :key="detail">
-              &nbsp; &nbsp; {{ index + 1 }} ) {{ detail.value }}
-              <template v-if="detail.items.length > 0">
-                <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail">
-                  &nbsp; &nbsp; {{ subIndex + 1 }} ) {{ subDetail.value }}
-                </li>
-              </template>
-            </li>
-          </ul>
-        </a-descriptions-item>
-      </a-descriptions>
 
-      <a-descriptions :title="$t('page.givingGifts.applyForm.givingGiftInfo')" />
-      <a-form>
+        <a-descriptions :title="$t('page.givingGifts.policy.title')" layout="vertical">
+          <a-descriptions-item
+            v-for="(item, index) in $tm(`page.givingGifts.policy.desc_${userInfo.companyCode}`)"
+            :key="index"
+            :span="3"
+            :label="item.label"
+          >
+            <ul>
+              <li v-for="(detail, index) in item.items" :key="detail">
+                &nbsp; &nbsp; {{ index + 1 }} ) {{ detail.value }}
+                <template v-if="detail.items.length > 0">
+                  <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail">
+                    &nbsp; &nbsp; {{ subIndex + 1 }} ) {{ subDetail.value }}
+                  </li>
+                </template>
+              </li>
+            </ul>
+          </a-descriptions-item>
+        </a-descriptions>
+
+        <a-descriptions :title="$t('page.givingGifts.applyForm.givingGiftInfo')" />
         <template
           v-if="userInfo.companyCode === '0813' || userInfo.companyCode === '1391' || userInfo.companyCode === '2614'"
         >
@@ -692,78 +701,57 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
-
-        <template
-          v-if="userInfo.companyCode === '0813' || userInfo.companyCode === '1391' || userInfo.companyCode === '2614'"
-        >
-          <a-row :gutter="24">
-            <a-col span="14">
-              <a-form-item
-                v-bind="validateInfos.isGoSoc"
-                :label="$t(`page.givingGifts.applyForm.giftRecipientCategory_${userInfo.companyCode}`)"
+        <a-row :gutter="24">
+          <a-col span="24">
+            <a-form-item :label="$t('form.common.upload_person_label')">
+              <a-upload
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                :file-list="fileList"
+                @change="handleChange"
               >
-                <a-select v-model:value="applyModelRef.isGoSoc" @change="handleChange">
-                  <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
-                  <a-select-option value="No">
-                    {{ $t('form.common.option_no') }}
-                  </a-select-option>
-                  <a-select-option value="Not Applicable">
-                    {{ $t('form.common.option_not_Applicable') }}
-                  </a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col span="10">
-              <a-form-item
-                v-bind="validateInfos.isBayerCustomer"
-                :label="$t('page.givingGifts.applyForm.giftIsBayerCustomer')"
-              >
-                <a-select v-model:value="applyModelRef.isBayerCustomer" @change="handleChange">
-                  <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
-                  <a-select-option value="No">{{ $t('form.common.option_no') }}</a-select-option>
-                  <a-select-option value="Not Applicable">
-                    {{ $t('form.common.option_not_Applicable') }}
-                  </a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-          </a-row>
-        </template>
-        <template v-else>
-          <a-row :gutter="24">
-            <a-col span="14">
-              <a-form-item
-                v-bind="validateInfos.isGoSoc"
-                :label="$t(`page.givingGifts.applyForm.giftRecipientCategory_${userInfo.companyCode}`)"
-              >
-                <a-select v-model:value="applyModelRef.isGoSoc" @change="handleChange">
-                  <a-select-option value="HCP">{{ $t('form.common.option_go_sco_HCP') }}</a-select-option>
-                  <a-select-option value="Government Official">
-                    {{ $t('form.common.option_go_sco_Government_Official') }}
-                  </a-select-option>
-                  <a-select-option value="Distributor">
-                    {{ $t('form.common.option_go_sco_Distributor') }}
-                  </a-select-option>
-                  <a-select-option value="Others">{{ $t('form.common.option_Other') }}</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col span="10">
-              <a-form-item
-                v-bind="validateInfos.isBayerCustomer"
-                :label="$t('page.givingGifts.applyForm.giftIsBayerCustomer')"
-              >
-                <a-select v-model:value="applyModelRef.isBayerCustomer" @change="handleChange">
-                  <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
-                  <a-select-option value="No">{{ $t('form.common.option_no') }}</a-select-option>
-                  <a-select-option value="Not Applicable">
-                    {{ $t('form.common.option_not_Applicable') }}
-                  </a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-          </a-row>
-        </template>
+                <a-button>
+                  <upload-outlined></upload-outlined>
+                  {{ $t('form.common.upload_file') }}
+                </a-button>
+              </a-upload>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col span="14">
+            <a-form-item v-bind="validateInfos.isGoSoc" :label="$t('page.givingGifts.applyForm.giftRecipientCategory')">
+              <a-select v-model:value="applyModelRef.isGoSoc" @change="handleChange">
+                <a-select-option value="Government Official">
+                  {{ $t('form.common.option_go_sco_Government_Official') }}
+                </a-select-option>
+                <a-select-option value="Non Government Official">
+                  {{ $t('form.common.option_go_sco_Government_Non_Official') }}
+                </a-select-option>
+                <a-select-option value="HCP">
+                  {{ $t('form.common.option_go_sco_HCP') }}
+                </a-select-option>
+                <a-select-option value="Distributor">
+                  {{ $t('form.common.option_go_sco_Distributor') }}
+                </a-select-option>
+                <a-select-option value="Others">{{ $t('form.common.option_Other') }}</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col span="10">
+            <a-form-item
+              v-bind="validateInfos.isBayerCustomer"
+              :label="$t('page.givingGifts.applyForm.giftIsBayerCustomer')"
+            >
+              <a-select v-model:value="applyModelRef.isBayerCustomer" @change="handleChange">
+                <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
+                <a-select-option value="No">{{ $t('form.common.option_no') }}</a-select-option>
+                <a-select-option value="Not Applicable">
+                  {{ $t('form.common.option_not_Applicable') }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
 
         <a-row :gutter="24">
           <a-col span="24">

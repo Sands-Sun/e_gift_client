@@ -471,15 +471,7 @@ const local: App.I18n.Schema = {
         giftReason_desc_label: 'Description of reasons for receiving gifts',
         giftDesc_label: 'Gift Description',
         giftDesc_label_validation: 'please input gift description',
-        giftDesc_type_label: 'gift description type',
-        giftBayerCoustomer_label_0813:
-          'Are you going to hand over this gift to the Subgroup Compliance Officer? \n A gift or set of gifts valued in RMB300 or more must be handed over to him/her. Yes No Not Applicable',
-        giftBayerCoustomer_label_1391:
-          'Are you going to hand over this gift to the Subgroup Compliance Officer? \n A gift or set of gifts valued in RMB300 or more must be handed over to him/her. Yes No Not Applicable',
-        giftBayerCoustomer_label_0882: 'Are you going to hand over the gift to Compliance team?',
-        giftBayerCoustomer_label_1954: 'Are you going to hand over the gift to Compliance team?',
-        giftBayerCoustomer_label_1955: 'Are you going to hand over the gift to Compliance team?',
-        giftBayerCoustomer_validation: 'please select whethergoing to hand over the gift to Compliance team '
+        giftDesc_type_label: 'gift description type'
       },
       policy: {
         title: 'Policy Reminder',
@@ -743,6 +735,8 @@ const local: App.I18n.Schema = {
       option_Other: 'Other',
       option_giftDesc_Company_Branded_Gift: 'Company Branded Gift',
       option_giftDesc_Cultural_Courtesy: 'Cultural Courtesy Gifts',
+      option_giftDesc_Promotional_Supplies:
+        'Promotional AIDS for HCP when promoting OTC products (with company or brand logo)',
       option_giftDesc_Other: 'Other Gifts',
       option_giftDesc_General_Gift: 'General Gift',
       option_giftDesc_Cash_Equivalents: 'Cash or Cash Equivalents',

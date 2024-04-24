@@ -279,15 +279,7 @@ const local: App.I18n.Schema = {
 
         giftDesc_label: '礼品描述',
         giftDesc_label_validation: '请输入礼品描述',
-        giftDesc_type_label: '礼品描述类别',
-        giftBayerCoustomer_label_0813:
-          '你打算把这件礼品交给子集团合规负责人吗? 一件或一套价值RMB300元以上的礼品必须交给他/她。',
-        giftBayerCoustomer_label_1391:
-          '你打算把这件礼品交给子集团合规负责人吗? 一件或一套价值RMB300元以上的礼品必须交给他/她。',
-        giftBayerCoustomer_label_0882: '您将把接受到的礼品交予合规团队吗? ',
-        giftBayerCoustomer_label_1954: '您将把接受到的礼品交予合规团队吗? ',
-        giftBayerCoustomer_label_1955: '您将把接受到的礼品交予合规团队吗? ',
-        giftBayerCoustomer_validation: '请选择是否交予合规团队'
+        giftDesc_type_label: '礼品描述类别'
       },
       policy: {
         title: '政策提示',
@@ -640,8 +632,10 @@ const local: App.I18n.Schema = {
       option_giftDesc_General_Gift: '一般物品',
       option_giftDesc_Cash_Equivalents: '现金或现金等价物',
       option_giftDesc_Present: '礼品',
-      option_giftDesc_Cultural_Courtesy: '风俗礼品（只针对于健康消费品经销商）',
+      option_giftDesc_Cultural_Courtesy: '风俗礼品（仅限于经销商，仅限于春节和中秋节）',
+      option_giftDesc_Promotional_Supplies: '推广OTC产品时面向HCP提供的推广辅助用品（带公司或品牌标识的）',
       option_giftDesc_Other: '其他礼品',
+
       option_go_sco_Government_Official: '政府官员/国家机关工作人员',
       option_go_sco_Government_Non_Official: '非政府官员/非国家机关工作人员',
       option_go_sco_Distributor: '经销商',

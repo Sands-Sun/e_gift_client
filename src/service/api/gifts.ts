@@ -5,6 +5,8 @@ const api_url = {
   group_save: '/gifts/group/save',
   // group_update: '/gifts/group/update',
   giving_gifts_list: '/gifts/giving/page',
+  giving_gifts_save: '/gifts/giving/save',
+  giving_gifts_cancel: '',
   receiving_gifts_list: '/gifts/receiving/page',
   receiving_gifts_save: '/gifts/receiving/save',
   receiving_gifts_cancel: 'gifts/receiving/cancel',
@@ -44,6 +46,14 @@ export function saveGroup(param: any) {
   });
 }
 
+export function saveGivingGifts(param: any) {
+  return request({
+    url: api_url.giving_gifts_save,
+    method: 'post',
+    data: param
+  });
+}
+
 export function cancelReceivingGifts(param: any) {
   return request({
     url: api_url.receiving_gifts_cancel,
@@ -60,9 +70,9 @@ export function saveReceivingGifts(param: any) {
   });
 }
 
-export function updateDraftReceivingGifts(param: any) {
+export function updateReceivingGifts(param: any) {
   return request({
-    url: `gifts/receiving/draft/update/${param.applicationId}`,
+    url: `gifts/receiving/update/${param.applicationId}`,
     method: 'post',
     data: param
   });

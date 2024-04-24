@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { $t } from '@/locales';
-import {
-  fetchGivingGiftsList,
-  fuzzySearchGiftCompanyList,
-  fuzzySearchGiftPersonList,
-  fuzzySearchUserList
-} from '@/service/api';
+import { fetchGivingGiftsList, fuzzySearchUserList, saveGivingGifts } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
 import type { SelectProps } from '@ant-design/icons-vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -29,11 +24,8 @@ const listDataSource = ref([] as any);
 const givingGiftFormRef = ref();
 const searchRangeDate = ref<[Dayjs, Dayjs]>();
 const applySearch = ref<string>('');
-const giftCompanySearch = ref<string>('');
-const giftPersonSearch = ref<string>('');
 const userState = reactive({ data: [] as any, value: [] as any, ccValue: [] as any, fetching: true });
-const giftCompanyState = reactive({ data: [] as any, value: -1, fetching: true });
-const giftCompanyPersonState = reactive({ data: [] as any, value: [] as any, fetching: true });
+const giftCompanyPersonState = reactive({ data: [] as any, value: [] as any });
 const searchFormRef = ref<FormInstance>();
 const searchFormModelRef = reactive({
   userId: '',
@@ -161,17 +153,19 @@ const formApplyRules: Record<string, Rule[]> = reactive({
   givenCompany: [
     {
       required: true,
-      message: $t('page.receivingGifts.applyForm.giftGiverCompanyName_validation')
+      message: $t('page.givingGifts.applyForm.giftGivingCompanyName_validation')
       // tsmg: 'page.receivingGifts.applyForm.giftGiverCompanyName_validation'
     }
   ],
   givenPersons: [
     {
       required: true,
-      message: $t('page.receivingGifts.applyForm.giftGiverEmployeeName_validation')
+      message: $t('page.givingGifts.applyForm.giftGivingEmployeeName_validation')
       // tsmg: 'page.receivingGifts.applyForm.giftGiverEmployeeName_validation'
     }
-  ]
+  ],
+  isGoSoc: [{ required: true, message: $t('form.common.select_validation') }],
+  isBayerCustomer: [{ required: true, message: $t('form.common.select_validation') }]
   // givingTitle: [{ required: true, message: $t('page.receivingGifts.applyForm.giftGiverTitle_validation') }]
 });
 
@@ -205,48 +199,6 @@ const { resetFields, validate, validateInfos } = applyGivingForm(applyModelRef, 
   onValidate: (...args) => console.log(...args)
 });
 
-const loadGiftCompanyPersonData = debounce(async (keyword: string) => {
-  if (!keyword) {
-    giftCompanyPersonState.data = [];
-  }
-  if (!giftCompanyState.value && giftCompanyState.value === -1) {
-    giftCompanyPersonState.data.push({ personName: keyword });
-    return;
-  }
-  const { data: items, error } = await fuzzySearchGiftPersonList(giftCompanyState.value, keyword);
-  if (!error) {
-    console.log('fuzzySearchGiftPersonList:', items);
-    giftCompanyPersonState.data = items;
-    if (giftCompanyPersonState.data.length === 0) {
-      console.log('gift company person push new key:', keyword);
-      giftCompanyPersonState.data.push({ personName: keyword });
-    }
-
-    giftCompanyPersonState.fetching = false;
-    console.log('giftCompanyState: ', giftCompanyState);
-  }
-});
-const loadGiftCompanyData = debounce(async (keyword: string) => {
-  if (!keyword) {
-    giftCompanyState.data = [];
-  }
-  const { data: items, error } = await fuzzySearchGiftCompanyList(keyword);
-  if (!error) {
-    console.log('giftCompanyInfo:', items);
-    if (giftCompanySearch.value !== keyword) {
-      return;
-    }
-    giftCompanyState.data = items;
-    if (giftCompanyState.data.length === 0) {
-      console.log('push new key:', keyword);
-      giftCompanyState.data.push({ companyName: keyword, id: -1 });
-    }
-
-    giftCompanyState.fetching = false;
-    console.log('giftCompanyState: ', giftCompanyState);
-  }
-});
-
 const loadUserData = debounce(async (keyword: string) => {
   if (!keyword) {
     userState.data = [];
@@ -269,26 +221,6 @@ const onApplySearch = (searchValue: string) => {
   userState.fetching = true;
   console.log('Search:', searchValue);
   loadUserData(searchValue);
-};
-
-const ongGiftPersonSearch = (searchValue: string) => {
-  giftPersonSearch.value = searchValue;
-  giftCompanyPersonState.data = [];
-  console.log('Search:', searchValue);
-  loadGiftCompanyPersonData(searchValue);
-};
-
-const onGiftCompanySearch = (searchValue: string) => {
-  giftCompanySearch.value = searchValue;
-  giftCompanyState.data = [];
-  giftCompanyState.fetching = true;
-  console.log('Search:', searchValue);
-  loadGiftCompanyData(searchValue);
-};
-
-const onGiftCompanyChange = (value: any) => {
-  console.log(`selected ${value}`);
-  giftCompanyState.value = value;
 };
 
 const ccApplyOptions = computed<SelectProps['options']>(() =>
@@ -358,27 +290,36 @@ const handleTableChange = (pag: { pageSize: number; current: number }, filters: 
 };
 
 const onSubmitApply = (value: string) => {
+  let confirmContent = '';
+  if (value === 'Draft') {
+    console.log('update draft...');
+    confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+  } else if (value === 'Submit') {
+    console.log('modify submit...');
+    confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+  }
   console.log(`submit type ${value}`);
   validate()
     .then(() => {
       Modal.confirm({
         title: $t('common.tip'),
         icon: createVNode(ExclamationCircleOutlined),
-        content: '确定保存赠送？',
+        content: confirmContent,
         okText: $t('common.confirm'),
         cancelText: $t('common.cancel'),
         async onOk() {
+          debugger;
           const requestParam = toRaw(applyModelRef);
-          // requestParam.actionType = value;
-          // requestParam.applyForId = requestParam.applyName.option.userId;
-          // requestParam.copyToUserEmails = requestParam.applyCCName;
+          requestParam.actionType = value;
+          requestParam.applyForId = requestParam.applyName.userId;
+          requestParam.copyToUserEmails = requestParam.applyCCName;
           console.log(requestParam);
-          // const { error } = await saveReceivingGifts(requestParam);
-          // if (!error) {
-          //   console.log('success!');
-          //   resetFields();
-          //   closeApplyDrawerModal();
-          // }
+          const { error } = await saveGivingGifts(requestParam);
+          if (!error) {
+            console.log('success!');
+            resetFields();
+            closeApplyDrawerModal();
+          }
         },
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         onCancel() {
@@ -450,20 +391,15 @@ onMounted(async () => {
 // });
 
 watch(
-  () => [userState.value, giftCompanyState.value, giftCompanyPersonState.value],
-  ([newVal1, newVal2, newVal3], [oldVal1, oldVal2, oldVal3]) => {
+  () => [userState.value, giftCompanyPersonState.value],
+  ([newVal1, newVal3], [oldVal1, oldVal3]) => {
     console.log('newVal1:', newVal1);
     console.log('oldVal1:', oldVal1);
-    console.log('newVal2:', newVal2);
-    console.log('oldVal2:', oldVal2);
     console.log('newVal3:', newVal3);
     console.log('oldVal3:', oldVal3);
     userState.data = [];
     userState.fetching = false;
-    giftCompanyState.data = [];
-    giftCompanyState.fetching = false;
     giftCompanyPersonState.data = [];
-    giftCompanyPersonState.fetching = false;
   }
 );
 </script>
@@ -605,7 +541,7 @@ watch(
         </template>
         <template v-else>
           <a-row :gutter="24">
-            <a-col span="14">
+            <a-col span="12">
               <a-form-item v-bind="validateInfos.reasonType" :label="$t('page.givingGifts.applyForm.giftReason_label')">
                 <a-input
                   v-model:value="applyModelRef.reasonType"
@@ -613,16 +549,44 @@ watch(
                 ></a-input>
               </a-form-item>
             </a-col>
-            <a-col span="10">
-              <a-form-item v-bind="validateInfos.giftDescType" :label="$t('page.givingGifts.applyForm.giftDesc_label')">
-                <a-select v-model:value="applyModelRef.giftDescType" @change="handleChange">
-                  <a-select-option value="Cultural Courtesy Gifts">
-                    {{ $t('form.common.option_giftDesc_Cultural_Courtesy') }}
-                  </a-select-option>
-                  <a-select-option value="Other">{{ $t('form.common.option_giftDesc_Other') }}</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
+
+            <!--0882 区分 CH 和 PH-->
+            <template v-if="userInfo.division === 'CH'">
+              <a-col span="12">
+                <a-form-item
+                  v-bind="validateInfos.giftDescType"
+                  :label="$t('page.givingGifts.applyForm.giftDesc_label')"
+                >
+                  <a-select v-model:value="applyModelRef.giftDescType" @change="handleChange">
+                    <a-select-option
+                      value="Promotional Supplies Gifts"
+                      :title="$t('form.common.option_giftDesc_Promotional_Supplies')"
+                    >
+                      {{ $t('form.common.option_giftDesc_Promotional_Supplies') }}
+                    </a-select-option>
+                    <a-select-option value="Cultural Courtesy Gifts">
+                      {{ $t('form.common.option_giftDesc_Cultural_Courtesy') }}
+                    </a-select-option>
+                    <a-select-option value="Other">
+                      {{ $t('form.common.option_giftDesc_Other') }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </template>
+            <template v-else>
+              <a-col span="10">
+                <a-form-item
+                  v-bind="validateInfos.giftDescType"
+                  :label="$t('page.givingGifts.applyForm.giftDesc_label')"
+                >
+                  <a-input
+                    v-model:value="applyModelRef.giftDescType"
+                    :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
+                  ></a-input>
+                </a-form-item>
+              </a-col>
+            </template>
           </a-row>
         </template>
 
@@ -665,7 +629,12 @@ watch(
               v-bind="validateInfos.givenCompany"
               :label="$t('page.givingGifts.applyForm.giftGivingCompanyName')"
             >
-              <a-select
+              <a-input
+                v-model:value="applyModelRef.givenCompany"
+                :placeholder="$t('page.givingGifts.applyForm.giftGivingCompanyName_validation')"
+              ></a-input>
+              <!--
+ <a-select
                 :placeholder="$t('form.common.select_validation')"
                 show-search
                 :allow-clear="true"
@@ -679,6 +648,7 @@ watch(
                   {{ item.companyName }}
                 </a-select-option>
               </a-select>
+-->
             </a-form-item>
           </a-col>
         </a-row>
@@ -689,10 +659,15 @@ watch(
               :label="$t('page.givingGifts.applyForm.giftGivingEmployeeName')"
             >
               <a-select
-                mode="multiple"
+                v-model:value="applyModelRef.givenPersons"
+                mode="tags"
+                :default-active-first-option="false"
+                :filter-option="false"
                 style="width: 100%"
-                :placeholder="$t('form.common.select_validation')"
-                @search="ongGiftPersonSearch"
+                :allow-clear="true"
+                :placeholder="$t('page.givingGifts.applyForm.giftGivingEmployeeName_validation')"
+                :open="false"
+                :token-separators="[';']"
               >
                 <a-select-option v-for="item in giftCompanyPersonState.data" :key="item.id" :value="item.id">
                   {{ item.personName }}
@@ -701,6 +676,7 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
+
         <a-row :gutter="24">
           <a-col span="24">
             <a-form-item :label="$t('form.common.upload_person_label')">
@@ -717,6 +693,7 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
+
         <a-row :gutter="24">
           <a-col span="14">
             <a-form-item v-bind="validateInfos.isGoSoc" :label="$t('page.givingGifts.applyForm.giftRecipientCategory')">

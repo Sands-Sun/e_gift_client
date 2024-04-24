@@ -491,12 +491,6 @@ declare namespace App {
             giftDesc_label: string;
             giftDesc_label_validation: string;
             giftDesc_type_label: string;
-            giftBayerCoustomer_label_0813: string;
-            giftBayerCoustomer_label_1391: string;
-            giftBayerCoustomer_label_0882: string;
-            giftBayerCoustomer_label_1954: string;
-            giftBayerCoustomer_label_1955: string;
-            giftBayerCoustomer_validation: string;
           };
           policy: {
             title: string;
@@ -563,6 +557,7 @@ declare namespace App {
           option_giftDesc_Cash_Equivalents: string;
           option_giftDesc_Present: string;
           option_giftDesc_Cultural_Courtesy: string;
+          option_giftDesc_Promotional_Supplies: string;
           option_giftDesc_Other: string;
           option_go_sco_Government_Official: string;
           option_go_sco_Government_Non_Official: string;

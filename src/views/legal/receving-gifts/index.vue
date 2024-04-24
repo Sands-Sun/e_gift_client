@@ -7,12 +7,12 @@ import {
   fuzzySearchUserList,
   getReceivingGiftsByApplicationId,
   saveReceivingGifts,
-  updateDraftReceivingGifts
+  updateReceivingGifts
 } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
 import type { SelectProps } from '@ant-design/icons-vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-import type { FormInstance, TableColumnsType } from 'ant-design-vue';
+import type { TableColumnsType } from 'ant-design-vue';
 import { Form, Modal } from 'ant-design-vue';
 import type { Rule } from 'ant-design-vue/es/form';
 import type { Dayjs } from 'dayjs';
@@ -22,18 +22,21 @@ import { computed, createVNode, onMounted, reactive, ref, toRaw, watch } from 'v
 let authStore: any;
 let userInfo: Api.Auth.UserInfo;
 let supervisorInfo: Api.Auth.UserInfo;
+const searchFormRef = ref();
 const applyReceivingForm = Form.useForm;
 const applyReceivingCancelForm = Form.useForm;
+
 const openCancelModal = ref<boolean>(false);
 const listTableLoading = ref(true);
 const openApplyDrawerModal = ref<boolean>(false);
 const showReasonDesc = ref(false);
 const expandSearchFields = ref(true);
-const receivingGiftFromStatus = reactive({ disableStatus: false, actionStatus: '' });
+const receivingGiftFromStatus = reactive({ disableStatus: false, descTypeHistory: false, actionStatus: '' });
 const listDataSource = ref([] as any);
 const receivingGiftFormRef = ref();
 const applySearch = ref<string>('');
 const searchRangeDate = ref<[Dayjs, Dayjs]>();
+const giftDescTypeArray = ['Cash Equivalents', 'Present'];
 const userState = reactive({ data: [] as any, value: [] as any, ccValue: [] as any, fetching: true });
 const giftCompanyPersonState = reactive({ data: [] as any, value: [] as any, fetching: true });
 const applyFormCancelModelRef = reactive({ remark: undefined, applicationId: '' });
@@ -139,6 +142,7 @@ const formApplyRules: Record<string, Rule[]> = reactive({
 const applyModelRef = reactive({
   actionType: '',
   applicationId: '',
+  reference: '',
   applyName: undefined as any,
   applyForId: undefined as any,
   copyToUserEmails: [] as any,
@@ -159,7 +163,6 @@ const applyModelRef = reactive({
   activity: [] as any,
   remark: ''
 });
-const searchFormRef = ref<FormInstance>();
 const disabledAfterCurrentDate = (current: Dayjs) => {
   // Can not select days after today and today
   return current && current > dayjs().endOf('day');
@@ -193,14 +196,6 @@ const onApplySearch = (searchValue: string) => {
   loadUserData(searchValue);
 };
 
-const handOverToOptions = computed<SelectProps['options']>(() =>
-  userState.data.map((user: any) => ({
-    label: `${user.firstName} ${user.lastName} <${user.email}>`,
-    value: user.email,
-    userId: user.sfUserId
-  }))
-);
-
 const ccApplyOptions = computed<SelectProps['options']>(() =>
   userState.data.map((user: any) => ({
     label: `${user.firstName} ${user.lastName} <${user.email}>`,
@@ -217,12 +212,13 @@ const applyOptions = computed<SelectProps['options']>(() =>
   }))
 );
 
+// 重置search表单
 const resetSearchForm = () => {
-  debugger;
+  searchRangeDate.value = undefined;
   searchFormRef?.value?.resetFields();
 };
 
-// 搜索按钮，
+// 搜索按钮
 const getListDataByCondition = async (currentPage = 1) => {
   listTableLoading.value = true;
   // get search date
@@ -261,6 +257,7 @@ const handleChangeReasonType = (value: any) => {
 const showApplyDrawerModal = async (type: string, item?: any) => {
   resetFields();
   receivingGiftFromStatus.disableStatus = false;
+  receivingGiftFromStatus.descTypeHistory = false;
   receivingGiftFromStatus.actionStatus = type;
   console.log('show apply drawer type:', type);
   giftCompanyPersonState.data = [];
@@ -284,6 +281,7 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       receivingGiftFromStatus.actionStatus = data.status;
       applyModelRef.applicationId = data.applicationId;
       applyModelRef.actionType = data.status;
+      applyModelRef.reference = data.reference;
       applyOptions.value.unshift({
         label: `${data.sfUserAppliedName} <${data.sfUserAppliedEmail}>`,
         value: data.sfUserAppliedEmail,
@@ -319,6 +317,10 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       applyModelRef.giftDescType = data.giftsRef.giftDescType;
       // applyModelRef.isHandedOver = data.isHandedOver;
       applyModelRef.remark = data.remark;
+      if (giftDescTypeArray.filter(d => applyModelRef.giftDescType === d).length === 0) {
+        receivingGiftFromStatus.descTypeHistory = true;
+      }
+
       console.log('success:', data);
 
       if (data.status === 'Documented') {
@@ -398,6 +400,7 @@ const onSubmitCancel = () => {
             cancelForm.resetFields();
             closeCancelModal();
             // closeApplyDrawerModal();
+            getListDataByCondition();
           }
         },
         onCancel() {
@@ -438,18 +441,16 @@ const onModifyApply = (value: string) => {
           requestParam.applyForId = requestParam.applyName.userId;
           requestParam.copyToUserEmails = requestParam.applyCCName;
           console.log(requestParam);
-          if (value === 'Draft') {
+          if (value === 'Draft' || value === 'Submit') {
             console.log('update draft...');
-            await updateDraftReceivingGifts(requestParam);
-          } else if (value === 'Submit') {
-            console.log('modify submit...');
-            await saveReceivingGifts(requestParam);
+            await updateReceivingGifts(requestParam);
           } else if (value === 'Delete') {
             console.log('modify delete draft...');
             await deleteDraftReceivingGifts(requestParam.applicationId);
           }
           resetFields();
           closeApplyDrawerModal();
+          getListDataByCondition();
         },
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         onCancel() {
@@ -464,12 +465,21 @@ const onModifyApply = (value: string) => {
 
 // 保存提交
 const onSubmitApply = (value: string) => {
+  let confirmContent = '';
+  if (value === 'Draft') {
+    console.log('update draft...');
+    confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+  } else if (value === 'Submit') {
+    console.log('modify submit...');
+    confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+  }
+
   validate()
     .then(() => {
       Modal.confirm({
         title: $t('common.tip'),
         icon: createVNode(ExclamationCircleOutlined),
-        content: '确定保存接受礼品？',
+        content: confirmContent,
         okText: $t('common.confirm'),
         cancelText: $t('common.cancel'),
         async onOk() {
@@ -483,6 +493,7 @@ const onSubmitApply = (value: string) => {
             console.log('success!');
             resetFields();
             closeApplyDrawerModal();
+            getListDataByCondition();
           }
         },
         // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -552,7 +563,31 @@ watch(
         <a-descriptions-item :label="$t('form.applicateInfo.costCenter')">
           {{ userInfo.costCenter }}
         </a-descriptions-item>
-        <a-descriptions-item :label="$t('form.applicateInfo.division')">{{ userInfo.division }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('form.applicateInfo.division')">
+          {{ userInfo.division }}
+        </a-descriptions-item>
+
+        <template v-if="applyModelRef.reference !== ''">
+          <a-descriptions-item :label="$t('form.common.reference')">
+            <strong>{{ applyModelRef.reference }}</strong>
+          </a-descriptions-item>
+        </template>
+
+        <template v-if="applyModelRef.actionType !== ''">
+          <a-descriptions-item :label="$t('common.status')">
+            <span>
+              <template v-if="applyModelRef.actionType === 'Draft'">
+                <a-tag color="green">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="applyModelRef.actionType === 'Documented'">
+                <a-tag color="geekblue">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else>
+                <a-tag color="volcano">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+            </span>
+          </a-descriptions-item>
+        </template>
       </a-descriptions>
 
       <a-form ref="receivingGiftFormRef" :disabled="receivingGiftFromStatus.disableStatus">
@@ -650,12 +685,22 @@ watch(
               v-bind="validateInfos.giftDescType"
             >
               <a-select v-model:value="applyModelRef.giftDescType">
-                <a-select-option value="Company Branded Gift">
-                  {{ $t('form.common.option_giftDesc_Cash_Equivalents') }}
-                </a-select-option>
-                <a-select-option value="General Gift">
-                  {{ $t('form.common.option_giftDesc_Present') }}
-                </a-select-option>
+                <template v-if="receivingGiftFromStatus.descTypeHistory">
+                  <a-select-option value="General Gift">
+                    {{ $t('form.common.option_giftDesc_General_Gift') }}
+                  </a-select-option>
+                  <a-select-option value="Company Branded Gift">
+                    {{ $t('form.common.option_giftDesc_Company_Branded_Gift') }}
+                  </a-select-option>
+                </template>
+                <template v-else>
+                  <a-select-option value="Cash Equivalents">
+                    {{ $t('form.common.option_giftDesc_Cash_Equivalents') }}
+                  </a-select-option>
+                  <a-select-option value="Present">
+                    {{ $t('form.common.option_giftDesc_Present') }}
+                  </a-select-option>
+                </template>
               </a-select>
             </a-form-item>
           </a-col>
@@ -757,21 +802,25 @@ watch(
       <template v-if="receivingGiftFromStatus.disableStatus">
         <a-descriptions :title="$t('form.common.historyLog')">
           <a-descriptions-item :label="$t('form.common.operationInfo')" span="4">
-            <template v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
-              &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
-              <strong>{{ item.action }}</strong>
-              &nbsp; at &nbsp;
-              {{ item.createdDate }}
-            </template>
+            <ul>
+              <li v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
+                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <strong>{{ item.action }}</strong>
+                &nbsp; at &nbsp;
+                {{ item.createdDate }}
+              </li>
+            </ul>
           </a-descriptions-item>
 
           <a-descriptions-item :label="$t('form.common.remarkInfo')" span="4">
-            <template v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
-              &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
-              <strong>wrote at {{ item.createdDate }}</strong>
-              &nbsp;
-              {{ item.remark }}
-            </template>
+            <ul>
+              <li v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
+                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <strong>wrote at {{ item.createdDate }}</strong>
+                &nbsp;
+                {{ item.remark }}
+              </li>
+            </ul>
           </a-descriptions-item>
         </a-descriptions>
       </template>
@@ -832,7 +881,7 @@ watch(
         <div v-show="expandSearchFields">
           <a-row :gutter="8">
             <a-col span="6">
-              <a-form-item :label="$t('form.common.reference')">
+              <a-form-item :label="$t('form.common.reference')" name="reference">
                 <a-input
                   v-model:value="searchFormModelRef.reference"
                   :placeholder="$t('form.common.reference_placeHolder')"
@@ -840,7 +889,7 @@ watch(
               </a-form-item>
             </a-col>
             <a-col span="4">
-              <a-form-item :label="$t('form.applicateInfo.employeeLe')">
+              <a-form-item :label="$t('form.applicateInfo.employeeLe')" name="companyCode">
                 <a-input
                   v-model:value="searchFormModelRef.companyCode"
                   :placeholder="$t('form.applicateInfo.employeeLe_placeHolder')"
@@ -848,7 +897,7 @@ watch(
               </a-form-item>
             </a-col>
             <a-col span="5">
-              <a-form-item :label="$t('form.applicateInfo.formFiller')">
+              <a-form-item :label="$t('form.applicateInfo.formFiller')" name="creator">
                 <a-input
                   v-model:value="searchFormModelRef.creator"
                   :placeholder="$t('form.applicateInfo.formFiller_placeHolder')"
@@ -856,7 +905,7 @@ watch(
               </a-form-item>
             </a-col>
             <a-col span="5">
-              <a-form-item :label="$t('form.applicateInfo.applyFor')">
+              <a-form-item :label="$t('form.applicateInfo.applyFor')" name="userName">
                 <a-input
                   v-model:value="searchFormModelRef.userName"
                   :placeholder="$t('form.applicateInfo.applyFor_placeHolder')"
@@ -864,25 +913,15 @@ watch(
               </a-form-item>
             </a-col>
             <a-col span="4">
-              <a-form-item label="CWID">
+              <a-form-item label="CWID" name="cwid">
                 <a-input v-model:value="searchFormModelRef.cwid"></a-input>
               </a-form-item>
             </a-col>
           </a-row>
 
           <a-row :gutter="35">
-            <!--
- <a-col span="4">
-              <a-form-item :label="$t('form.searchFrom.applyType')">
-                <a-select v-model:value="searchFormModelRef.type">
-                  <a-select-option value="draft">{{ $t('form.common.option_draft') }}</a-select-option>
-                  <a-select-option value="complete">{{ $t('form.common.option_complete') }}</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
--->
             <a-col span="6">
-              <a-form-item :label="$t('form.searchFrom.applyStatus')">
+              <a-form-item :label="$t('form.searchFrom.applyStatus')" name="status">
                 <a-select v-model:value="searchFormModelRef.status">
                   <a-select-option value="draft">Draft</a-select-option>
                   <a-select-option value="documented">Documented</a-select-option>
@@ -891,7 +930,7 @@ watch(
               </a-form-item>
             </a-col>
             <a-col span="10">
-              <a-form-item :label="$t('page.receivingGifts.applyForm.giftReceivingDate')">
+              <a-form-item :label="$t('page.receivingGifts.applyForm.giftReceivingDate')" name="searchRangeDate">
                 <a-range-picker v-model:value="searchRangeDate" />
               </a-form-item>
             </a-col>

@@ -24,7 +24,7 @@ const local: App.I18n.Schema = {
     delete: 'Delete',
     deleteSuccess: 'Delete Success',
     batchDelete: 'Batch Delete',
-    confirm: 'Confirm',
+    confirm: 'SSO',
     cancel: 'Cancel',
     conformCancel: 'Confirm Cancel ?',
     createdDate: 'Created Date',

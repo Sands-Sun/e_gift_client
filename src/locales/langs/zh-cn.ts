@@ -24,7 +24,7 @@ const local: App.I18n.Schema = {
     delete: '删除',
     deleteSuccess: '删除成功',
     batchDelete: '批量删除',
-    confirm: '确认',
+    confirm: 'SSO',
     cancel: '取消',
     conformCancel: '确认取消？',
     createdDate: '创建日期',

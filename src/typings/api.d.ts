@@ -115,6 +115,9 @@ declare namespace Api {
   }
 
   namespace Auth {
+    interface SSO {
+      url: string;
+    }
     interface LoginToken {
       token: string;
       userId: number;
@@ -138,6 +141,7 @@ declare namespace Api {
       division: string;
       supervisor: UserInfo;
       roles: string[];
+      token: string;
     }
   }
 

@@ -34,6 +34,13 @@ export default defineConfig(configEnv => {
       port: 9527,
       open: true,
       proxy: createViteProxy(viteEnv, configEnv.command === 'serve'),
+      // proxy: {
+      //   '/api': {
+      //     target: 'http://backend.example.com', // 目标服务器地址
+      //     changeOrigin: true, // 是否改变源地址
+      //     rewrite: (path) => path.replace(/^\/api/, ''), // 重写路径
+      //   },
+      // },
       fs: {
         cachedChecks: false
       }

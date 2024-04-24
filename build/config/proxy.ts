@@ -9,7 +9,7 @@ import { createServiceConfig } from '../../src/utils/service';
  */
 export function createViteProxy(env: Env.ImportMeta, isDev: boolean) {
   const isEnableHttpProxy = isDev && env.VITE_HTTP_PROXY === 'Y';
-
+debugger
   if (!isEnableHttpProxy) return undefined;
 
   const { baseURL, proxyPattern, other } = createServiceConfig(env);

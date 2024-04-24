@@ -143,3 +143,4 @@ pnpm build
 ## 开源协议
 
 项目基于 [MIT © 2021 Soybean](./LICENSE) 协议，仅供学习参考，商业使用请保留作者版权信息，作者不保证也不承担任何软件的使用风险。
+git commit -m '提交信息' --no-verify

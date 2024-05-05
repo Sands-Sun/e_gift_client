@@ -8,7 +8,7 @@ import type { Rule } from 'ant-design-vue/es/form';
 import { $t } from '@/locales';
 import { fetchGroupList, fuzzySearchUserList, getGroupById, saveGroup, updateGroup } from '@/service/api';
 import { debounce } from 'lodash-es';
-import { computed, createVNode, onMounted, onUpdated, reactive, ref, toRaw } from 'vue';
+import { computed, createVNode, onMounted, reactive, ref, toRaw } from 'vue';
 const groupForm = Form.useForm;
 const listTableLoading = ref(true);
 const openGroupModal = ref<boolean>(false);
@@ -20,6 +20,7 @@ const groupFormModelRef = reactive({
   action: '',
   id: undefined,
   bindPersons: [],
+  userEmails: [],
   groupName: '',
   fullName: '',
   groupCode: '',
@@ -32,6 +33,7 @@ const searchFormModelRef = reactive({
   groupName: '',
   fullName: '',
   groupCode: '',
+  status: '',
   markDeleted: '',
   createdDate: undefined,
   lastModifiedDate: undefined,
@@ -82,36 +84,36 @@ const groupFormRules: Record<string, Rule[]> = reactive({
   groupName: [
     {
       required: true,
-      message: $t('page.manageGroup.applyForm.groupName_validation'),
-      tsmg: 'page.manageGroup.applyForm.groupName_validation'
+      message: $t('page.manageGroup.applyForm.groupName_validation')
+      // tsmg: 'page.manageGroup.applyForm.groupName_validation'
     }
   ],
   fullName: [
     {
       required: true,
-      message: $t('page.manageGroup.applyForm.fullName_validation'),
-      tsmg: 'page.manageGroup.applyForm.fullName_validation'
+      message: $t('page.manageGroup.applyForm.fullName_validation')
+      // tsmg: 'page.manageGroup.applyForm.fullName_validation'
     }
   ],
   groupCode: [
     {
       required: true,
-      message: $t('page.manageGroup.applyForm.groupCode_validation'),
-      tsmg: 'page.manageGroup.applyForm.groupCode_validation'
+      message: $t('page.manageGroup.applyForm.groupCode_validation')
+      // tsmg: 'page.manageGroup.applyForm.groupCode_validation'
     }
   ],
   bindPersons: [
     {
       required: true,
-      message: $t('page.manageGroup.applyForm.bindPerson_validation'),
-      tsmg: 'page.manageGroup.applyForm.bindPerson_validation'
+      message: $t('page.manageGroup.applyForm.bindPerson_validation')
+      // tsmg: 'page.manageGroup.applyForm.bindPerson_validation'
     }
   ],
   remark: [
     {
       required: true,
-      message: $t('page.manageGroup.applyForm.remark_validation'),
-      tsmg: 'page.manageGroup.applyForm.remark_validation'
+      message: $t('page.manageGroup.applyForm.remark_validation')
+      // tsmg: 'page.manageGroup.applyForm.remark_validation'
     }
   ]
 });
@@ -299,13 +301,13 @@ onMounted(async () => {
   }
 });
 
-onUpdated(() => {
-  // 切换语言后表单验证失效
-  Object.entries(groupFormRules).forEach(([key, value]) => {
-    console.log(`key: ${key}`);
-    value[0].message = $t(`${value[0].tsmg}`);
-  });
-});
+// onUpdated(() => {
+//   // 切换语言后表单验证失效
+//   Object.entries(groupFormRules).forEach(([key, value]) => {
+//     console.log(`key: ${key}`);
+//     value[0].message = $t(`${value[0].tsmg}`);
+//   });
+// });
 </script>
 
 <template>

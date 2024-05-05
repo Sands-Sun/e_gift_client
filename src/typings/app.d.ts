@@ -269,6 +269,10 @@ declare namespace App {
         disable: string;
         status: string;
         submit: string;
+        approve: string;
+        agreeApprove: string;
+        rejectApprove: string;
+        confirmApprove: string;
         saveDraft: string;
         reset: string;
         newGroupCreate: string;
@@ -280,7 +284,7 @@ declare namespace App {
         batchDelete: string;
         confirm: string;
         cancel: string;
-        conformCancel: string;
+        confirmCancel: string;
         createdDate: string;
         lastModifiedDate: string;
         pleaseCheckValue: string;
@@ -453,6 +457,7 @@ declare namespace App {
             giftDesc_label_validation: string;
             giftDesc_type_label: string;
             giftGivingDate: string;
+            giftGivingDate_validation: string;
             giftGivingCompanyName: string;
             giftGivingCompanyName_validation: string;
             giftGivingEmployeeName: string;
@@ -540,6 +545,9 @@ declare namespace App {
           reference: string;
           reference_placeHolder: string;
           totalPrice_validation: string;
+          cancelReson: string;
+          approveComment: string;
+          addPerson: string;
           historyLog: string;
           operationInfo: string;
           remarkInfo: string;
@@ -549,11 +557,13 @@ declare namespace App {
           upload_file: string;
           option_not_Applicable: string;
           upload_person_label: string;
+          upload_template: string;
           option_giftReason_NewYear: string;
           option_giftReason_Mid_Autumn: string;
           option_Other: string;
           option_giftDesc_Company_Branded_Gift: string;
           option_giftDesc_General_Gift: string;
+          option_giftDesc_Medicine: string;
           option_giftDesc_Cash_Equivalents: string;
           option_giftDesc_Present: string;
           option_giftDesc_Cultural_Courtesy: string;

@@ -25,13 +25,17 @@ declare namespace Api {
       id: number;
       companyId: number;
       personName: string;
+      positionTitle: string;
       description: string;
+      key: number;
     }
 
     interface GiftCompany {
       id: number;
       companyName: string;
       description: string;
+      personList: GiftPerson[];
+      key: number;
     }
 
     interface ReceivingGifts {
@@ -58,8 +62,10 @@ declare namespace Api {
       reasonType: string;
       reference: string;
       status: string;
+      fileAttach: FileAttach;
       giftsActivities: ReceivingActivity[];
       giftsRef: ReceivingGiftRef;
+      companyList: GiftCompany[];
     }
 
     interface ReceivingActivity {
@@ -85,8 +91,34 @@ declare namespace Api {
       givingPerson: string;
     }
 
+    interface GivingHospitality {
+      applicationId: string;
+      sfUserAppliedName: string;
+      sfUserAppliedCwid: string;
+      sfUserAppliedEmail: string;
+      sfUserIdAppliedFor: string;
+      copyToUsers: unknown[];
+      costCenter: string;
+      createdDate: string;
+      department: string;
+      employeeLe: string;
+      reference: string;
+      unitValue: number;
+      volume: number;
+      remark: string;
+      reason: string;
+      reasonType: string;
+      status: string;
+      fileAttach: FileAttach;
+    }
+
     interface GivingGifts {
       applicationId: string;
+      sfUserAppliedName: string;
+      sfUserAppliedCwid: string;
+      sfUserAppliedEmail: string;
+      sfUserIdAppliedFor: string;
+      copyToUsers: unknown[];
       costCenter: string;
       createdDate: string;
       department: string;
@@ -94,7 +126,57 @@ declare namespace Api {
       reference: string;
       isExcluded: string;
       markDeleted: string;
+      unitValue: number;
+      volume: number;
+      remark: string;
+      reason: string;
+      reasonType: string;
+      status: string;
+      companyList: GiftCompany[];
+      fileAttach: FileAttach;
+      giftsRef: GivingGiftRef;
+      giftsActivities: GivingActivity[];
     }
+
+    interface FileAttach {
+      id: string;
+      fileName: string;
+      filePath: string;
+      fileSize: string;
+      fileType: string;
+      origFileName: string;
+    }
+
+    interface GivingGiftRef {
+      giftDesc: string;
+      giftDescType: string;
+      attachmentFile: string;
+      attachmentFileName: string;
+      unitValue: number;
+      volume: number;
+      isGoSoc: string;
+      isBayerCustomer: string;
+      givenDate: string;
+      givenCompany: string;
+      giftsPersons: GiftPerson[];
+      givenPerson: string;
+    }
+
+    interface GivingActivity {
+      action: string;
+      appActivityDataId: number;
+      applicationId: number;
+      createdDate: string;
+      lastModifiedDate: string;
+      sfActivityInsId: number;
+      sfProcessInsId: number;
+      sfUserIdSubmitter: number;
+      userEmail: string;
+      userFirstName: string;
+      userLastName: string;
+      remark: string;
+    }
+
     interface TableListResponse {
       list: unknown[];
       pageSize: number;

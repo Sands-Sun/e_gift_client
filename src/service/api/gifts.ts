@@ -4,9 +4,10 @@ const api_url = {
   group_gifts_list: '/gifts/group/page',
   group_save: '/gifts/group/save',
   // group_update: '/gifts/group/update',
+  process_task_list: '/process//task/page',
   giving_gifts_list: '/gifts/giving/page',
   giving_gifts_save: '/gifts/giving/save',
-  giving_gifts_cancel: '',
+  giving_gifts_cancel: '/gifts/giving/cancel',
   receiving_gifts_list: '/gifts/receiving/page',
   receiving_gifts_save: '/gifts/receiving/save',
   receiving_gifts_cancel: 'gifts/receiving/cancel',
@@ -15,6 +16,27 @@ const api_url = {
   // fuzzy_search_gift_company_person: 'gifts/company/person/search',
   fuzzy_search_user_list: '/sys/user/search'
 };
+
+export function exportFile(fileId: any) {
+  return request({
+    url: `sys/download/file/${fileId}`,
+    method: 'post'
+  });
+}
+
+export function getGivingHospitalityByApplicationId(id: any) {
+  return request<Api.Gifts.GivingHospitality>({
+    url: `hospitality/giving/get/${id}`,
+    method: 'get'
+  });
+}
+
+export function getGivingGiftsByApplicationId(id: any) {
+  return request<Api.Gifts.GivingGifts>({
+    url: `gifts/giving/get/${id}`,
+    method: 'get'
+  });
+}
 
 export function getReceivingGiftsByApplicationId(id: any) {
   return request<Api.Gifts.ReceivingGifts>({
@@ -54,6 +76,29 @@ export function saveGivingGifts(param: any) {
   });
 }
 
+export function updateGivingGifts(param: any) {
+  return request({
+    url: `gifts/giving/update/${param.applicationId}`,
+    method: 'post',
+    data: param
+  });
+}
+
+export function deleteDraftGivingGifts(applicationId: string) {
+  return request({
+    url: `gifts/giving/draft/delete/${applicationId}`,
+    method: 'delete'
+  });
+}
+
+export function cancelGivingGifts(param: any) {
+  return request({
+    url: api_url.giving_gifts_cancel,
+    method: 'post',
+    data: param
+  });
+}
+
 export function cancelReceivingGifts(param: any) {
   return request({
     url: api_url.receiving_gifts_cancel,
@@ -85,6 +130,14 @@ export function deleteDraftReceivingGifts(applicationId: string) {
   });
 }
 
+export function handleTask(param: any) {
+  return request({
+    url: `process/task/handle/${param.taskId}`,
+    method: 'post',
+    data: param
+  });
+}
+
 export function fuzzySearchGiftPersonList(companyId: number, keyword: string) {
   return request<Array<Api.Gifts.GiftCompany>>({
     url: `gifts/company/person/${companyId}/search?keyword=${keyword}`,
@@ -109,6 +162,14 @@ export function fuzzySearchUserList(keyword: string) {
 export function fetchGroupList(queryParam?: any) {
   return request<Api.Gifts.TableListResponse>({
     url: api_url.group_gifts_list,
+    method: 'post',
+    data: queryParam
+  });
+}
+
+export function fetchTaskList(queryParam: any) {
+  return request<Api.Gifts.TableListResponse>({
+    url: api_url.process_task_list,
     method: 'post',
     data: queryParam
   });

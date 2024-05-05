@@ -8,9 +8,9 @@ export function createDefaultOptions<ResponseData = any>(options?: Partial<Reque
   const opts: RequestOption<ResponseData> = {
     onRequest: async config => config,
     isBackendSuccess: _response => true,
-    onBackendFail: async () => {},
+    onBackendFail: async () => { },
     transformBackendResponse: async response => response.data,
-    onError: async () => {}
+    onError: async () => { }
   };
 
   Object.assign(opts, options);
@@ -29,7 +29,7 @@ export function createRetryOptions(config?: Partial<CreateAxiosDefaults>) {
 }
 
 export function createAxiosConfig(config?: Partial<CreateAxiosDefaults>) {
-  const TEN_SECONDS = 10 * 1000;
+  const TEN_SECONDS = 10 * 3000;
 
   const axiosConfig: CreateAxiosDefaults = {
     timeout: TEN_SECONDS,

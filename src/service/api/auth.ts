@@ -22,6 +22,11 @@ export function fetchGetUserInfo() {
   return request<Api.Auth.UserInfo>({ url: '/sys/user/getUserInfo' });
 }
 
+/** Get user info by id */
+export function fetchGetUserInfoById(userId: string) {
+  return request<Api.Auth.UserInfo>({ url: `/sys/user/get/${userId}` });
+}
+
 /**
  * Refresh token
  *

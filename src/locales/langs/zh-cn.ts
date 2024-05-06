@@ -262,6 +262,14 @@ const local: App.I18n.Schema = {
         remark_validation: '请输入备注信息'
       }
     },
+    manageUser: {
+      applyForm: {
+        userFirstName: '',
+        userLastName: '',
+        userCwid: 'CWID',
+        userEmail: '用户邮箱'
+      }
+    },
     receivingGifts: {
       applyForm: {
         acceptGiftRequestTitle: '接受礼品申请表',

@@ -389,7 +389,7 @@ onMounted(async () => {
       >
         <a-row :gutter="8">
           <a-col span="6">
-            <a-form-item :label="$t('page.manageGroup.applyForm.groupName')">
+            <a-form-item :label="$t('page.manageGroup.applyForm.groupName')" name="groupName">
               <a-input
                 v-model:value="searchFormModelRef.groupName"
                 :placeholder="$t('page.manageGroup.applyForm.groupName_validation')"
@@ -397,7 +397,7 @@ onMounted(async () => {
             </a-form-item>
           </a-col>
           <a-col span="6">
-            <a-form-item :label="$t('page.manageGroup.applyForm.groupCode')">
+            <a-form-item :label="$t('page.manageGroup.applyForm.groupCode')" name="groupCode">
               <a-input
                 v-model:value="searchFormModelRef.groupCode"
                 :placeholder="$t('page.manageGroup.applyForm.groupCode_validation')"
@@ -405,7 +405,7 @@ onMounted(async () => {
             </a-form-item>
           </a-col>
           <a-col span="6">
-            <a-form-item :label="$t('page.manageGroup.applyForm.fullName')">
+            <a-form-item :label="$t('page.manageGroup.applyForm.fullName')" name="fullName">
               <a-input
                 v-model:value="searchFormModelRef.fullName"
                 :placeholder="$t('page.manageGroup.applyForm.fullName_validation')"

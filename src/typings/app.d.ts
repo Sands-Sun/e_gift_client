@@ -445,6 +445,14 @@ declare namespace App {
             remark_validation: string;
           };
         };
+        manageUser: {
+          applyForm: {
+            userFirstName: string;
+            userLastName: string;
+            userCwid: string;
+            userEmail: string;
+          };
+        };
         givingGifts: {
           applyForm: {
             givingGiftRequestTitle: string;

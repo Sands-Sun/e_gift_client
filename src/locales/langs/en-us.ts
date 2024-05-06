@@ -262,6 +262,14 @@ const local: App.I18n.Schema = {
         remark_validation: 'please input remark'
       }
     },
+    manageUser: {
+      applyForm: {
+        userFirstName: '',
+        userLastName: '',
+        userCwid: '',
+        userEmail: ''
+      }
+    },
     givingGifts: {
       applyForm: {
         givingGiftRequestTitle: 'Giving Gift Request Form',

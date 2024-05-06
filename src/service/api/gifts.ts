@@ -14,7 +14,8 @@ const api_url = {
   // receiving_gifts_getById: '',
   fuzzy_search_gift_company: 'gifts/company/search',
   // fuzzy_search_gift_company_person: 'gifts/company/person/search',
-  fuzzy_search_user_list: '/sys/user/search'
+  fuzzy_search_user_list: '/sys/user/search',
+  user_list: '/sys/user/page'
 };
 
 export function exportFile(fileId: any) {
@@ -156,6 +157,14 @@ export function fuzzySearchUserList(keyword: string) {
   return request<Array<Api.Auth.UserInfo>>({
     url: `${api_url.fuzzy_search_user_list}?keyword=${keyword}`,
     method: 'get'
+  });
+}
+
+export function fetchUserList(queryParam?: any) {
+  return request<Api.Gifts.TableListResponse>({
+    url: api_url.user_list,
+    method: 'post',
+    data: queryParam
   });
 }
 

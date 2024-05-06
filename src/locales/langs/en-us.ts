@@ -15,6 +15,10 @@ const local: App.I18n.Schema = {
     disable: 'Disable',
     status: 'Status',
     submit: 'Submit',
+    approve: 'Approve',
+    agreeApprove: 'Argee',
+    rejectApprove: 'Reject',
+    confirmApprove: 'Confirm Approve?',
     saveDraft: 'Save Draft',
     reset: 'Reset',
     newGroupCreate: 'New Create User Group',
@@ -26,7 +30,7 @@ const local: App.I18n.Schema = {
     batchDelete: 'Batch Delete',
     confirm: 'SSO',
     cancel: 'Cancel',
-    conformCancel: 'Confirm Cancel ?',
+    confirmCancel: 'Confirm Cancel ?',
     createdDate: 'Created Date',
     lastModifiedDate: 'Last Modified Date',
     pleaseCheckValue: 'Please check whether the value is valid',
@@ -258,6 +262,14 @@ const local: App.I18n.Schema = {
         remark_validation: 'please input remark'
       }
     },
+    manageUser: {
+      applyForm: {
+        userFirstName: '',
+        userLastName: '',
+        userCwid: '',
+        userEmail: ''
+      }
+    },
     givingGifts: {
       applyForm: {
         givingGiftRequestTitle: 'Giving Gift Request Form',
@@ -270,6 +282,7 @@ const local: App.I18n.Schema = {
         giftDesc_label_validation: 'please input gift description',
         giftDesc_type_label: 'gift description type',
         giftGivingDate: 'Giving Date ',
+        giftGivingDate_validation: 'please select giving date',
         giftGivingCompanyName: 'Name of empolyer of recipient',
         giftGivingCompanyName_validation: 'please input Name of empolyer of recipient',
         giftGivingEmployeeName: 'Name of recipient',
@@ -712,6 +725,7 @@ const local: App.I18n.Schema = {
   },
   form: {
     common: {
+      upload_file: 'Uppload Attachment',
       option_yes: 'Yes',
       option_no: 'No',
       unitPrice: 'Unit Price',
@@ -722,6 +736,9 @@ const local: App.I18n.Schema = {
       reference: 'Reference No',
       reference_placeHolder: 'please input reference no',
       totalPrice_validation: 'please input total value',
+      cancelReson: 'Fill In Cancel Reson',
+      approveComment: 'Fill In Approve Comment',
+      addPerson: 'Add person',
       historyLog: 'History Log',
       operationInfo: 'Operation Information',
       remarkInfo: 'Remark Information',
@@ -730,6 +747,7 @@ const local: App.I18n.Schema = {
       option_complete: 'Complete',
       option_not_Applicable: 'not Applicable',
       upload_person_label: 'File (you can attach a list of names)',
+      upload_template: 'template download',
       option_giftReason_NewYear: 'Chinese New Year',
       option_giftReason_Mid_Autumn: 'Mid-Autumn Festival',
       option_Other: 'Other',
@@ -739,6 +757,7 @@ const local: App.I18n.Schema = {
         'Promotional AIDS for HCP when promoting OTC products (with company or brand logo)',
       option_giftDesc_Other: 'Other Gifts',
       option_giftDesc_General_Gift: 'General Gift',
+      option_giftDesc_Medicine: 'Medicine',
       option_giftDesc_Cash_Equivalents: 'Cash or Cash Equivalents',
       option_giftDesc_Present: 'Present',
       option_go_sco_Government_Official: 'Government Official',

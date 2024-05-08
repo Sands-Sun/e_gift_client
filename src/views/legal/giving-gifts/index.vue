@@ -204,8 +204,10 @@ const applyOptions = computed<SelectProps['options']>(() =>
 const handleChangeReasonType = (value: any) => {
   console.log('change reason', value);
   if (value === 'Other') {
+    applyModelRef.reason = '';
     showReasonDesc.value = true;
   } else {
+    applyModelRef.reason = 'NA';
     showReasonDesc.value = false;
   }
 };
@@ -251,7 +253,7 @@ const clearApplyModel = () => {
   applyModelRef.applyForId = -1;
   applyModelRef.copyToUserEmails = [];
   applyModelRef.applyCCName = [];
-  applyModelRef.reason = 'NA';
+  applyModelRef.reason = '';
   applyModelRef.reasonType = '';
   applyModelRef.giftDescType = '';
   applyModelRef.date = dayjs();
@@ -524,6 +526,23 @@ const onSubmitApply = (value: string) => {
     confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
   }
   console.log(`submit type ${value}`);
+  const personArr = [];
+  applyModelRef.companyList.forEach(c => {
+    c.personList.forEach(p => {
+      personArr.push(p);
+    });
+  });
+  if (!applyModelRef.fileId && applyModelRef.volume !== personArr.length) {
+    Modal.warning({
+      title: '人员与数量不符',
+      content: h('div', {}, [h('p', `提供人员：${personArr.length}`), h('p', `数量：${applyModelRef.volume}`)]),
+      onOk() {
+        console.log('ok');
+      }
+    });
+    return;
+  }
+
   givingGiftFormRef?.value
     ?.validate()
     .then(() => {
@@ -860,42 +879,74 @@ watch(
                   }
                 ]"
               >
-                <a-select v-model:value="applyModelRef.reasonType" @change="handleChangeReasonType">
+                <a-select
+                  v-model:value="applyModelRef.reasonType"
+                  :dropdown-match-select-width="false"
+                  @change="handleChangeReasonType"
+                >
                   <a-select-option value="Chinese New Year">
                     {{ $t('form.common.option_giftReason_NewYear') }}
                   </a-select-option>
                   <a-select-option value="Mid-Autumn Festival">
                     {{ $t('form.common.option_giftReason_Mid_Autumn') }}
                   </a-select-option>
-                  <a-select-option value="Other">{{ $t('form.common.option_Other') }}</a-select-option>
+                  <a-select-option value="Other">{{ $t('form.common.option_giftReason_Other') }}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
-
-            <a-col span="12">
-              <a-form-item
-                :label="$t('page.givingGifts.applyForm.giftDesc_type_label')"
-                name="giftDescType"
-                :rules="[
-                  {
-                    required: true,
-                    message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
-                  }
-                ]"
-              >
-                <a-select v-model:value="applyModelRef.giftDescType" @change="handleChangeGiftDesc">
-                  <a-select-option value="Company Branded Gift">
-                    {{ $t('form.common.option_giftDesc_Company_Branded_Gift') }}
-                  </a-select-option>
-                  <a-select-option value="General Gift">
-                    {{ $t('form.common.option_giftDesc_General_Gift') }}
-                  </a-select-option>
-                  <a-select-option value="Medicine Gift">
-                    {{ $t('form.common.option_giftDesc_Medicine') }}
-                  </a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
+            <!--0813 下拉列表-->
+            <template v-if="userInfo.companyCode === '0813'">
+              <a-col span="12">
+                <a-form-item
+                  :label="$t('page.givingGifts.applyForm.giftDesc_type_label')"
+                  name="giftDescType"
+                  :rules="[
+                    {
+                      required: true,
+                      message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
+                    }
+                  ]"
+                >
+                  <a-select v-model:value="applyModelRef.giftDescType" @change="handleChangeGiftDesc">
+                    <a-select-option value="Company Branded Gift">
+                      {{ $t('form.common.option_giftDesc_Company_Branded_Gift') }}
+                    </a-select-option>
+                    <a-select-option value="General Gift">
+                      {{ $t('form.common.option_giftDesc_General_Gift') }}
+                    </a-select-option>
+                    <a-select-option value="Medicine Gift">
+                      {{ $t('form.common.option_giftDesc_Medicine') }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </template>
+            <template v-else-if="userInfo.companyCode === '1391' || userInfo.companyCode === '2614'">
+              <a-col span="12">
+                <a-form-item
+                  :label="$t('page.givingGifts.applyForm.giftDesc_type_label')"
+                  name="giftDescType"
+                  :rules="[
+                    {
+                      required: true,
+                      message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
+                    }
+                  ]"
+                >
+                  <a-select v-model:value="applyModelRef.giftDescType">
+                    <a-select-option
+                      value="Promotional Supplies Gifts"
+                      :title="$t('form.common.option_giftDesc_Promotional_Supplies')"
+                    >
+                      {{ $t('form.common.option_giftDesc_Promotional_Supplies') }}
+                    </a-select-option>
+                    <a-select-option value="Cultural Courtesy Gifts">
+                      {{ $t('form.common.option_giftDesc_Cultural_Courtesy') }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </template>
           </a-row>
 
           <a-row v-show="showReasonDesc" :gutter="24">
@@ -936,9 +987,9 @@ watch(
                   <a-select v-model:value="applyModelRef.giftDescType" @change="handleChange">
                     <a-select-option
                       value="Promotional Supplies Gifts"
-                      :title="$t('form.common.option_giftDesc_Promotional_Supplies')"
+                      :title="$t('form.common.option_giftDesc_HCP_Promotional_Supplies')"
                     >
-                      {{ $t('form.common.option_giftDesc_Promotional_Supplies') }}
+                      {{ $t('form.common.option_giftDesc_HCP_Promotional_Supplies') }}
                     </a-select-option>
                     <a-select-option value="Cultural Courtesy Gifts">
                       {{ $t('form.common.option_giftDesc_Cultural_Courtesy') }}
@@ -952,7 +1003,16 @@ watch(
             </template>
             <template v-else>
               <a-col span="10">
-                <a-form-item :label="$t('page.givingGifts.applyForm.giftDesc_label')" name="giftDesc">
+                <a-form-item
+                  :label="$t('page.givingGifts.applyForm.giftDesc_label')"
+                  name="giftDesc"
+                  :rules="[
+                    {
+                      required: true,
+                      message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
+                    }
+                  ]"
+                >
                   <a-input
                     v-model:value="applyModelRef.giftDesc"
                     :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
@@ -963,36 +1023,66 @@ watch(
           </a-row>
         </template>
         <a-row :gutter="24">
-          <a-col span="14">
-            <a-form-item
-              :label="$t('page.givingGifts.applyForm.giftRecipientCategory')"
-              name="isGoSoc"
-              :rules="[
-                {
-                  required: true,
-                  message: $t('form.common.select_validation')
-                }
-              ]"
-            >
-              <a-select v-model:value="applyModelRef.isGoSoc" @change="handleChange">
-                <a-select-option value="Yes">
-                  {{ $t('form.common.option_go_sco_Government_Official') }}
-                </a-select-option>
-                <a-select-option value="No">
-                  {{ $t('form.common.option_go_sco_Government_Non_Official') }}
-                </a-select-option>
-                <a-select-option value="HCP">
-                  {{ $t('form.common.option_go_sco_HCP') }}
-                </a-select-option>
-                <!--
+          <!--1391 2614 只显示 政府官员/非政府官员-->
+          <template v-if="userInfo.companyCode === '1391' || userInfo.companyCode === '2614'">
+            <a-col span="14">
+              <a-form-item
+                :label="$t('page.givingGifts.applyForm.giftRecipientCategory')"
+                name="isGoSoc"
+                :rules="[
+                  {
+                    required: true,
+                    message: $t('form.common.select_validation')
+                  }
+                ]"
+              >
+                <a-select v-model:value="applyModelRef.isGoSoc" @change="handleChange">
+                  <a-select-option value="Yes">
+                    {{ $t('form.common.option_go_sco_Government_Official') }}
+                  </a-select-option>
+                  <a-select-option value="No">
+                    {{ $t('form.common.option_go_sco_Government_Non_Official') }}
+                  </a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </template>
+          <template v-else>
+            <a-col span="14">
+              <a-form-item
+                :label="$t('page.givingGifts.applyForm.giftRecipientCategory')"
+                name="isGoSoc"
+                :rules="[
+                  {
+                    required: true,
+                    message: $t('form.common.select_validation')
+                  }
+                ]"
+              >
+                <a-select v-model:value="applyModelRef.isGoSoc" @change="handleChange">
+                  <a-select-option value="Yes">
+                    {{ $t('form.common.option_go_sco_Government_Official') }}
+                  </a-select-option>
+                  <a-select-option value="No">
+                    {{ $t('form.common.option_go_sco_Government_Non_Official') }}
+                  </a-select-option>
+                  <a-select-option value="HCP">
+                    {{ $t('form.common.option_go_sco_HCP') }}
+                  </a-select-option>
+                  <!--
  <a-select-option value="Distributor">
                   {{ $t('form.common.option_go_sco_Distributor') }}
                 </a-select-option>
 -->
-                <a-select-option value="Others">{{ $t('form.common.option_Other') }}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
+                  <!--
+ <a-select-option value="Others">
+                    {{ $t('form.common.option_Other') }}
+                  </a-select-option>
+-->
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </template>
           <a-col span="10">
             <a-form-item
               name="isBayerCustomer"
@@ -1437,7 +1527,7 @@ watch(
           <a-col span="10">
             <a-form-item
               :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
-              :name="['persons', index, 'personName']"
+              :name="['personList', index, 'personName']"
               :rules="{
                 required: true,
                 message: $t('page.receivingGifts.applyForm.giftGiverEmployeeName_validation'),
@@ -1451,7 +1541,7 @@ watch(
           <a-col span="10">
             <a-form-item
               :label="$t('page.receivingGifts.applyForm.giftGiverTitle')"
-              :name="['persons', index, 'positionTitle']"
+              :name="['personList', index, 'positionTitle']"
               :rules="{
                 required: true,
                 message: $t('page.receivingGifts.applyForm.giftGiverTitle_validation'),

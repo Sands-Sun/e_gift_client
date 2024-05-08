@@ -264,10 +264,11 @@ const local: App.I18n.Schema = {
     },
     manageUser: {
       applyForm: {
-        userFirstName: '',
-        userLastName: '',
-        userCwid: '',
-        userEmail: ''
+        userFirstName: 'first name',
+        userLastName: 'last name',
+        userChineseName: 'chinese name',
+        userEnglishName: 'english name',
+        userEmail: 'email'
       }
     },
     givingGifts: {
@@ -287,6 +288,8 @@ const local: App.I18n.Schema = {
         giftGivingCompanyName_validation: 'please input Name of empolyer of recipient',
         giftGivingEmployeeName: 'Name of recipient',
         giftGivingEmployeeName_validation: 'please input Name of recipient',
+        giftGivingTitle: 'Title of recipient',
+        giftGivingTitle_validation: 'please input title of recipient',
         giftRecipientCategory: 'Recipient category? ',
         giftIsBayerCustomer: 'Is the recipient a current Bayer customer? '
       },
@@ -379,11 +382,6 @@ const local: App.I18n.Schema = {
                 value:
                   'If unit price is more than RMB 300 (including 300), approvals from Department Head, BCS Country Head and Compliance are needed.',
                 items: []
-              },
-              {
-                value:
-                  'For gifts or hospitality offered to state personnel, approval from Compliance is always needed.',
-                items: []
               }
             ]
           }
@@ -400,11 +398,6 @@ const local: App.I18n.Schema = {
               {
                 value:
                   'If unit price is more than RMB 300 (including 300), approvals from Department Head, BCS Country Head and Compliance are needed.',
-                items: []
-              },
-              {
-                value:
-                  'For gifts or hospitality offered to state personnel, approval from Compliance is always needed.',
                 items: []
               }
             ]
@@ -748,11 +741,14 @@ const local: App.I18n.Schema = {
       option_not_Applicable: 'not Applicable',
       upload_person_label: 'File (you can attach a list of names)',
       upload_template: 'template download',
+      option_giftReason_Other:
+        'Other(Please fill in the detailed reason for gift in the input field "Reason for gift")',
       option_giftReason_NewYear: 'Chinese New Year',
       option_giftReason_Mid_Autumn: 'Mid-Autumn Festival',
       option_Other: 'Other',
       option_giftDesc_Company_Branded_Gift: 'Company Branded Gift',
       option_giftDesc_Cultural_Courtesy: 'Cultural Courtesy Gifts',
+      option_giftDesc_HCP_Promotional_Supplies: 'Promotional AIDS products (with company or brand logo)',
       option_giftDesc_Promotional_Supplies:
         'Promotional AIDS for HCP when promoting OTC products (with company or brand logo)',
       option_giftDesc_Other: 'Other Gifts',

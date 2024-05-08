@@ -264,9 +264,10 @@ const local: App.I18n.Schema = {
     },
     manageUser: {
       applyForm: {
-        userFirstName: '',
-        userLastName: '',
-        userCwid: 'CWID',
+        userFirstName: 'FirstName',
+        userLastName: 'LastName',
+        userChineseName: '中文名',
+        userEnglishName: '英文名',
         userEmail: '用户邮箱'
       }
     },
@@ -288,10 +289,9 @@ const local: App.I18n.Schema = {
         giftReason_label: '赠送礼品的原因',
         giftReason_label_validation: '请输入接受礼品原因',
         giftReason_desc_label: '赠送场景',
-
-        giftDesc_label: '礼品描述',
-        giftDesc_label_validation: '请输入礼品描述',
-        giftDesc_type_label: '礼品描述类别'
+        giftDesc_label: '赠送礼品的原因',
+        giftDesc_label_validation: '请输入赠送礼品的原因',
+        giftDesc_type_label: '礼品类别'
       },
       policy: {
         title: '政策提示',
@@ -462,15 +462,17 @@ const local: App.I18n.Schema = {
         givingGiftInfo: '赠送礼品信息',
         giftReason_label: '赠送礼品的原因',
         giftReason_label_validation: '请输入提供礼品原因',
-        giftDesc_label: '礼品描述',
-        giftDesc_label_validation: '请输入礼品描述',
-        giftDesc_type_label: '礼品描述类别',
+        giftDesc_label: '接收礼品的原因',
+        giftDesc_label_validation: '请输入接收礼品的原因',
+        giftDesc_type_label: '礼品类别',
         giftGivingDate: '赠送日期',
         giftGivingDate_validation: '请选则赠送日期',
-        giftGivingCompanyName: '赠送者单位名称',
+        giftGivingCompanyName: '接收者单位名称',
         giftGivingCompanyName_validation: '请输入接受者单位名称',
-        giftGivingEmployeeName: '赠送者姓名',
+        giftGivingEmployeeName: '接收者姓名',
         giftGivingEmployeeName_validation: '请输入接受者姓名',
+        giftGivingTitle: '接收者职位',
+        giftGivingTitle_validation: '请输入接收者职位',
         giftRecipientCategory: '礼品接受者的类别',
         giftIsBayerCustomer: '礼品接收者是否是拜耳现有客户'
       },
@@ -530,10 +532,12 @@ const local: App.I18n.Schema = {
           {
             label: 'Note',
             items: [
-              { value: '仅非营销性质的礼品或招待须事先在eGift系统中申请。', items: [] },
-              { value: '如果单价小于人民币300元，无需审批。', items: [] },
-              { value: '如果单价高于人民币300元（含300元），须获得部门总监、国家经理及合规的审批。', items: [] },
-              { value: '向国家工作人员提供礼品和招待，均须获得合规的审批。', items: [] }
+              { value: '仅与推广活动无关的礼品须事先在EGift系统中申请。', items: [] },
+              {
+                value: '如果礼品单价超过300元人民币（不含300元人民币），需要事先取得部门总监、国家经理及合规的审批。',
+                items: []
+              },
+              { value: '原则上不应当向政府官员赠送任何单价超过200元的礼品。', items: [] }
             ]
           }
         ],
@@ -541,10 +545,12 @@ const local: App.I18n.Schema = {
           {
             label: 'Note',
             items: [
-              { value: '仅非营销性质的礼品或招待须事先在eGift系统中申请。', items: [] },
-              { value: '如果单价小于人民币300元，无需审批。', items: [] },
-              { value: '如果单价高于人民币300元（含300元），须获得部门总监、国家经理及合规的审批。', items: [] },
-              { value: '向国家工作人员提供礼品和招待，均须获得合规的审批。', items: [] }
+              { value: '仅与推广活动无关的礼品须事先在EGift系统中申请。', items: [] },
+              {
+                value: '如果礼品单价超过300元人民币（不含300元人民币），需要事先取得部门总监、国家经理及合规的审批。',
+                items: []
+              },
+              { value: '原则上不应当向政府官员赠送任何单价超过200元的礼品。', items: [] }
             ]
           }
         ],
@@ -642,6 +648,7 @@ const local: App.I18n.Schema = {
       option_not_Applicable: '不适用',
       option_inProcess: '处理中',
       option_complete: '完成',
+      option_giftReason_Other: '其他（请在输入栏“赠送礼品的原因”内填写详细的赠送礼品原因）',
       option_giftReason_NewYear: '春节',
       option_giftReason_Mid_Autumn: '中秋节',
       option_Other: '其他',
@@ -650,12 +657,13 @@ const local: App.I18n.Schema = {
       option_giftDesc_Medicine: '药品',
       option_giftDesc_Cash_Equivalents: '现金或现金等价物',
       option_giftDesc_Present: '礼品',
-      option_giftDesc_Cultural_Courtesy: '风俗礼品（仅限于经销商，仅限于春节和中秋节）',
-      option_giftDesc_Promotional_Supplies: '推广OTC产品时面向HCP提供的推广辅助用品（带公司或品牌标识的）',
+      option_giftDesc_Cultural_Courtesy: '风俗礼品（仅限于春节和中秋节）',
+      option_giftDesc_HCP_Promotional_Supplies: '推广OTC产品时面向HCP提供的推广辅助用品（带公司或品牌标识的）',
+      option_giftDesc_Promotional_Supplies: '推广辅助用品（带公司或品牌标识的）',
       option_giftDesc_Other: '其他礼品',
 
-      option_go_sco_Government_Official: '政府官员/国家机关工作人员',
-      option_go_sco_Government_Non_Official: '非政府官员/非国家机关工作人员',
+      option_go_sco_Government_Official: '政府官员',
+      option_go_sco_Government_Non_Official: '非政府官员',
       option_go_sco_Distributor: '经销商',
       option_go_sco_HCP: '医疗卫生专业人士（HCP）',
       select_validation: '请选择'

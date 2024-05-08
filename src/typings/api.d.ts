@@ -210,6 +210,7 @@ declare namespace Api {
       sfUserId: string;
       firstName: string;
       lastName: string;
+      chineseName: string;
       email: string;
       cwid: string;
       companyCode: string;
@@ -217,7 +218,9 @@ declare namespace Api {
       employeeId: string;
       orgTxt: string;
       positionTxt: string;
+      oUDescription: string;
       division: string;
+      markDeleted: string;
       supervisor: UserInfo;
       roles: string[];
     }

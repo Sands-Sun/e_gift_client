@@ -449,7 +449,8 @@ declare namespace App {
           applyForm: {
             userFirstName: string;
             userLastName: string;
-            userCwid: string;
+            userChineseName: string;
+            userEnglishName: string;
             userEmail: string;
           };
         };
@@ -470,6 +471,8 @@ declare namespace App {
             giftGivingCompanyName_validation: string;
             giftGivingEmployeeName: string;
             giftGivingEmployeeName_validation: string;
+            giftGivingTitle: string;
+            giftGivingTitle_validation: string;
             giftRecipientCategory: string;
             giftIsBayerCustomer: string;
           };
@@ -562,6 +565,7 @@ declare namespace App {
           option_draft: string;
           option_inProcess: string;
           option_complete: string;
+          option_giftReason_Other: string;
           upload_file: string;
           option_not_Applicable: string;
           upload_person_label: string;
@@ -575,6 +579,7 @@ declare namespace App {
           option_giftDesc_Cash_Equivalents: string;
           option_giftDesc_Present: string;
           option_giftDesc_Cultural_Courtesy: string;
+          option_giftDesc_HCP_Promotional_Supplies: string;
           option_giftDesc_Promotional_Supplies: string;
           option_giftDesc_Other: string;
           option_go_sco_Government_Official: string;

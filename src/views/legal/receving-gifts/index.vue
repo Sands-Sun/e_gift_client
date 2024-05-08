@@ -25,7 +25,7 @@ import {
 } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
 import { getServiceBaseURL } from '@/utils/service';
-import { computed, createVNode, nextTick, onMounted, reactive, ref, toRaw, watch } from 'vue';
+import { computed, createVNode, h, nextTick, onMounted, reactive, ref, toRaw, watch } from 'vue';
 let authStore: any;
 let userInfo: Api.Auth.UserInfo;
 let supervisorInfo: Api.Auth.UserInfo;
@@ -577,6 +577,22 @@ const onModifyApply = (value: string) => {
         console.log('modify delete draft...');
         confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
       }
+      const personArr = [];
+      applyModelRef.companyList.forEach(c => {
+        c.personList.forEach(p => {
+          personArr.push(p);
+        });
+      });
+      if (!applyModelRef.fileId && applyModelRef.volume !== personArr.length) {
+        Modal.warning({
+          title: '人员与数量不符',
+          content: h('div', {}, [h('p', `提供人员：${personArr.length}`), h('p', `数量：${applyModelRef.volume}`)]),
+          onOk() {
+            console.log('ok');
+          }
+        });
+        return;
+      }
 
       Modal.confirm({
         title: $t('common.tip'),
@@ -625,6 +641,13 @@ const onSubmitApply = (value: string) => {
   receivingGiftFormRef?.value
     ?.validate()
     .then(() => {
+      let personArr = [];
+      applyModelRef.companyList.forEach(c => {
+        personArr = [...c.personList];
+      });
+      debugger;
+      console.log(personArr.length);
+
       Modal.confirm({
         title: $t('common.tip'),
         icon: createVNode(ExclamationCircleOutlined),
@@ -1279,7 +1302,7 @@ watch(
           <a-col span="10">
             <a-form-item
               :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
-              :name="['persons', index, 'personName']"
+              :name="['personList', index, 'personName']"
               :rules="{
                 required: true,
                 message: $t('page.receivingGifts.applyForm.giftGiverEmployeeName_validation'),
@@ -1292,11 +1315,11 @@ watch(
 
           <a-col span="10">
             <a-form-item
-              :label="$t('page.receivingGifts.applyForm.giftGiverTitle')"
-              :name="['persons', index, 'positionTitle']"
+              :label="$t('page.givingGifts.applyForm.giftGivingTitle')"
+              :name="['personList', index, 'positionTitle']"
               :rules="{
                 required: true,
-                message: $t('page.receivingGifts.applyForm.giftGiverTitle_validation'),
+                message: $t('page.givingGifts.applyForm.giftGivingTitle_validation'),
                 trigger: 'change'
               }"
             >

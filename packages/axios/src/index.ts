@@ -48,6 +48,11 @@ function createCommonRequest<ResponseData = any>(
 
   instance.interceptors.response.use(
     async response => {
+      if (response.data.code === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
+      }
+
       if (opts.isBackendSuccess(response)) {
         return Promise.resolve(response);
       }

@@ -13,7 +13,6 @@ if (href.includes('token')) {
 }
 
 async function handleSubmit() {
-  // await validate();
   await authStore.login('handle');
 }
 </script>

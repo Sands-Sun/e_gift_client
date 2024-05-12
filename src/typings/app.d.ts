@@ -274,6 +274,10 @@ declare namespace App {
         userCenter: string;
         logout: string;
         logoutConfirm: string;
+        search: string;
+        reset: string;
+        operate: string;
+        confirmDelete: string;
       };
       theme: {
         themeSchema: { title: string } & Record<UnionKey.ThemeScheme, string>;
@@ -454,6 +458,34 @@ declare namespace App {
           multiTab: {
             routeParam: string;
             backTab: string;
+          };
+        };
+        manage: {
+          common: {
+            status: {
+              enable: string;
+              disable: string;
+            };
+          };
+          role: {
+            title: string;
+            roleName: string;
+            roleStatus: string;
+            roleDesc: string;
+            form: {
+              roleName: string;
+              roleStatus: string;
+            };
+            common: {
+              addTitle: string;
+              editTitle: string;
+            };
+          };
+          table: {
+            index: string;
+            desc: string;
+            status: string;
+            roleName: string;
           };
         };
       };

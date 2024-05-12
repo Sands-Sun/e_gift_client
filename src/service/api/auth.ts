@@ -14,8 +14,8 @@ export function fetchLogin() {
 }
 
 /** Get user info */
-export function fetchGetUserInfo() {
-  return request<Api.Auth.UserInfo>({ url: '/sys/user/getUserInfo' });
+export function fetchGetUserInfo(token: string) {
+  return request<Api.Auth.UserInfo>({ url: '/sys/user/getUserInfo', method: 'get', params: { token } });
 }
 
 /**

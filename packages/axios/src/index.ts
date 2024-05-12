@@ -51,6 +51,8 @@ function createCommonRequest<ResponseData = any>(
       if (response.data.code === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('userInfo');
+        const baseUrl = location.href.split('/');
+        location.href = `${baseUrl}/home`;
       }
 
       if (opts.isBackendSuccess(response)) {

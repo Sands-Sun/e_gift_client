@@ -19,7 +19,11 @@ const local: App.I18n.Schema = {
     lookForward: '敬请期待',
     userCenter: '个人中心',
     logout: '退出登录',
-    logoutConfirm: '确认退出登录吗？'
+    logoutConfirm: '确认退出登录吗？',
+    operate: '操作',
+    search: '查询',
+    reset: '重置',
+    confirmDelete: '确认删除吗？'
   },
   theme: {
     themeSchema: {
@@ -489,6 +493,34 @@ const local: App.I18n.Schema = {
       multiTab: {
         routeParam: '路由参数',
         backTab: '返回 function_tab'
+      }
+    },
+    manage: {
+      common: {
+        status: {
+          enable: '开启',
+          disable: '禁用'
+        }
+      },
+      role: {
+        title: '角色列表',
+        roleName: '角色名称',
+        roleStatus: '角色状态',
+        roleDesc: '角色描述',
+        form: {
+          roleName: '',
+          roleStatus: ''
+        },
+        common: {
+          addTitle: '新增角色',
+          editTitle: '修改角色'
+        }
+      },
+      table: {
+        index: '序号',
+        desc: '描述',
+        status: '状态',
+        roleName: '角色名称'
       }
     }
   },

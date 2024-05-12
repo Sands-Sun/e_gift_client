@@ -37,10 +37,10 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   }
 
   /** SSO Login */
-  async function login(loginType: string) {
+  async function login(type: string) {
     startLoading();
     // debugger;
-    if (loginType === 'handle') {
+    if (type === 'handle') {
       const { data: url, error } = await fetchLogin();
       if (!error) {
         location.href = url;
@@ -49,21 +49,28 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
       }
     } else {
       // 获取用户信息
-      const { pass, error } = await loginByToken(loginType);
+      localStg.set('token', type);
+      const { data: info, error } = await fetchGetUserInfo(type);
+
       if (!error) {
-        if (pass) {
-          await routeStore.initAuthRoute();
+        // 2. store user info
+        localStg.set('userInfo', info);
 
-          await redirectFromLogin();
+        // 3. update auth route
+        token.value = type;
+        Object.assign(userInfo, info);
 
-          if (routeStore.isInitAuthRoute) {
-            window.$notification?.success({
-              message: $t('page.login.common.loginSuccess'),
-              description: $t('page.login.common.welcomeBack', {
-                userName: `${userInfo.firstName}  ${userInfo.lastName}`
-              })
-            });
-          }
+        await routeStore.initAuthRoute();
+
+        await redirectFromLogin();
+
+        if (routeStore.isInitAuthRoute) {
+          window.$notification?.success({
+            message: $t('page.login.common.loginSuccess'),
+            description: $t('page.login.common.welcomeBack', {
+              userName: `${userInfo.firstName}  ${userInfo.lastName}`
+            })
+          });
         }
       } else {
         resetStore();

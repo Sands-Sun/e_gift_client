@@ -1,14 +1,8 @@
 import { request } from '../request';
 
-/**
- * Login
- *
- * @param CWID User CWID
- * @param password Password
- */
-export function fetchLogin(CWID: string, password: string) {
+export function fetchAdminLogin(CWID: string, password: string) {
   return request<Api.Auth.LoginToken>({
-    url: '/sys/login',
+    url: '/sys/adminLogin',
     method: 'post',
     data: {
       CWID,
@@ -17,9 +11,22 @@ export function fetchLogin(CWID: string, password: string) {
   });
 }
 
+/**
+ * Login
+ *
+ * @param CWID User CWID
+ * @param password Password
+ */
+export function fetchLogin() {
+  return request<Api.Auth.SSO>({
+    url: '/sys/azureLogin',
+    method: 'get'
+  });
+}
+
 /** Get user info */
-export function fetchGetUserInfo() {
-  return request<Api.Auth.UserInfo>({ url: '/sys/user/getUserInfo' });
+export function fetchGetUserInfo(token: string) {
+  return request<Api.Auth.UserInfo>({ url: '/sys/user/getUserInfo', method: 'get', params: { token } });
 }
 
 /** Get user info by id */

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { useLoading } from '@sa/hooks';
 import { SetupStoreId } from '@/enum';
 import { useRouterPush } from '@/hooks/common/router';
-import { fetchGetUserInfo, fetchLogin } from '@/service/api';
+import { fetchAdminLogin, fetchGetUserInfo, fetchLogin } from '@/service/api';
 import { localStg } from '@/utils/storage';
 import { $t } from '@/locales';
 import { useRouteStore } from '../route';
@@ -42,10 +42,83 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
    * @param userName User name
    * @param password Password
    */
-  async function login(userName: string, password: string) {
+  async function adminLogin(userName: string, password: string) {
+    startLoading();
+    debugger;
+    const { data: loginToken, error } = await fetchAdminLogin(userName, password);
+
+    if (!error) {
+      const pass = await loginByToken(loginToken.token);
+
+      if (pass) {
+        await routeStore.initAuthRoute();
+
+        await redirectFromLogin();
+
+        if (routeStore.isInitAuthRoute) {
+          window.$notification?.success({
+            message: $t('page.login.common.loginSuccess'),
+            description: $t('page.login.common.welcomeBack', {
+              userName: `${userInfo.firstName}  ${userInfo.lastName}`
+            })
+          });
+        }
+      }
+    } else {
+      resetStore();
+    }
+
+    endLoading();
+  }
+
+  /** SSO Login */
+  async function login(type: string) {
     startLoading();
     // debugger;
-    const { data: loginToken, error } = await fetchLogin(userName, password);
+    if (type === 'handle') {
+      const { data: url, error } = await fetchLogin();
+      if (!error) {
+        location.href = url;
+      } else {
+        resetStore();
+      }
+    } else {
+      // 获取用户信息
+      localStg.set('token', type);
+      const { data: info, error } = await fetchGetUserInfo(type);
+
+      if (!error) {
+        // 2. store user info
+        localStg.set('userInfo', info);
+
+        // 3. update auth route
+        token.value = type;
+        Object.assign(userInfo, info);
+
+        await routeStore.initAuthRoute();
+
+        await redirectFromLogin();
+
+        if (routeStore.isInitAuthRoute) {
+          window.$notification?.success({
+            message: $t('page.login.common.loginSuccess'),
+            description: $t('page.login.common.welcomeBack', {
+              userName: `${userInfo.firstName}  ${userInfo.lastName}`
+            })
+          });
+        }
+      } else {
+        resetStore();
+      }
+    }
+
+    endLoading();
+  }
+
+  async function login1() {
+    startLoading();
+    // debugger;
+    const { data: loginToken, error } = await fetchLogin();
 
     if (!error) {
       const pass = await loginByToken(loginToken);
@@ -71,19 +144,19 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     endLoading();
   }
 
-  async function loginByToken(loginToken: Api.Auth.LoginToken) {
+  async function loginByToken(loginToken: string) {
     // 1. stored in the localStorage, the later requests need it in headers
-    localStg.set('token', loginToken.token);
+    localStg.set('token', loginToken);
     // localStg.set('refreshToken', loginToken.refreshToken);
 
-    const { data: info, error } = await fetchGetUserInfo();
+    const { data: info, error } = await fetchGetUserInfo(loginToken);
 
     if (!error) {
       // 2. store user info
       localStg.set('userInfo', info);
 
       // 3. update auth route
-      token.value = loginToken.token;
+      token.value = loginToken;
       Object.assign(userInfo, info);
 
       return true;
@@ -98,6 +171,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     isLogin,
     loginLoading,
     resetStore,
-    login
+    login,
+    adminLogin
   };
 });

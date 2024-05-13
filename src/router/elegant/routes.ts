@@ -221,9 +221,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.manage_function',
         meta: {
           title: 'manage_function',
-          i18nKey: 'route.manage_function',
-          icon: 'material-symbols:format-indent-increase-rounded',
-          order: 4
+          i18nKey: 'route.manage_function'
         }
       },
       {

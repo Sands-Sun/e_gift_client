@@ -28,7 +28,7 @@ const local: App.I18n.Schema = {
     delete: 'Delete',
     deleteSuccess: 'Delete Success',
     batchDelete: 'Batch Delete',
-    confirm: 'Confirm',
+    confirm: 'SSO',
     cancel: 'Cancel',
     confirmCancel: 'Confirm Cancel ?',
     createdDate: 'Created Date',
@@ -39,7 +39,11 @@ const local: App.I18n.Schema = {
     lookForward: 'Coming soon',
     userCenter: 'User Center',
     logout: 'Logout',
-    logoutConfirm: 'Are you sure you want to log out?'
+    logoutConfirm: 'Are you sure you want to log out?',
+    search: 'search',
+    reset: 'Reset',
+    operate: 'operate',
+    confirmDelete: 'Are you sure you want delete this record?'
   },
   theme: {
     themeSchema: {
@@ -1055,6 +1059,34 @@ const local: App.I18n.Schema = {
       multiTab: {
         routeParam: 'Route Param',
         backTab: 'Back function_tab'
+      }
+    },
+    manage: {
+      common: {
+        status: {
+          enable: 'Enable',
+          disable: 'Disable'
+        }
+      },
+      role: {
+        title: 'Role List',
+        roleName: 'Name',
+        roleStatus: 'Status',
+        roleDesc: 'Role desc',
+        form: {
+          roleName: '',
+          roleStatus: ''
+        },
+        common: {
+          addTitle: 'Add Role',
+          editTitle: 'Edit Role'
+        }
+      },
+      table: {
+        index: 'Index',
+        desc: 'Desc',
+        status: 'Status',
+        roleName: 'Role Name'
       }
     }
   },

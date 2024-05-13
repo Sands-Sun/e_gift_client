@@ -48,6 +48,13 @@ function createCommonRequest<ResponseData = any>(
 
   instance.interceptors.response.use(
     async response => {
+      if (response.data.code === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
+        const baseUrl = location.href.split('/');
+        location.href = `${baseUrl}/home`;
+      }
+
       if (opts.isBackendSuccess(response)) {
         return Promise.resolve(response);
       }

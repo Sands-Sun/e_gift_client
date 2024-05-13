@@ -47,6 +47,7 @@ const applySearch = ref<string>('');
 const userState = reactive({ data: [] as any, value: [] as any, ccValue: [] as any, fetching: true });
 const giftCompanyPersonState = reactive({ data: [] as any, value: [] as any });
 const applyFormCancelModelRef = reactive({ remark: undefined, applicationId: '' });
+const searchFormRef = ref<FormInstance>();
 let currentCompanyState = reactive<{
   companyName: string;
   personList: Api.Gifts.GiftPerson[];
@@ -57,7 +58,6 @@ let currentCompanyState = reactive<{
   key: 0
 });
 
-const searchFormRef = ref<FormInstance>();
 const searchFormModelRef = reactive({
   userId: '',
   userName: '',
@@ -70,6 +70,7 @@ const searchFormModelRef = reactive({
   beginDate: '',
   endDate: '',
   currentPage: 1,
+  pageSize: 5,
   orders: [] as any[]
 });
 const listPagination = ref({
@@ -211,13 +212,37 @@ const handleChangeReasonType = (value: any) => {
     showReasonDesc.value = false;
   }
 };
+// 选择HCP增加提示内容
+const handleIsScoChange = (value: any) => {
+  console.log('change sco desc', value);
+  if (value === 'HCP') {
+    Modal.info({
+      title: '接受者类别提示',
+      content: h('div', {}, [
+        h(
+          'p',
+          '对医疗卫生专业人士（HCP）的礼品赠送需同时满足BHC的礼品招待准则，请参考BHC礼品招待准则。如活动的主办者中包含业务部门需由业务部门直接申请。'
+        )
+      ]),
+      onOk() {
+        console.log('ok');
+      }
+    });
+  }
+};
 
+// 选择药品增加提示内容
 const handleChangeGiftDesc = (value: any) => {
   console.log('change gift desc', value);
   if (value === 'Medicine Gift') {
     Modal.info({
       title: '赠送药品提示',
-      content: h('div', {}, [h('p', '任何药品作为礼品赠送需特批 （禁止赠送处方药和甲类非处方药）')]),
+      content: h('div', {}, [
+        h(
+          'p',
+          '禁止赠送处方药和甲类非处方药作为礼品。其他药品原则上不允许，极特殊情况需直线经理、部门经理（CMT成员）、合规部门事先评估批准后赠送。请在Remark中详述您的赠送原因。'
+        )
+      ]),
       onOk() {
         console.log('ok');
       }
@@ -256,6 +281,8 @@ const clearApplyModel = () => {
   applyModelRef.reason = '';
   applyModelRef.reasonType = '';
   applyModelRef.giftDescType = '';
+  applyModelRef.isGoSoc = '';
+  applyModelRef.isBayerCustomer = '';
   applyModelRef.date = dayjs();
   applyModelRef.companyList = [];
   applyModelRef.giftsActivities = [];
@@ -275,7 +302,18 @@ const resetFromFields = (updateStatus = false) => {
       companyName: '',
       description: '',
       key: Date.now(),
-      personList: [{ id: -1, personName: '', positionTitle: '', companyId: -1, description: '', key: Date.now() }]
+      personList: [
+        {
+          id: -1,
+          personName: '',
+          positionTitle: '',
+          isGoSoc: '',
+          isBayerCustomer: '',
+          companyId: -1,
+          description: '',
+          key: Date.now()
+        }
+      ]
     });
   }
 };
@@ -333,6 +371,7 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       applyModelRef.applyCCName = ccApplyOptions.value.map((v: any) => v.value);
       applyModelRef.unitValue = data.giftsRef.unitValue;
       applyModelRef.volume = data.giftsRef.volume;
+      applyModelRef.date = dayjs(data.giftsRef.givenDate);
       // applyModelRef.givenCompany = data.giftsRef.givenCompany;
       // applyModelRef.givenPersons = data.giftsRef.givingPerson;
       // giftCompanyPersonState.data = data.giftsRef.giftsPersons.map((v: any) => v.personName);
@@ -392,14 +431,15 @@ const closeApplyDrawerModal = () => {
 };
 
 // 搜索按钮，
-const getListDataByCondition = async (currentPage = 1) => {
+const getListDataByCondition = async (pag?: { pageSize: number; current: number }) => {
   // get search date
   listTableLoading.value = true;
   if (typeof searchRangeDate.value !== 'undefined') {
     searchFormModelRef.beginDate = searchRangeDate.value[0].format('YYYY-MM-DD');
     searchFormModelRef.endDate = searchRangeDate.value[1].format('YYYY-MM-DD');
   }
-  searchFormModelRef.currentPage = currentPage;
+  searchFormModelRef.currentPage = pag?.current ? pag?.current : 1;
+  searchFormModelRef.pageSize = pag?.pageSize ? pag?.pageSize : 5;
   const { data: queryResult, error } = await fetchGivingGiftsList(searchFormModelRef);
   console.log(queryResult);
   listDataSource.value = [];
@@ -429,7 +469,7 @@ const handleTableChange = (pag: { pageSize: number; current: number }, filters: 
   if (sorter.columnKey) {
     searchFormModelRef.orders.push({ column: sorter.columnKey, type: sorter.order === 'ascend' ? 'ASC' : 'DESC' });
   }
-  getListDataByCondition(pag.current);
+  getListDataByCondition(pag);
 };
 
 const onSubmitCancel = () => {
@@ -465,116 +505,137 @@ const onSubmitCancel = () => {
     });
 };
 
-// 修改提交
-const onModifyApply = (value: string) => {
-  givingGiftFormRef?.value
-    ?.validate()
-    .then(() => {
-      let confirmContent = '';
-      if (value === 'Draft') {
-        console.log('update draft...');
-        confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
-      } else if (value === 'Submit') {
-        console.log('modify submit...');
-        confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
-      } else if (value === 'Delete') {
-        console.log('modify delete draft...');
-        confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
-      }
-
-      Modal.confirm({
-        title: $t('common.tip'),
-        icon: createVNode(ExclamationCircleOutlined),
-        content: confirmContent,
-        okText: $t('common.confirm'),
-        cancelText: $t('common.cancel'),
-        async onOk() {
-          const requestParam = toRaw(applyModelRef);
-          requestParam.actionType = value;
-          requestParam.applyForId = requestParam.applyName.userId;
-          requestParam.copyToUserEmails = requestParam.applyCCName;
-          console.log(requestParam);
-          if (value === 'Draft' || value === 'Submit') {
-            console.log('update draft...');
-            await updateGivingGifts(requestParam);
-          } else if (value === 'Delete') {
-            console.log('modify delete draft...');
-            await deleteDraftGivingGifts(requestParam.applicationId);
-          }
-          resetFromFields();
-          closeApplyDrawerModal();
-          getListDataByCondition();
-        },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel() {
-          console.log('cancel');
+// 前置验证
+const perVerification = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const personArr = [];
+    applyModelRef.companyList.forEach(c => {
+      c.personList.forEach(p => {
+        if (p.personName && p.positionTitle) {
+          personArr.push(p);
         }
       });
+    });
+    if (!applyModelRef.fileId && applyModelRef.volume !== personArr.length) {
+      Modal.warning({
+        title: '人员与数量不符',
+        content: h('div', {}, [h('p', `接收人员：${personArr.length}`), h('p', `数量：${applyModelRef.volume}`)]),
+        onOk() {
+          console.log('ok');
+        }
+      });
+      reject(new Error('人员与数量不符'));
+      return;
+    }
+    resolve();
+  });
+};
+
+// 修改提交
+const onModifyApply = (value: string) => {
+  perVerification()
+    .then(() => {
+      givingGiftFormRef?.value
+        ?.validate()
+        .then(() => {
+          let confirmContent = '';
+          if (value === 'Draft') {
+            console.log('update draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+          } else if (value === 'Submit') {
+            console.log('modify submit...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+          } else if (value === 'Delete') {
+            console.log('modify delete draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
+          }
+
+          Modal.confirm({
+            title: $t('common.tip'),
+            icon: createVNode(ExclamationCircleOutlined),
+            content: confirmContent,
+            okText: $t('common.confirm'),
+            cancelText: $t('common.cancel'),
+            async onOk() {
+              const requestParam = toRaw(applyModelRef);
+              requestParam.actionType = value;
+              requestParam.applyForId = requestParam.applyName.userId;
+              requestParam.copyToUserEmails = requestParam.applyCCName;
+              console.log(requestParam);
+              if (value === 'Draft' || value === 'Submit') {
+                console.log('update draft...');
+                await updateGivingGifts(requestParam);
+              } else if (value === 'Delete') {
+                console.log('modify delete draft...');
+                await deleteDraftGivingGifts(requestParam.applicationId);
+              }
+              resetFromFields();
+              closeApplyDrawerModal();
+              getListDataByCondition();
+            },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onCancel() {
+              console.log('cancel');
+            }
+          });
+        })
+        .catch(err => {
+          console.log('error', err);
+        });
     })
     .catch(err => {
-      console.log('error', err);
+      console.log('error per validation', err);
     });
 };
 
+// 保存提交
 const onSubmitApply = (value: string) => {
-  let confirmContent = '';
-  if (value === 'Draft') {
-    console.log('update draft...');
-    confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
-  } else if (value === 'Submit') {
-    console.log('modify submit...');
-    confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
-  }
-  console.log(`submit type ${value}`);
-  const personArr = [];
-  applyModelRef.companyList.forEach(c => {
-    c.personList.forEach(p => {
-      personArr.push(p);
-    });
-  });
-  if (!applyModelRef.fileId && applyModelRef.volume !== personArr.length) {
-    Modal.warning({
-      title: '人员与数量不符',
-      content: h('div', {}, [h('p', `提供人员：${personArr.length}`), h('p', `数量：${applyModelRef.volume}`)]),
-      onOk() {
-        console.log('ok');
-      }
-    });
-    return;
-  }
-
-  givingGiftFormRef?.value
-    ?.validate()
+  perVerification()
     .then(() => {
-      Modal.confirm({
-        title: $t('common.tip'),
-        icon: createVNode(ExclamationCircleOutlined),
-        content: confirmContent,
-        okText: $t('common.confirm'),
-        cancelText: $t('common.cancel'),
-        async onOk() {
-          debugger;
-          const requestParam = toRaw(applyModelRef);
-          requestParam.actionType = value;
-          requestParam.applyForId = requestParam.applyName.userId;
-          requestParam.copyToUserEmails = requestParam.applyCCName;
-          console.log(requestParam);
-          const { error } = await saveGivingGifts(requestParam);
-          if (!error) {
-            console.log('success!');
-            resetFromFields();
-            closeApplyDrawerModal();
-            getListDataByCondition();
+      givingGiftFormRef?.value
+        ?.validate()
+        .then(() => {
+          let confirmContent = '';
+          if (value === 'Draft') {
+            console.log('update draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+          } else if (value === 'Submit') {
+            console.log('modify submit...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
           }
-        },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel() {
-          console.log('cancel');
-        }
-      });
+          console.log(`submit type ${value}`);
+          Modal.confirm({
+            title: $t('common.tip'),
+            icon: createVNode(ExclamationCircleOutlined),
+            content: confirmContent,
+            okText: $t('common.confirm'),
+            cancelText: $t('common.cancel'),
+            async onOk() {
+              const requestParam = toRaw(applyModelRef);
+              requestParam.actionType = value;
+              requestParam.applyForId = requestParam.applyName.userId;
+              requestParam.copyToUserEmails = requestParam.applyCCName;
+              console.log(requestParam);
+              const { error } = await saveGivingGifts(requestParam);
+              if (!error) {
+                console.log('success!');
+                resetFromFields();
+                closeApplyDrawerModal();
+                getListDataByCondition();
+              }
+            },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onCancel() {
+              console.log('cancel');
+            }
+          });
+        })
+        .catch(err => {
+          console.log('error', err);
+        });
     })
     .catch(err => {
-      console.log('error', err);
+      console.log('error per validation', err);
     });
 };
 
@@ -619,7 +680,18 @@ const addCompany = () => {
     description: '',
     companyName: '',
     key: Date.now(),
-    personList: [{ id: -1, personName: '', positionTitle: '', description: '', companyId: -1, key: Date.now() }]
+    personList: [
+      {
+        id: -1,
+        personName: '',
+        positionTitle: '',
+        isGoSoc: '',
+        isBayerCustomer: '',
+        description: '',
+        companyId: -1,
+        key: Date.now()
+      }
+    ]
   });
 };
 
@@ -658,6 +730,8 @@ const addPerson = () => {
     id: -1,
     personName: '',
     positionTitle: '',
+    isGoSoc: '',
+    isBayerCustomer: '',
     description: '',
     companyId: -1,
     key: Date.now()
@@ -686,14 +760,6 @@ const resetApplyFrom = () => {
       console.log('cancel');
     }
   });
-};
-
-const handleChange = (value: any) => {
-  console.log(`selected ${value}`);
-};
-const typeHandleChange = (value: any) => {
-  console.log(`value: ${value}`);
-  searchFormModelRef.type = value;
 };
 
 onMounted(async () => {
@@ -849,12 +915,17 @@ watch(
             :span="3"
             :label="item.label"
           >
-            <ul>
-              <li v-for="(detail, index) in item.items" :key="detail">
-                &nbsp; &nbsp; {{ index + 1 }} ) {{ detail.value }}
+            <ul style="list-style-position: outside">
+              <li v-for="(detail, index) in item.items" :key="detail" style="text-indent: -1em">
+                &emsp;{{ index + 1 }}. {{ detail.value }}
                 <template v-if="detail.items.length > 0">
-                  <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail">
-                    &nbsp; &nbsp; {{ subIndex + 1 }} ) {{ subDetail.value }}
+                  <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail" style="text-indent: -1em">
+                    &emsp;&emsp;{{ subIndex + 1 }} ) {{ subDetail.value }}
+                    <template v-if="subDetail && subDetail.items && subDetail.items.length > 0">
+                      <li v-for="subsDetail in subDetail.items" :key="subsDetail" style="text-indent: -1em">
+                        &emsp;&emsp;&emsp; • {{ subsDetail.value }}
+                      </li>
+                    </template>
                   </li>
                 </template>
               </li>
@@ -1036,7 +1107,7 @@ watch(
                   }
                 ]"
               >
-                <a-select v-model:value="applyModelRef.isGoSoc" @change="handleChange">
+                <a-select v-model:value="applyModelRef.isGoSoc">
                   <a-select-option value="Yes">
                     {{ $t('form.common.option_go_sco_Government_Official') }}
                   </a-select-option>
@@ -1059,7 +1130,7 @@ watch(
                   }
                 ]"
               >
-                <a-select v-model:value="applyModelRef.isGoSoc" @change="handleChange">
+                <a-select v-model:value="applyModelRef.isGoSoc" @change="handleIsScoChange">
                   <a-select-option value="Yes">
                     {{ $t('form.common.option_go_sco_Government_Official') }}
                   </a-select-option>
@@ -1094,7 +1165,7 @@ watch(
                 }
               ]"
             >
-              <a-select v-model:value="applyModelRef.isBayerCustomer" @change="handleChange">
+              <a-select v-model:value="applyModelRef.isBayerCustomer">
                 <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
                 <a-select-option value="No">{{ $t('form.common.option_no') }}</a-select-option>
                 <a-select-option value="Not Applicable">
@@ -1170,7 +1241,7 @@ watch(
 
         <div v-for="(company, index) in applyModelRef.companyList" :key="company.key">
           <a-row :gutter="24">
-            <a-col span="18">
+            <a-col span="20">
               <a-form-item
                 :label="$t('page.givingGifts.applyForm.giftGivingCompanyName')"
                 :name="['companyList', index, 'companyName']"
@@ -1185,7 +1256,7 @@ watch(
                 <a-input v-model:value="company.companyName"></a-input>
               </a-form-item>
             </a-col>
-            <a-col span="5">
+            <a-col span="4">
               <PlusCircleOutlined class="dynamic-add-del-button" @click="addCompany" />
               &nbsp;
               <MinusCircleOutlined
@@ -1303,7 +1374,13 @@ watch(
               </a-button>
             </template>
             <!---表单只读-->
-            <template v-else-if="givingGiftFromStatus.actionStatus === 'Documented'">
+            <template
+              v-else-if="
+                givingGiftFromStatus.actionStatus !== 'Completed' &&
+                givingGiftFromStatus.actionStatus !== 'Rejected' &&
+                givingGiftFromStatus.actionStatus !== 'Cancelled'
+              "
+            >
               <a-button style="margin: 1px" @click="showCancelModal">
                 {{ $t('common.cancel') }}
               </a-button>
@@ -1371,11 +1448,7 @@ watch(
           <a-row :gutter="35">
             <a-col span="8">
               <a-form-item :label="$t('form.searchFrom.applyStatus')" name="status">
-                <a-select
-                  v-model:value="searchFormModelRef.status"
-                  :placeholder="$t('form.common.select_validation')"
-                  @change="typeHandleChange($event)"
-                >
+                <a-select v-model:value="searchFormModelRef.status" :placeholder="$t('form.common.select_validation')">
                   <a-select-opt-group :label="$t('form.common.option_draft')">
                     <a-select-option value="Draft">Draft</a-select-option>
                   </a-select-opt-group>
@@ -1439,12 +1512,6 @@ watch(
       <template #extra>
         <a-button type="link" @click="showApplyDrawerModal('Create')">{{ $t('common.newApplyCreate') }}</a-button>
       </template>
-      <!--
- <template v-for="(item, index) in columns" v-slot: "item.slotName">
-        <span :key="index">{{ $t(item.slotName) }}</span>
-      </template>
--->
-
       <a-table
         :columns="columns"
         :data-source="listDataSource"
@@ -1494,6 +1561,7 @@ watch(
       </a-table>
     </a-card>
 
+    <!--取消 modal-->
     <a-modal
       v-model:open="openCancelModal"
       width="500px"
@@ -1526,11 +1594,11 @@ watch(
         <a-row v-for="(person, index) in currentCompanyState.personList" :key="person.key" :gutter="24">
           <a-col span="10">
             <a-form-item
-              :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
+              :label="$t('page.givingGifts.applyForm.giftGivingEmployeeName')"
               :name="['personList', index, 'personName']"
               :rules="{
                 required: true,
-                message: $t('page.receivingGifts.applyForm.giftGiverEmployeeName_validation'),
+                message: $t('page.givingGifts.applyForm.giftGivingEmployeeName_validation'),
                 trigger: 'change'
               }"
             >
@@ -1540,11 +1608,11 @@ watch(
 
           <a-col span="10">
             <a-form-item
-              :label="$t('page.receivingGifts.applyForm.giftGiverTitle')"
+              :label="$t('page.givingGifts.applyForm.giftGivingTitle')"
               :name="['personList', index, 'positionTitle']"
               :rules="{
                 required: true,
-                message: $t('page.receivingGifts.applyForm.giftGiverTitle_validation'),
+                message: $t('page.givingGifts.applyForm.giftGivingTitle_validation'),
                 trigger: 'change'
               }"
             >

@@ -71,6 +71,7 @@ const searchFormModelRef = reactive({
   beginDate: '',
   endDate: '',
   currentPage: 1,
+  pageSize: 5,
   orders: [] as any[]
 });
 const listPagination = ref({
@@ -139,7 +140,7 @@ const applyModelRef = reactive<{
   applyForId: undefined as any,
   copyToUserEmails: [] as any,
   applyCCName: undefined as any,
-  reason: 'NA',
+  reason: '',
   reasonType: '',
   giftDescType: undefined as any,
   date: dayjs(),
@@ -310,7 +311,18 @@ const resetFromFields = () => {
       description: '',
       companyName: '',
       key: Date.now(),
-      personList: [{ id: -1, personName: '', positionTitle: '', description: '', companyId: -1, key: Date.now() }]
+      personList: [
+        {
+          id: -1,
+          personName: '',
+          positionTitle: '',
+          isGoSoc: '',
+          isBayerCustomer: '',
+          description: '',
+          companyId: -1,
+          key: Date.now()
+        }
+      ]
     });
   }
 };
@@ -334,14 +346,15 @@ function resetApplyFrom() {
 }
 
 // 搜索按钮
-const getListDataByCondition = async (currentPage = 1) => {
+const getListDataByCondition = async (pag?: { pageSize: number; current: number }) => {
   listTableLoading.value = true;
   // get search date
   if (typeof searchRangeDate.value !== 'undefined') {
     searchFormModelRef.beginDate = searchRangeDate.value[0].format('YYYY-MM-DD');
     searchFormModelRef.endDate = searchRangeDate.value[1].format('YYYY-MM-DD');
   }
-  searchFormModelRef.currentPage = currentPage;
+  searchFormModelRef.currentPage = pag?.current ? pag?.current : 1;
+  searchFormModelRef.pageSize = pag?.pageSize ? pag?.pageSize : 5;
   const { data: queryResult, error } = await fetchReceivingGiftsList(searchFormModelRef);
   listDataSource.value = [];
   if (!error) {
@@ -359,8 +372,10 @@ const getListDataByCondition = async (currentPage = 1) => {
 const handleChangeReasonType = (value: any) => {
   console.log('change reason reason', value);
   if (value === 'Other') {
+    applyModelRef.reason = '';
     showReasonDesc.value = true;
   } else {
+    applyModelRef.reason = 'NA';
     showReasonDesc.value = false;
   }
 };
@@ -439,6 +454,7 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       applyModelRef.estimatedTotalValue = data.estimatedTotalValue;
       applyModelRef.unitValue = data.giftsRef.unitValue;
       applyModelRef.volume = data.giftsRef.volume;
+      applyModelRef.date = dayjs(data.giftsRef.givingDate);
       data.companyList.forEach(c => {
         const company = {
           id: c.id,
@@ -505,7 +521,7 @@ const handleTableChange = (pag: { pageSize: number; current: number }, filters: 
     searchFormModelRef.orders.push({ column: sorter.columnKey, type: sorter.order === 'ascend' ? 'ASC' : 'DESC' });
   }
 
-  getListDataByCondition(pag.current);
+  getListDataByCondition(pag);
 };
 
 const onFinishSearch = (values: any) => {
@@ -561,121 +577,138 @@ const onSubmitCancel = () => {
     });
 };
 
-// 修改提交
-const onModifyApply = (value: string) => {
-  receivingGiftFormRef?.value
-    ?.validate()
-    .then(() => {
-      let confirmContent = '';
-      if (value === 'Draft') {
-        console.log('update draft...');
-        confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
-      } else if (value === 'Submit') {
-        console.log('modify submit...');
-        confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
-      } else if (value === 'Delete') {
-        console.log('modify delete draft...');
-        confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
-      }
-      const personArr = [];
-      applyModelRef.companyList.forEach(c => {
-        c.personList.forEach(p => {
+// 前置验证
+const perVerification = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const personArr = [];
+    applyModelRef.companyList.forEach(c => {
+      c.personList.forEach(p => {
+        if (p.personName && p.positionTitle) {
           personArr.push(p);
-        });
-      });
-      if (!applyModelRef.fileId && applyModelRef.volume !== personArr.length) {
-        Modal.warning({
-          title: '人员与数量不符',
-          content: h('div', {}, [h('p', `提供人员：${personArr.length}`), h('p', `数量：${applyModelRef.volume}`)]),
-          onOk() {
-            console.log('ok');
-          }
-        });
-        return;
-      }
-
-      Modal.confirm({
-        title: $t('common.tip'),
-        icon: createVNode(ExclamationCircleOutlined),
-        content: confirmContent,
-        okText: $t('common.confirm'),
-        cancelText: $t('common.cancel'),
-        async onOk() {
-          const requestParam = toRaw(applyModelRef);
-          requestParam.actionType = value;
-          requestParam.applyForId = requestParam.applyName.userId;
-          requestParam.copyToUserEmails = requestParam.applyCCName;
-          console.log(requestParam);
-          if (value === 'Draft' || value === 'Submit') {
-            console.log('update draft...');
-            await updateReceivingGifts(requestParam);
-          } else if (value === 'Delete') {
-            console.log('modify delete draft...');
-            await deleteDraftReceivingGifts(requestParam.applicationId);
-          }
-          resetFromFields();
-          closeApplyDrawerModal();
-          getListDataByCondition();
-        },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel() {
-          console.log('cancel');
         }
       });
+    });
+    if (!applyModelRef.fileId && applyModelRef.volume !== personArr.length) {
+      Modal.warning({
+        title: '人员与数量不符',
+        content: h('div', {}, [h('p', `提供人员：${personArr.length}`), h('p', `数量：${applyModelRef.volume}`)]),
+        onOk() {
+          console.log('ok');
+        }
+      });
+      reject(new Error('人员与数量不符'));
+      return;
+    }
+    resolve();
+  });
+};
+
+// 修改提交
+const onModifyApply = (value: string) => {
+  perVerification()
+    .then(() => {
+      receivingGiftFormRef?.value
+        ?.validate()
+        .then(() => {
+          let confirmContent = '';
+          if (value === 'Draft') {
+            console.log('update draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+          } else if (value === 'Submit') {
+            console.log('modify submit...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+          } else if (value === 'Delete') {
+            console.log('modify delete draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
+          }
+
+          Modal.confirm({
+            title: $t('common.tip'),
+            icon: createVNode(ExclamationCircleOutlined),
+            content: confirmContent,
+            okText: $t('common.confirm'),
+            cancelText: $t('common.cancel'),
+            async onOk() {
+              const requestParam = toRaw(applyModelRef);
+              requestParam.actionType = value;
+              requestParam.applyForId = requestParam.applyName.userId;
+              requestParam.copyToUserEmails = requestParam.applyCCName;
+              console.log(requestParam);
+              if (value === 'Draft' || value === 'Submit') {
+                console.log('update draft...');
+                await updateReceivingGifts(requestParam);
+              } else if (value === 'Delete') {
+                console.log('modify delete draft...');
+                await deleteDraftReceivingGifts(requestParam.applicationId);
+              }
+              resetFromFields();
+              closeApplyDrawerModal();
+              getListDataByCondition();
+            },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onCancel() {
+              console.log('cancel');
+            }
+          });
+        })
+        .catch(err => {
+          console.log('error', err);
+        });
     })
     .catch(err => {
-      console.log('error', err);
+      console.log('error per validation', err);
     });
 };
 
 // 保存提交
 const onSubmitApply = (value: string) => {
-  let confirmContent = '';
-  if (value === 'Draft') {
-    console.log('update draft...');
-    confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
-  } else if (value === 'Submit') {
-    console.log('modify submit...');
-    confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
-  }
-  receivingGiftFormRef?.value
-    ?.validate()
+  perVerification()
     .then(() => {
-      let personArr = [];
-      applyModelRef.companyList.forEach(c => {
-        personArr = [...c.personList];
-      });
-      debugger;
-      console.log(personArr.length);
-
-      Modal.confirm({
-        title: $t('common.tip'),
-        icon: createVNode(ExclamationCircleOutlined),
-        content: confirmContent,
-        okText: $t('common.confirm'),
-        cancelText: $t('common.cancel'),
-        async onOk() {
-          const requestParam = toRaw(applyModelRef);
-          requestParam.actionType = value;
-          requestParam.applyForId = requestParam.applyName.userId;
-          requestParam.copyToUserEmails = requestParam.applyCCName;
-          console.log(requestParam);
-          const { error } = await saveReceivingGifts(requestParam);
-          if (!error) {
-            console.log('success!');
-            resetFromFields();
-            closeApplyDrawerModal();
-            getListDataByCondition();
+      receivingGiftFormRef?.value
+        ?.validate()
+        .then(() => {
+          let confirmContent = '';
+          if (value === 'Draft') {
+            console.log('update draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+          } else if (value === 'Submit') {
+            console.log('modify submit...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
           }
-        },
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        onCancel() {
-          console.log('cancel');
-        }
-      });
+
+          Modal.confirm({
+            title: $t('common.tip'),
+            icon: createVNode(ExclamationCircleOutlined),
+            content: confirmContent,
+            okText: $t('common.confirm'),
+            cancelText: $t('common.cancel'),
+            async onOk() {
+              const requestParam = toRaw(applyModelRef);
+              requestParam.actionType = value;
+              requestParam.applyForId = requestParam.applyName.userId;
+
+              requestParam.copyToUserEmails = requestParam.applyCCName;
+              console.log(requestParam);
+              const { error } = await saveReceivingGifts(requestParam);
+              if (!error) {
+                console.log('success!');
+                resetFromFields();
+                closeApplyDrawerModal();
+                getListDataByCondition();
+              }
+            },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onCancel() {
+              console.log('cancel');
+            }
+          });
+        })
+        .catch(err => {
+          console.log('error', err);
+        });
     })
     .catch(err => {
-      console.log('error', err);
+      console.log('error per validation', err);
     });
 };
 
@@ -700,24 +733,6 @@ onMounted(async () => {
 //     value[0].message = $t(`${value[0].tsmg}`);
 //   });
 // });
-
-// watch(
-//   () => [userState.value, applyModelRef.reasonType],
-//   ([userStateNewVal, reasonNewVal], [userStateOldVal, reasonOldVal]) => {
-//     // debugger;
-//     console.log(userStateNewVal, reasonNewVal, userStateOldVal, reasonOldVal);
-//     userState.data = [];
-//     userState.fetching = false;
-
-//     console.log('change reason reason', reasonNewVal);
-//     applyModelRef.reason = 'NA';
-//     if (reasonNewVal === 'Other') {
-//       showReasonDesc.value = true;
-//     } else {
-//       showReasonDesc.value = false;
-//     }
-//   }
-// );
 
 watch(
   () => [userState.value],
@@ -992,7 +1007,7 @@ watch(
         </a-row>
         <div v-for="(company, index) in applyModelRef.companyList" :key="company.key">
           <a-row :gutter="24">
-            <a-col span="18">
+            <a-col span="20">
               <a-form-item
                 :label="$t('page.receivingGifts.applyForm.giftGiverCompanyName')"
                 :name="['companyList', index, 'companyName']"
@@ -1007,7 +1022,7 @@ watch(
                 <a-input v-model:value="company.companyName"></a-input>
               </a-form-item>
             </a-col>
-            <a-col span="5">
+            <a-col span="4">
               <PlusCircleOutlined class="dynamic-add-del-button" @click="addCompany" />
               &nbsp;
               <MinusCircleOutlined
@@ -1315,11 +1330,11 @@ watch(
 
           <a-col span="10">
             <a-form-item
-              :label="$t('page.givingGifts.applyForm.giftGivingTitle')"
+              :label="$t('page.receivingGifts.applyForm.giftGiverTitle_validation')"
               :name="['personList', index, 'positionTitle']"
               :rules="{
                 required: true,
-                message: $t('page.givingGifts.applyForm.giftGivingTitle_validation'),
+                message: $t('page.receivingGifts.applyForm.giftGiverTitle'),
                 trigger: 'change'
               }"
             >

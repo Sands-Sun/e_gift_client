@@ -271,6 +271,345 @@ const local: App.I18n.Schema = {
         userEmail: 'email'
       }
     },
+    givingHospitality: {
+      applyForm: {
+        givingHospitalityRequestTitle: 'New Giving Hospitality Request Form',
+        remark: 'Remarks (Please fill in specific hospitality)',
+        remark_validation: 'Please fill in hospitality remarks',
+        givingHospitalityInfo: 'Giving Hospitality Information',
+        giftReason_label: 'Why are you going to provide this hospitable activity?',
+        giftReason_label_validation: 'please input provide this hopitable reson',
+        giftGivingDate: 'Date of Activity',
+        giftGivingDate_validation: 'please select date of activity',
+        giftHospitalityType: 'Please describe the hospitable activity',
+        giftHospitalityType_validation: 'please input describe',
+        giftExpensePerHead: 'Estimated expense per head',
+        giftExpensePerHead_validation: 'please input estimated expense per head',
+        giftHeadCount: 'Number of invitees',
+        giftHeadCount_validation: 'please input number of invitees',
+        giftEstimatedTotalExpense: 'Estimated total expense',
+        giftEstimatedTotalExpense_validation: 'please input estimated total expense',
+        giftHospPlace: 'Name of the place where the activity take place and location',
+        giftHospPlace_validation: 'please input take please'
+      },
+      policy: {
+        title: 'Policy Reminder',
+        desc_1954: [
+          {
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding eGift application in the reimbursement system.',
+                items: []
+              },
+              {
+                value:
+                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding eGift record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees giving Hospitality to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Requester should comply with below compliance regulations',
+            items: [
+              {
+                value:
+                  'Giving Hospitality to HCPs, Government Officials and Distributors, the Criteria is <= CNY 300 per person per time (including drinks and service charge)',
+                items: []
+              },
+              {
+                value:
+                  'Only on very rare occasions with appropriate reasons, the Hospitality provided to HCPs, Government Officials and Distributors may exceed CNY 300 per person, and requires upfront approval by the Head of Compliance China, or the China Head of Pharmaceuticals / Consumer Health, or the Regional Managing Directors for Pharmaceuticals or the Head of Field Sales for Consumer Health.',
+                items: []
+              },
+              {
+                value:
+                  'For meals with HCPs that are unconnected to an event and that are arranged by medical representatives, the total cost for one meal (incl. beverages) should not exceed CNY 2,000. If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
+                items: []
+              },
+              {
+                value:
+                  'If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
+                items: []
+              }
+            ]
+          }
+        ],
+        desc_1955: [
+          {
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding eGift application in the reimbursement system.',
+                items: []
+              },
+              {
+                value:
+                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding eGift record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees giving Hospitality to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Requester should comply with below compliance regulations',
+            items: [
+              {
+                value:
+                  'Giving Hospitality to HCPs, Government Officials and Distributors, the Criteria is <= CNY 300 per person per time (including drinks and service charge)',
+                items: []
+              },
+              {
+                value:
+                  'Only on very rare occasions with appropriate reasons, the Hospitality provided to HCPs, Government Officials and Distributors may exceed CNY 300 per person, and requires upfront approval by the Head of Compliance China, or the China Head of Pharmaceuticals / Consumer Health, or the Regional Managing Directors for Pharmaceuticals or the Head of Field Sales for Consumer Health.',
+                items: []
+              },
+              {
+                value:
+                  'For meals with HCPs that are unconnected to an event and that are arranged by medical representatives, the total cost for one meal (incl. beverages) should not exceed CNY 2,000. If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
+                items: []
+              },
+              {
+                value:
+                  'If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
+                items: []
+              }
+            ]
+          }
+        ],
+        desc_0813: [
+          {
+            label: 'Note',
+            items: [
+              {
+                value: 'If total expense per head is less than RMB 300 no approval is required.               ',
+                items: []
+              },
+              {
+                value:
+                  "If total expense per head is between RMB 300 and RMB 1000, line manager's prior approval is needed. ",
+                items: []
+              },
+              {
+                value:
+                  'If total expense per head is more than RMB 1000 or the total expense for the group is more than RMB 6000, prior approval of line manager and subgroup compliance officer is needed.',
+                items: []
+              },
+              {
+                value:
+                  'If invitee is government official or employee of state owned company, prior approval of line manager and subgroup compliance officer is needed.',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'The hospitable activity shall fulfill all of the following criteria:',
+            items: [
+              { value: 'Serving a Legitimate Purpose', items: [] },
+              { value: 'Consistent with Pre-Valuing Business Practice', items: [] },
+              { value: 'Reasonable and Appropriate', items: [] },
+              { value: 'Within the Expense Guidelines Stipulated', items: [] }
+            ]
+          },
+          {
+            label: ' The hospitable activity must NOT be',
+            items: [
+              { value: 'Lavish', items: [] },
+              { value: 'Extravagant', items: [] },
+              { value: 'Located in or near illegal activity', items: [] },
+              { value: 'Attached to the giving of gifts not in accordance with this Guideline or Table', items: [] },
+              {
+                value:
+                  'Provided in a place of ill-repute (eg strip club or in an inappropriate Bar) or of a similar nature',
+                items: []
+              }
+            ]
+          }
+        ],
+        desc_0882: [
+          {
+            label: 'Please note that this function is to register and record',
+            items: [
+              {
+                value:
+                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding eGift application in the reimbursement system.',
+                items: []
+              },
+              {
+                value:
+                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding eGift record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Principle',
+            items: [
+              {
+                value:
+                  'Employees giving Hospitality to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                items: []
+              },
+              {
+                value:
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'Requester should comply with below compliance regulations',
+            items: [
+              {
+                value:
+                  'Giving Hospitality to HCPs, Government Officials and Distributors, the Criteria is <= CNY 300 per person per time (including drinks and service charge)',
+                items: []
+              },
+              {
+                value:
+                  'Only on very rare occasions with appropriate reasons, the Hospitality provided to HCPs, Government Officials and Distributors may exceed CNY 300 per person, and requires upfront approval by the Head of Compliance China, or the China Head of Pharmaceuticals / Consumer Health, or the Regional Managing Directors for Pharmaceuticals or the Head of Field Sales for Consumer Health.',
+                items: []
+              },
+              {
+                value:
+                  'For meals with HCPs that are unconnected to an event and that are arranged by medical representatives, the total cost for one meal (incl. beverages) should not exceed CNY 2,000. If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
+                items: []
+              },
+              {
+                value:
+                  'If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
+                items: []
+              }
+            ]
+          }
+        ],
+        desc_1391: [
+          {
+            label: 'Note',
+            items: [
+              {
+                value: 'Only gifts and hospitality with non-promotion nature shall be pre-applied in eGift system.',
+                items: []
+              },
+              { value: 'If unit price is less than RMB 300, no approval is needed.', items: [] },
+              {
+                value:
+                  'If unit price is more than RMB 300 (including 300), approvals from Department Head, BCS Country Head and Compliance are needed.',
+                items: []
+              },
+              {
+                value:
+                  'For gifts or hospitality offered to state personnel, approval from Compliance is always needed.',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'The hospitable activity shall fulfill all of the following criteria:',
+            items: [
+              { value: 'Serving a Legitimate Purpose', items: [] },
+              { value: 'Consistent with Pre-Valuing Business Practice', items: [] },
+              { value: 'Reasonable and Appropriate', items: [] },
+              { value: 'Within the Expense Guidelines Stipulated', items: [] }
+            ]
+          },
+          {
+            label: ' The hospitable activity must NOT be',
+            items: [
+              { value: 'Lavish', items: [] },
+              { value: 'Extravagant', items: [] },
+              { value: 'Located in or near illegal activity', items: [] },
+              { value: 'Attached to the giving of gifts not in accordance with this Guideline or Table', items: [] },
+              {
+                value:
+                  'Provided in a place of ill-repute (eg strip club or in an inappropriate Bar) or of a similar nature',
+                items: []
+              }
+            ]
+          }
+        ],
+        desc_2614: [
+          {
+            label: 'Note',
+            items: [
+              {
+                value: 'If total expense per head is less than RMB 300 no approval is required.',
+                items: []
+              },
+              {
+                value:
+                  "If total expense per head is between RMB 300 and RMB 1000, line manager's prior approval is needed.",
+                items: []
+              },
+              {
+                value:
+                  'If total expense per head is more than RMB 1000 or the total expense for the group is more than RMB 6000, prior approval of line manager and subgroup compliance officer is needed.',
+                items: []
+              },
+              {
+                value:
+                  'If invitee is government official or employee of state owned company, prior approval of line manager and subgroup compliance officer is needed.',
+                items: []
+              }
+            ]
+          },
+          {
+            label: 'The hospitable activity shall fulfill all of the following criteria:',
+            items: [
+              { value: 'Serving a Legitimate Purpose', items: [] },
+              { value: 'Consistent with Pre-Valuing Business Practice', items: [] },
+              { value: 'Reasonable and Appropriate', items: [] },
+              { value: 'Within the Expense Guidelines Stipulated', items: [] }
+            ]
+          },
+          {
+            label: ' The hospitable activity must NOT be',
+            items: [
+              { value: 'Lavish', items: [] },
+              { value: 'Extravagant', items: [] },
+              { value: 'Located in or near illegal activity', items: [] },
+              { value: 'Attached to the giving of gifts not in accordance with this Guideline or Table', items: [] },
+              {
+                value:
+                  'Provided in a place of ill-repute (eg strip club or in an inappropriate Bar) or of a similar nature',
+                items: []
+              }
+            ]
+          }
+        ]
+      }
+    },
     givingGifts: {
       applyForm: {
         givingGiftRequestTitle: 'Giving Gift Request Form',
@@ -514,19 +853,20 @@ const local: App.I18n.Schema = {
                 value:
                   'Employees may accept and keep Gifts offered or granted by a Third Party when all the following conditions are met',
                 items: [
-                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)' },
-                  { value: 'On an occasional basis (<=2 times per year from one Third Party)' },
-                  { value: 'In accordance with local cultural courtesy customs' }
+                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)', items: [] },
+                  { value: 'On an occasional basis (<=2 times per year from one Third Party)', items: [] },
+                  { value: 'In accordance with local cultural courtesy customs', items: [] }
                 ]
               },
               {
                 value:
                   'If an employee receives a Gift with > CNY 300 value or unknown value, he/she should politely refuse it. When failing to refuse the Gift due to courtesy reasons, the employee should follow the following process',
                 items: [
-                  { value: 'The employee should directly notify his/her supervisor and Compliance team' },
+                  { value: 'The employee should directly notify his/her supervisor and Compliance team', items: [] },
                   {
                     value:
-                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team'
+                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team',
+                    items: []
                   }
                 ]
               }
@@ -566,19 +906,20 @@ const local: App.I18n.Schema = {
                 value:
                   'Employees may accept and keep Gifts offered or granted by a Third Party when all the following conditions are met',
                 items: [
-                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)' },
-                  { value: 'On an occasional basis (<=2 times per year from one Third Party)' },
-                  { value: 'In accordance with local cultural courtesy customs' }
+                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)', items: [] },
+                  { value: 'On an occasional basis (<=2 times per year from one Third Party)', items: [] },
+                  { value: 'In accordance with local cultural courtesy customs', items: [] }
                 ]
               },
               {
                 value:
                   'If an employee receives a Gift with > CNY 300 value or unknown value, he/she should politely refuse it. When failing to refuse the Gift due to courtesy reasons, the employee should follow the following process',
                 items: [
-                  { value: 'The employee should directly notify his/her supervisor and Compliance team' },
+                  { value: 'The employee should directly notify his/her supervisor and Compliance team', items: [] },
                   {
                     value:
-                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team'
+                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team',
+                    items: []
                   }
                 ]
               }
@@ -618,19 +959,20 @@ const local: App.I18n.Schema = {
                 value:
                   'Employees may accept and keep Gifts offered or granted by a Third Party when all the following conditions are met',
                 items: [
-                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)' },
-                  { value: 'On an occasional basis (<=2 times per year from one Third Party)' },
-                  { value: 'In accordance with local cultural courtesy customs' }
+                  { value: 'Of nominal or symbolic value (<=CNY 300 in value per item)', items: [] },
+                  { value: 'On an occasional basis (<=2 times per year from one Third Party)', items: [] },
+                  { value: 'In accordance with local cultural courtesy customs', items: [] }
                 ]
               },
               {
                 value:
                   'If an employee receives a Gift with > CNY 300 value or unknown value, he/she should politely refuse it. When failing to refuse the Gift due to courtesy reasons, the employee should follow the following process',
                 items: [
-                  { value: 'The employee should directly notify his/her supervisor and Compliance team' },
+                  { value: 'The employee should directly notify his/her supervisor and Compliance team', items: [] },
                   {
                     value:
-                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team'
+                      'The employee should hand over the Gift to Compliance team, or alternatively share the Gift among his/her department or group if approved by Compliance team',
+                    items: []
                   }
                 ]
               }
@@ -782,7 +1124,9 @@ const local: App.I18n.Schema = {
     },
     searchFrom: {
       applyStatus: 'Apply Status',
-      applyType: 'Apply Type'
+      applyType: 'Apply Type',
+      givingGifts: 'Giving Gifts',
+      givingHospitality: 'Giving Hospitality'
     },
     userName: {
       required: 'Please enter user name',

@@ -450,7 +450,7 @@ onMounted(async () => {
               {{ $t('common.viewDetail') }}
             </a-button>
           </template>
-          <template v-else-if="column.key === 'mark_Deleted'">
+          <template v-else-if="column.key === 'MARK_DELETED'">
             <span>
               <template v-if="record.markDeleted === 'Y'">
                 <a-tag color="red">{{ $t('common.disable') }}</a-tag>

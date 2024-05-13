@@ -249,7 +249,7 @@ declare namespace App {
 
     type PolicyDescItem = {
       value: string;
-      items: Array<any> | unknown;
+      items: Array<PolicyDescItem> | unknown;
     };
 
     type Schema = {
@@ -454,6 +454,37 @@ declare namespace App {
             userEmail: string;
           };
         };
+        givingHospitality: {
+          applyForm: {
+            givingHospitalityRequestTitle: string;
+            remark: string;
+            remark_validation: string;
+            givingHospitalityInfo: string;
+            giftReason_label: string;
+            giftReason_label_validation: string;
+            giftGivingDate: string;
+            giftGivingDate_validation: string;
+            giftHospitalityType: string;
+            giftHospitalityType_validation: string;
+            giftExpensePerHead: string;
+            giftExpensePerHead_validation: string;
+            giftHeadCount: string;
+            giftHeadCount_validation: string;
+            giftEstimatedTotalExpense: string;
+            giftEstimatedTotalExpense_validation: string;
+            giftHospPlace: string;
+            giftHospPlace_validation: string;
+          };
+          policy: {
+            title: string;
+            desc_1954: Array<PolicyDesc>;
+            desc_1955: Array<PolicyDesc>;
+            desc_0813: Array<PolicyDesc>;
+            desc_0882: Array<PolicyDesc>;
+            desc_1391: Array<PolicyDesc>;
+            desc_2614: Array<PolicyDesc>;
+          };
+        };
         givingGifts: {
           applyForm: {
             givingGiftRequestTitle: string;
@@ -591,6 +622,8 @@ declare namespace App {
         searchFrom: {
           applyStatus: string;
           applyType: string;
+          givingGifts: string;
+          givingHospitality: string;
         };
         applicateInfo: {
           applicateInfoTitle: string;

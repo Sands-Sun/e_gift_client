@@ -24,6 +24,8 @@ declare namespace Api {
     interface GiftPerson {
       id: number;
       companyId: number;
+      isGoSoc: string;
+      isBayerCustomer: string;
       personName: string;
       positionTitle: string;
       description: string;
@@ -86,9 +88,17 @@ declare namespace Api {
       givingCompany: string;
       unitValue: number;
       volume: number;
-      givingDate: unknown;
+      givingDate: string;
       giftsPersons: unknown[];
       givingPerson: string;
+    }
+
+    interface GivingHospitalityRef {
+      hospitalityType: string;
+      expensePerHead: number;
+      headCount: number;
+      hospitalityDate: string;
+      hospPlace: string;
     }
 
     interface GivingHospitality {
@@ -109,7 +119,10 @@ declare namespace Api {
       reason: string;
       reasonType: string;
       status: string;
+      companyList: GiftCompany[];
       fileAttach: FileAttach;
+      hospRef: GivingHospitalityRef;
+      hospActivities: GivingHospitalityActivity[];
     }
 
     interface GivingGifts {
@@ -163,6 +176,21 @@ declare namespace Api {
     }
 
     interface GivingActivity {
+      action: string;
+      appActivityDataId: number;
+      applicationId: number;
+      createdDate: string;
+      lastModifiedDate: string;
+      sfActivityInsId: number;
+      sfProcessInsId: number;
+      sfUserIdSubmitter: number;
+      userEmail: string;
+      userFirstName: string;
+      userLastName: string;
+      remark: string;
+    }
+
+    interface GivingHospitalityActivity {
       action: string;
       appActivityDataId: number;
       applicationId: number;

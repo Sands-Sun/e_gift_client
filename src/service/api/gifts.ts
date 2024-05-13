@@ -5,6 +5,9 @@ const api_url = {
   group_save: '/gifts/group/save',
   // group_update: '/gifts/group/update',
   process_task_list: '/process//task/page',
+  giving_hospitality_list: '/hospitality/giving/page',
+  giving_hospitaltiy_save: '/hospitality/giving/save',
+  giving_hospitality_cancel: '/hospitality/giving/cancel',
   giving_gifts_list: '/gifts/giving/page',
   giving_gifts_save: '/gifts/giving/save',
   giving_gifts_cancel: '/gifts/giving/cancel',
@@ -64,6 +67,37 @@ export function updateGroup(param: any) {
 export function saveGroup(param: any) {
   return request({
     url: api_url.group_save,
+    method: 'post',
+    data: param
+  });
+}
+
+export function saveGivingHospitality(param: any) {
+  return request({
+    url: api_url.giving_hospitaltiy_save,
+    method: 'post',
+    data: param
+  });
+}
+
+export function updateGivingHospitality(param: any) {
+  return request({
+    url: `hospitality/giving/update/${param.applicationId}`,
+    method: 'post',
+    data: param
+  });
+}
+
+export function deleteDraftGivingHospitality(applicationId: string) {
+  return request({
+    url: `hospitality/giving/draft/delete/${applicationId}`,
+    method: 'delete'
+  });
+}
+
+export function cancelGivingHospitality(param: any) {
+  return request({
+    url: api_url.giving_hospitality_cancel,
     method: 'post',
     data: param
   });
@@ -195,6 +229,14 @@ export function fetchReceivingGiftsList(queryParam: any) {
 export function fetchGivingGiftsList(queryParam: any) {
   return request<Api.Gifts.TableListResponse>({
     url: api_url.giving_gifts_list,
+    method: 'post',
+    data: queryParam
+  });
+}
+
+export function fetchGivingHospitalityList(queryParam: any) {
+  return request<Api.Gifts.TableListResponse>({
+    url: api_url.giving_hospitality_list,
     method: 'post',
     data: queryParam
   });

@@ -56,7 +56,7 @@ const searchFormModelRef = reactive({
   companyCode: '',
   creator: '',
   cwid: '',
-  status: '',
+  applyType: '',
   type: '',
   beginDate: '',
   endDate: '',
@@ -478,11 +478,12 @@ onMounted(async () => {
 
           <a-row :gutter="35">
             <a-col span="6">
-              <a-form-item :label="$t('form.searchFrom.applyStatus')" name="status">
-                <a-select v-model:value="searchFormModelRef.status">
-                  <a-select-option value="draft">Draft</a-select-option>
-                  <a-select-option value="documented">Documented</a-select-option>
-                  <a-select-option value="cancelled">Cancelled</a-select-option>
+              <a-form-item :label="$t('form.searchFrom.applyType')" name="applyType">
+                <a-select v-model:value="searchFormModelRef.applyType">
+                  <a-select-option value="Giving Gifts">{{ $t('form.searchFrom.givingGifts') }}</a-select-option>
+                  <a-select-option value="Giving Hospitality">
+                    {{ $t('form.searchFrom.givingHospitality') }}
+                  </a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -930,10 +931,10 @@ onMounted(async () => {
       :cancel-text="$t('common.rejectApprove')"
     >
       <template #footer>
-        <a-button key="approve" @click="onSubmitApproval(applyModelRef.taskId, 'Approved')">
+        <a-button key="approve" type="primary" @click="onSubmitApproval(applyModelRef.taskId, 'Approved')">
           {{ $t('common.agreeApprove') }}
         </a-button>
-        <a-button key="reject" type="primary" @click="onSubmitApproval(applyModelRef.taskId, 'Rejected')">
+        <a-button key="reject" @click="onSubmitApproval(applyModelRef.taskId, 'Rejected')">
           {{ $t('common.rejectApprove') }}
         </a-button>
       </template>

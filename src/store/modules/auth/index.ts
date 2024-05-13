@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { useLoading } from '@sa/hooks';
 import { SetupStoreId } from '@/enum';
 import { useRouterPush } from '@/hooks/common/router';
-import { fetchGetUserInfo, fetchLogin } from '@/service/api';
+import { fetchAdminLogin, fetchGetUserInfo, fetchLogin } from '@/service/api';
 import { localStg } from '@/utils/storage';
 import { $t } from '@/locales';
 import { useRouteStore } from '../route';
@@ -34,6 +34,41 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     }
 
     routeStore.resetStore();
+  }
+
+  /**
+   * Login
+   *
+   * @param userName User name
+   * @param password Password
+   */
+  async function adminLogin(userName: string, password: string) {
+    startLoading();
+    debugger;
+    const { data: loginToken, error } = await fetchAdminLogin(userName, password);
+
+    if (!error) {
+      const pass = await loginByToken(loginToken.token);
+
+      if (pass) {
+        await routeStore.initAuthRoute();
+
+        await redirectFromLogin();
+
+        if (routeStore.isInitAuthRoute) {
+          window.$notification?.success({
+            message: $t('page.login.common.loginSuccess'),
+            description: $t('page.login.common.welcomeBack', {
+              userName: `${userInfo.firstName}  ${userInfo.lastName}`
+            })
+          });
+        }
+      }
+    } else {
+      resetStore();
+    }
+
+    endLoading();
   }
 
   /** SSO Login */
@@ -114,7 +149,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     localStg.set('token', loginToken);
     // localStg.set('refreshToken', loginToken.refreshToken);
 
-    const { data: info, error } = await fetchGetUserInfo();
+    const { data: info, error } = await fetchGetUserInfo(loginToken);
 
     if (!error) {
       // 2. store user info
@@ -136,6 +171,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     isLogin,
     loginLoading,
     resetStore,
-    login
+    login,
+    adminLogin
   };
 });

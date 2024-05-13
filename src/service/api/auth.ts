@@ -1,5 +1,16 @@
 import { request } from '../request';
 
+export function fetchAdminLogin(CWID: string, password: string) {
+  return request<Api.Auth.LoginToken>({
+    url: '/sys/adminLogin',
+    method: 'post',
+    data: {
+      CWID,
+      password
+    }
+  });
+}
+
 /**
  * Login
  *

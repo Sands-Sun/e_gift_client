@@ -69,7 +69,6 @@ export function useAntdForm() {
 
   return {
     formRef,
-    validate,
-    resetFields
+    validate
   };
 }

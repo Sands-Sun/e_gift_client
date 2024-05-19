@@ -1,11 +1,11 @@
-import { computed, reactive, ref } from 'vue';
-import { defineStore } from 'pinia';
-import { useLoading } from '@sa/hooks';
 import { SetupStoreId } from '@/enum';
 import { useRouterPush } from '@/hooks/common/router';
+import { $t } from '@/locales';
 import { fetchAdminLogin, fetchGetUserInfo, fetchLogin } from '@/service/api';
 import { localStg } from '@/utils/storage';
-import { $t } from '@/locales';
+import { useLoading } from '@sa/hooks';
+import { defineStore } from 'pinia';
+import { computed, reactive, ref } from 'vue';
 import { useRouteStore } from '../route';
 import { clearAuthStorage, getToken, getUserInfo } from './shared';
 
@@ -44,7 +44,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
    */
   async function adminLogin(userName: string, password: string) {
     startLoading();
-    debugger;
+    // debugger;
     const { data: loginToken, error } = await fetchAdminLogin(userName, password);
 
     if (!error) {

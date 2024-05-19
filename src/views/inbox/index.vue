@@ -23,6 +23,7 @@ const applyUserInfo = reactive<{ userInfo: Api.Auth.UserInfo | undefined; superv
   supervisor: undefined
 });
 const expandSearchFields = ref(true);
+const expandPolicyDescription = ref(true);
 const openApplyDrawerModal = ref<boolean>(false);
 const openApproveModal = ref<boolean>(false);
 const uploadFileList = ref([] as any);
@@ -116,10 +117,17 @@ const applyModelRef = reactive<{
   date: Dayjs;
   companyList: Api.Gifts.GiftCompany[];
   giftsActivities: unknown[];
+  hospActivities: unknown[];
   isGoSoc: string;
   isBayerCustomer: string;
-  unitValue: number;
-  volume: number;
+  unitValue: number | undefined;
+  volume: number | undefined;
+  hospitalityType: string;
+  hospPlace: string;
+  expensePerHead: number | undefined;
+  headCount: number | undefined;
+  totalValue: number;
+  estimatedTotalExpense: number | undefined;
   remark: string;
   fileId: unknown;
 }>({
@@ -139,11 +147,18 @@ const applyModelRef = reactive<{
   date: dayjs(),
   companyList: [],
   giftsActivities: [] as any,
+  hospActivities: [] as any,
   isGoSoc: '',
   isBayerCustomer: '',
+  hospitalityType: '',
+  hospPlace: '',
   // givingTitle: '',
   unitValue: undefined as any,
   volume: undefined as any,
+  totalValue: undefined as any,
+  expensePerHead: undefined as any, // 估计人均费用
+  headCount: undefined as any, // 受邀人人数
+  estimatedTotalExpense: undefined as any, // 估计的总费用
   remark: '',
   fileId: undefined
 });
@@ -184,9 +199,46 @@ const getListDataByCondition = async (currentPage = 1) => {
   listTableLoading.value = false;
 };
 
+const showApplyGivingHosp = (data: any) => {
+  applyModelRef.expensePerHead = data.hospRef.expensePerHead;
+  applyModelRef.headCount = data.hospRef.headCount;
+  applyModelRef.hospitalityType = data.hospRef.hospitalityType;
+  applyModelRef.hospPlace = data.hospRef.hospPlace;
+  applyModelRef.date = dayjs(data.hospRef.hospitalityDate);
+  data.companyList.forEach(c => {
+    const company = {
+      id: c.id,
+      companyName: c.companyName,
+      description: c.description,
+      key: Date.now(),
+      personList: [] as any
+    };
+    c.personList.forEach(p => {
+      const person = {
+        id: p.id,
+        personName: p.personName,
+        positionTitle: p.positionTitle,
+        isGoSoc: p.isGoSoc,
+        isBayerCustomer: p.isBayerCustomer,
+        companyId: p.companyId,
+        description: p.description,
+        key: Date.now()
+      };
+      company.personList.push(person);
+    });
+    applyModelRef.companyList.push(company);
+  });
+  applyModelRef.reason = data.reason;
+  applyModelRef.remark = data.remark;
+  console.log('success:', data);
+  applyModelRef.hospActivities = data.hospActivities;
+};
+
 const showApplyGivingGift = (data: any) => {
   applyModelRef.unitValue = data.giftsRef.unitValue;
   applyModelRef.volume = data.giftsRef.volume;
+  applyModelRef.date = dayjs(data.giftsRef.givenDate);
+  applyModelRef.totalValue = data.totalValue;
   data.companyList.forEach(c => {
     const company = {
       id: c.id,
@@ -201,6 +253,8 @@ const showApplyGivingGift = (data: any) => {
         personName: p.personName,
         positionTitle: p.positionTitle,
         companyId: p.companyId,
+        unitValue: p.unitValue,
+        volume: p.volume,
         description: p.description,
         key: Date.now()
       };
@@ -248,6 +302,9 @@ const clearApplyModel = () => {
   applyModelRef.giftsActivities = [];
   applyModelRef.unitValue = undefined;
   applyModelRef.volume = undefined;
+  applyModelRef.expensePerHead = undefined;
+  applyModelRef.headCount = undefined;
+  applyModelRef.estimatedTotalExpense = 0;
   applyModelRef.remark = '';
 };
 
@@ -259,6 +316,7 @@ const resetFromFields = () => {
 
 const showApplyDrawerModal = async (item?: any) => {
   resetFromFields();
+  // debugger;
   giftCompanyPersonState.data = [];
   userState.data = [];
   if (item.applicationId) {
@@ -307,6 +365,9 @@ const showApplyDrawerModal = async (item?: any) => {
         if (item.requestType === 'Giving Gifts') {
           showApplyGivingGift(data);
         }
+        if (item.requestType === 'Giving Hospitality') {
+          showApplyGivingHosp(data);
+        }
         item.loading = false;
         openApplyDrawerModal.value = true;
       });
@@ -323,6 +384,7 @@ const closeApplyDrawerModal = () => {
 };
 
 const openAddPersonModal = (item: Api.Gifts.GiftCompany) => {
+  // debugger;
   currentCompanyState = item;
   showAddPersonModal.value = true;
 };
@@ -401,6 +463,16 @@ const resetSearchForm = () => {
 const onFinishSearch = (values: any) => {
   console.log('Received values of form: ', values);
   console.log('formState: ', searchFormModelRef);
+};
+
+const showDrawerModalTitle = () => {
+  let title;
+  if (applyModelRef.requestType === 'Giving Gifts') {
+    title = $t('page.givingGifts.applyForm.givingGiftRequestTitle');
+  } else if (applyModelRef.requestType === 'Giving Hospitality') {
+    title = $t('page.givingHospitality.applyForm.givingHospitalityRequestTitle');
+  }
+  return title;
 };
 
 onMounted(async () => {
@@ -548,7 +620,7 @@ onMounted(async () => {
     </a-card>
 
     <a-drawer
-      :title="$t('page.givingGifts.applyForm.givingGiftRequestTitle')"
+      :title="showDrawerModalTitle()"
       width="75%"
       size="large"
       :open="openApplyDrawerModal"
@@ -635,28 +707,38 @@ onMounted(async () => {
             </a-form-item>
           </a-col>
         </a-row>
-
+        <a-row justify="end">
+          <a-col>
+            <a-button type="link" :disabled="false" @click="expandPolicyDescription = !expandPolicyDescription">
+              <template v-if="expandPolicyDescription">{{ $t('common.shrink') }}</template>
+              <template v-else>{{ $t('common.expand') }}</template>
+            </a-button>
+          </a-col>
+        </a-row>
         <template v-if="applyModelRef.requestType === 'Giving Gifts'">
           <!--giving gifts template-->
-          <a-descriptions :title="$t('page.givingGifts.policy.title')" layout="vertical">
-            <a-descriptions-item
-              v-for="(item, index) in $tm(`page.givingGifts.policy.desc_${applyUserInfo?.userInfo?.companyCode}`)"
-              :key="index"
-              :span="3"
-              :label="item.label"
-            >
-              <ul>
-                <li v-for="(detail, index) in item.items" :key="detail">
-                  &nbsp; &nbsp; {{ index + 1 }} ) {{ detail.value }}
-                  <template v-if="detail.items.length > 0">
-                    <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail">
-                      &nbsp; &nbsp; {{ subIndex + 1 }} ) {{ subDetail.value }}
-                    </li>
-                  </template>
-                </li>
-              </ul>
-            </a-descriptions-item>
-          </a-descriptions>
+          <div v-show="expandPolicyDescription">
+            <a-descriptions :title="$t('page.givingGifts.policy.title')" layout="vertical">
+              <a-descriptions-item
+                v-for="(item, index) in $tm(`page.givingGifts.policy.desc_${applyUserInfo?.userInfo?.companyCode}`)"
+                :key="index"
+                :span="3"
+                :label="item.label"
+              >
+                <ul>
+                  <li v-for="(detail, index) in item.items" :key="detail">
+                    &nbsp; &nbsp; {{ index + 1 }} ) {{ detail.value }}
+                    <template v-if="detail.items.length > 0">
+                      <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail">
+                        &nbsp; &nbsp; {{ subIndex + 1 }} ) {{ subDetail.value }}
+                      </li>
+                    </template>
+                  </li>
+                </ul>
+              </a-descriptions-item>
+            </a-descriptions>
+          </div>
+
           <a-descriptions :title="$t('page.givingGifts.applyForm.givingGiftInfo')" />
           <template
             v-if="
@@ -668,42 +750,101 @@ onMounted(async () => {
             <!--0813 AND 2614 AND 1391 显示下拉列表-->
             <a-row :gutter="24">
               <a-col span="12">
-                <a-form-item :label="$t('page.givingGifts.applyForm.giftReason_label')" name="reasonType">
-                  <a-select v-model:value="applyModelRef.reasonType">
+                <a-form-item
+                  :label="$t('page.givingGifts.applyForm.giftReason_type_label')"
+                  name="reasonType"
+                  :rules="[
+                    {
+                      required: true,
+                      message: $t('page.givingGifts.applyForm.giftReason_type_label_validation')
+                    }
+                  ]"
+                >
+                  <a-select v-model:value="applyModelRef.reasonType" :dropdown-match-select-width="false">
                     <a-select-option value="Chinese New Year">
                       {{ $t('form.common.option_giftReason_NewYear') }}
                     </a-select-option>
                     <a-select-option value="Mid-Autumn Festival">
                       {{ $t('form.common.option_giftReason_Mid_Autumn') }}
                     </a-select-option>
-                    <a-select-option value="Other">{{ $t('form.common.option_Other') }}</a-select-option>
+                    <a-select-option value="Other">{{ $t('form.common.option_giftReason_Other') }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
-
-              <a-col span="12">
-                <a-form-item :label="$t('page.givingGifts.applyForm.giftDesc_type_label')" name="giftDescType">
-                  <a-select v-model:value="applyModelRef.giftDescType">
-                    <a-select-option value="Company Branded Gift">
-                      {{ $t('form.common.option_giftDesc_Company_Branded_Gift') }}
-                    </a-select-option>
-                    <a-select-option value="General Gift">
-                      {{ $t('form.common.option_giftDesc_General_Gift') }}
-                    </a-select-option>
-                    <a-select-option value="Medicine Gift">
-                      {{ $t('form.common.option_giftDesc_Medicine') }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
+              <!--0813 下拉列表-->
+              <template v-if="applyUserInfo?.userInfo?.companyCode === '0813'">
+                <a-col span="12">
+                  <a-form-item
+                    :label="$t('page.givingGifts.applyForm.giftDesc_type_label')"
+                    name="giftDescType"
+                    :rules="[
+                      {
+                        required: true,
+                        message: $t('page.givingGifts.applyForm.giftDesc_type_label_validation')
+                      }
+                    ]"
+                  >
+                    <a-select v-model:value="applyModelRef.giftDescType">
+                      <a-select-option value="Company Branded Gift">
+                        {{ $t('form.common.option_giftDesc_Company_Branded_Gift') }}
+                      </a-select-option>
+                      <a-select-option value="General Gift">
+                        {{ $t('form.common.option_giftDesc_General_Gift') }}
+                      </a-select-option>
+                      <a-select-option value="Medicine Gift">
+                        {{ $t('form.common.option_giftDesc_Medicine') }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+              </template>
+              <template
+                v-else-if="
+                  applyUserInfo?.userInfo?.companyCode === '1391' || applyUserInfo?.userInfo?.companyCode === '2614'
+                "
+              >
+                <a-col span="12">
+                  <a-form-item
+                    :label="$t('page.givingGifts.applyForm.giftDesc_type_label')"
+                    name="giftDescType"
+                    :rules="[
+                      {
+                        required: true,
+                        message: $t('page.givingGifts.applyForm.giftDesc_type_label_validation')
+                      }
+                    ]"
+                  >
+                    <a-select v-model:value="applyModelRef.giftDescType">
+                      <a-select-option
+                        value="Promotional Supplies Gifts"
+                        :title="$t('form.common.option_giftDesc_Promotional_Supplies')"
+                      >
+                        {{ $t('form.common.option_giftDesc_Promotional_Supplies') }}
+                      </a-select-option>
+                      <a-select-option value="Cultural Courtesy Gifts">
+                        {{ $t('form.common.option_giftDesc_Cultural_Courtesy') }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+              </template>
             </a-row>
 
             <a-row v-show="showReasonDesc" :gutter="24">
               <a-col span="24">
-                <a-form-item :label="$t('page.givingGifts.applyForm.giftDesc_label')" name="reason">
+                <a-form-item
+                  :label="$t('page.givingGifts.applyForm.giftReason_label')"
+                  name="reason"
+                  :rules="[
+                    {
+                      required: true,
+                      message: $t('page.givingGifts.applyForm.giftReason_label_validation')
+                    }
+                  ]"
+                >
                   <a-input
                     v-model:value="applyModelRef.reason"
-                    :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
+                    :placeholder="$t('page.givingGifts.applyForm.giftReason_label_validation')"
                   ></a-input>
                 </a-form-item>
               </a-col>
@@ -734,10 +875,10 @@ onMounted(async () => {
               </template>
               <template v-else>
                 <a-col span="10">
-                  <a-form-item :label="$t('page.givingGifts.applyForm.giftDesc_label')" name="giftDesc">
+                  <a-form-item :label="$t('page.givingGifts.applyForm.giftDesc_type_label')" name="reason">
                     <a-input
-                      v-model:value="applyModelRef.giftDesc"
-                      :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
+                      v-model:value="applyModelRef.reason"
+                      :placeholder="$t('page.givingGifts.applyForm.giftDesc_type_label_validation')"
                     ></a-input>
                   </a-form-item>
                 </a-col>
@@ -807,11 +948,7 @@ onMounted(async () => {
             <a-col span="5">
               <a-form-item :label="$t('form.common.totalPrice')">
                 <a-input-number
-                  :value="
-                    isNaN(applyModelRef.unitValue * applyModelRef.volume)
-                      ? undefined
-                      : applyModelRef.unitValue * applyModelRef.volume
-                  "
+                  :value="applyModelRef.totalValue"
                   addon-before="￥"
                   style="width: 195px"
                   :step="0.01"
@@ -838,7 +975,7 @@ onMounted(async () => {
                   style="margin: 0 8px"
                   @click="openAddPersonModal(company)"
                 >
-                  {{ $t('form.common.addPerson') }}
+                  {{ $t('form.common.viewPerson') }}
                 </a-button>
               </a-col>
             </a-row>
@@ -884,33 +1021,161 @@ onMounted(async () => {
         </template>
         <template v-else-if="applyModelRef.requestType === 'Giving Hospitality'">
           <!-- giving hospitality template-->
+          <div v-show="expandPolicyDescription">
+            <a-descriptions :title="$t('page.givingHospitality.policy.title')" layout="vertical">
+              <a-descriptions-item
+                v-for="(item, index) in $tm(`page.givingHospitality.policy.desc_${userInfo.companyCode}`)"
+                :key="index"
+                :span="3"
+                :label="item.label"
+              >
+                <ul style="list-style-position: outside">
+                  <li v-for="(detail, index) in item.items" :key="detail" style="text-indent: -1em">
+                    &emsp;{{ index + 1 }}. {{ detail.value }}
+                    <template v-if="detail.items.length > 0">
+                      <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail" style="text-indent: -1em">
+                        &emsp;&emsp;{{ subIndex + 1 }} ) {{ subDetail.value }}
+                        <template v-if="subDetail && subDetail.items && subDetail.items.length > 0">
+                          <li v-for="subsDetail in subDetail.items" :key="subsDetail" style="text-indent: -1em">
+                            &emsp;&emsp;&emsp; • {{ subsDetail.value }}
+                          </li>
+                        </template>
+                      </li>
+                    </template>
+                  </li>
+                </ul>
+              </a-descriptions-item>
+            </a-descriptions>
+          </div>
+          <a-descriptions :title="$t('page.givingHospitality.applyForm.givingHospitalityInfo')" />
+          <a-row :gutter="24">
+            <a-col span="24">
+              <a-form-item :label="$t('page.givingHospitality.applyForm.giftReason_label')" name="reason">
+                <a-input v-model:value="applyModelRef.reason"></a-input>
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row :gutter="24">
+            <a-col span="16">
+              <a-form-item :label="$t('page.givingHospitality.applyForm.giftHospitalityType')" name="hospitalityType">
+                <a-input v-model:value="applyModelRef.hospitalityType"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col span="8">
+              <a-form-item :label="$t('page.givingHospitality.applyForm.giftHospPlace')" name="hospPlace">
+                <a-input v-model:value="applyModelRef.hospPlace"></a-input>
+              </a-form-item>
+            </a-col>
+          </a-row>
+
+          <a-row>
+            <a-col :flex="1">
+              <a-form-item name="date" :label="$t('page.givingHospitality.applyForm.giftGivingDate')">
+                <a-date-picker v-model:value="applyModelRef.date" value-format="YYYY-MM-DD" />
+              </a-form-item>
+            </a-col>
+            <a-col :flex="1">
+              <a-form-item name="expensePerHead" :label="$t('page.givingHospitality.applyForm.giftExpensePerHead')">
+                <a-input-number v-model:value="applyModelRef.expensePerHead" :step="0.01"></a-input-number>
+              </a-form-item>
+            </a-col>
+            <a-col :flex="2">
+              <a-form-item
+                style="white-space: normal"
+                name="headCount"
+                :label="$t('page.givingHospitality.applyForm.giftHeadCount')"
+              >
+                <a-input-number v-model:value="applyModelRef.headCount" :min="1"></a-input-number>
+              </a-form-item>
+            </a-col>
+            <a-col :flex="1">
+              <a-form-item :label="$t('form.common.totalPrice')" name="estimatedTotalExpense">
+                <a-input-number
+                  :value="applyModelRef.estimatedTotalExpense"
+                  addon-before="￥"
+                  style="width: 195px"
+                  :step="0.01"
+                ></a-input-number>
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <div v-for="(company, index) in applyModelRef.companyList" :key="company.key">
+            <a-row :gutter="24">
+              <a-col span="20">
+                <a-form-item
+                  :label="$t('page.givingGifts.applyForm.giftGivingCompanyName')"
+                  :name="['companyList', index, 'companyName']"
+                >
+                  <a-input v-model:value="company.companyName"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col span="4">
+                <a-button
+                  html-type="button"
+                  type="dashed"
+                  :disabled="false"
+                  style="margin: 0 8px"
+                  @click="openAddPersonModal(company)"
+                >
+                  {{ $t('form.common.viewPerson') }}
+                </a-button>
+              </a-col>
+            </a-row>
+          </div>
         </template>
       </a-form>
 
       <!--显示历史操作记录-->
-      <a-descriptions :title="$t('form.common.historyLog')">
-        <a-descriptions-item :label="$t('form.common.operationInfo')" span="4">
-          <ul>
-            <li v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
-              &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
-              <strong>{{ item.action }}</strong>
-              &nbsp; at &nbsp;
-              {{ item.createdDate }}
-            </li>
-          </ul>
-        </a-descriptions-item>
+      <template v-if="applyModelRef.requestType === 'Giving Gifts'">
+        <a-descriptions :title="$t('form.common.historyLog')">
+          <a-descriptions-item :label="$t('form.common.operationInfo')" span="4">
+            <ul>
+              <li v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
+                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <strong>{{ item.action }}</strong>
+                &nbsp; at &nbsp;
+                {{ item.createdDate }}
+              </li>
+            </ul>
+          </a-descriptions-item>
 
-        <a-descriptions-item :label="$t('form.common.remarkInfo')" span="4">
-          <ul>
-            <li v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
-              &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
-              <strong>wrote at {{ item.createdDate }}</strong>
-              &nbsp;
-              {{ item.remark }}
-            </li>
-          </ul>
-        </a-descriptions-item>
-      </a-descriptions>
+          <a-descriptions-item :label="$t('form.common.remarkInfo')" span="4">
+            <ul>
+              <li v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
+                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <strong>wrote at {{ item.createdDate }}</strong>
+                &nbsp;
+                {{ item.remark }}
+              </li>
+            </ul>
+          </a-descriptions-item>
+        </a-descriptions>
+      </template>
+      <template v-else-if="applyModelRef.requestType === 'Giving Hospitality'">
+        <a-descriptions :title="$t('form.common.historyLog')">
+          <a-descriptions-item :label="$t('form.common.operationInfo')" span="4">
+            <ul>
+              <li v-for="(item, index) in applyModelRef.hospActivities" :key="item.appActivityDataId">
+                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <strong>{{ item.action }}</strong>
+                &nbsp; at &nbsp;
+                {{ item.createdDate }}
+              </li>
+            </ul>
+          </a-descriptions-item>
+
+          <a-descriptions-item :label="$t('form.common.remarkInfo')" span="4">
+            <ul>
+              <li v-for="(item, index) in applyModelRef.hospActivities" :key="item.appActivityDataId">
+                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <strong>wrote at {{ item.createdDate }}</strong>
+                &nbsp;
+                {{ item.remark }}
+              </li>
+            </ul>
+          </a-descriptions-item>
+        </a-descriptions>
+      </template>
 
       <a-row :gutter="24">
         <a-col :span="24" style="text-align: right">
@@ -970,25 +1235,171 @@ onMounted(async () => {
       @ok="onSubmitAddPerson"
     >
       <a-form ref="addPersonModalFormRef" :model="currentCompanyState" :disabled="true">
-        <a-row v-for="(person, index) in currentCompanyState.personList" :key="person.key" :gutter="24">
-          <a-col span="10">
-            <a-form-item
-              :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
-              :name="['persons', index, 'personName']"
-            >
-              <a-input v-model:value="person.personName"></a-input>
-            </a-form-item>
-          </a-col>
+        <template v-for="(person, index) in currentCompanyState.personList" :key="person.key">
+          <a-divider orientation="left" />
+          <template v-if="applyModelRef.requestType === 'Giving Gifts'">
+            <a-row :gutter="24">
+              <a-col span="12">
+                <a-form-item
+                  :label-col="{ span: 10 }"
+                  :wrapper-col="{ span: 14 }"
+                  :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
+                  :name="['personList', index, 'personName']"
+                >
+                  <a-input v-model:value="person.personName"></a-input>
+                </a-form-item>
+              </a-col>
 
-          <a-col span="10">
-            <a-form-item
-              :label="$t('page.receivingGifts.applyForm.giftGiverTitle')"
-              :name="['persons', index, 'positionTitle']"
+              <a-col span="12">
+                <a-form-item
+                  :label-col="{ span: 12 }"
+                  :wrapper-col="{ span: 12 }"
+                  :label="$t('page.receivingGifts.applyForm.giftGiverTitle_validation')"
+                  :name="['personList', index, 'positionTitle']"
+                >
+                  <a-input v-model:value="person.positionTitle"></a-input>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col span="10">
+                <a-form-item
+                  :label-col="{ span: 8 }"
+                  :wrapper-col="{ span: 14 }"
+                  :label="$t('form.common.unitPrice')"
+                  :name="['personList', index, 'unitValue']"
+                >
+                  <a-input-number
+                    v-model:value="person.unitValue"
+                    :style="{ width: '130px' }"
+                    :min="1"
+                    :step="0.01"
+                  ></a-input-number>
+                </a-form-item>
+              </a-col>
+
+              <a-col span="10">
+                <a-form-item
+                  :label-col="{ span: 11 }"
+                  :wrapper-col="{ span: 14 }"
+                  :label="$t('form.common.quantity')"
+                  :name="['personList', index, 'volume']"
+                >
+                  <a-input-number v-model:value="person.volume" :style="{ width: '130px' }" :min="1"></a-input-number>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </template>
+          <template v-else-if="applyModelRef.requestType === 'Giving Hospitality'">
+            <template
+              v-if="
+                userInfo.companyCode === '0813' || userInfo.companyCode === '2614' || userInfo.companyCode === '1391'
+              "
             >
-              <a-input v-model:value="person.positionTitle"></a-input>
-            </a-form-item>
-          </a-col>
-        </a-row>
+              <a-row :gutter="24">
+                <a-col :span="10">
+                  <a-form-item
+                    :label="$t('page.givingHospitality.applyForm.gitfHospEmployeeIsGoSoc')"
+                    :name="['personList', index, 'isGoSoc']"
+                    :rules="{
+                      required: true,
+                      message: $t('form.common.select_validation'),
+                      trigger: 'change'
+                    }"
+                  >
+                    <a-select v-model:value="person.isGoSoc">
+                      <a-select-option value="Yes">
+                        {{ $t('form.common.option_go_sco_Government_Official') }}
+                      </a-select-option>
+                      <a-select-option value="No">
+                        {{ $t('form.common.option_go_sco_Government_Non_Official') }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <template v-if="userInfo.companyCode === '2614' || userInfo.companyCode === '1391'">
+                  <a-col :span="10">
+                    <a-form-item
+                      :label="$t('page.givingHospitality.applyForm.giftHospEmployeeIsBayerCustomer')"
+                      :name="['personList', index, 'isBayerCustomer']"
+                      :rules="{
+                        required: true,
+                        message: $t('form.common.select_validation'),
+                        trigger: 'change'
+                      }"
+                    >
+                      <a-select v-model:value="person.isBayerCustomer">
+                        <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
+                        <a-select-option value="No">{{ $t('form.common.option_no') }}</a-select-option>
+                        <a-select-option value="Not Applicable">
+                          {{ $t('form.common.option_not_Applicable') }}
+                        </a-select-option>
+                      </a-select>
+                    </a-form-item>
+                  </a-col>
+                </template>
+              </a-row>
+            </template>
+            <template v-else>
+              <a-row :gutter="24">
+                <a-col :span="10">
+                  <a-form-item
+                    :label="$t('page.givingHospitality.applyForm.gitfHospEmployeeIsGoSoc')"
+                    :name="['personList', index, 'isGoSoc']"
+                    :rules="{
+                      required: true,
+                      message: $t('form.common.select_validation'),
+                      trigger: 'change'
+                    }"
+                  >
+                    <a-select v-model:value="person.isGoSoc">
+                      <a-select-option value="Yes">
+                        {{ $t('form.common.option_go_sco_Government_Official') }}
+                      </a-select-option>
+                      <a-select-option value="No">
+                        {{ $t('form.common.option_go_sco_Government_Non_Official') }}
+                      </a-select-option>
+                      <a-select-option value="HCP">
+                        {{ $t('form.common.option_go_sco_HCP') }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+              </a-row>
+            </template>
+
+            <a-row :gutter="24">
+              <a-col :span="10">
+                <a-form-item
+                  :label="$t('page.givingHospitality.applyForm.giftHospEmployeeName')"
+                  :dropdown-match-select-width="false"
+                  :name="['personList', index, 'personName']"
+                  :rules="{
+                    required: true,
+                    message: $t('page.givingHospitality.applyForm.giftHospEmployeeName_validation'),
+                    trigger: 'change'
+                  }"
+                >
+                  <a-input v-model:value="person.personName"></a-input>
+                </a-form-item>
+              </a-col>
+
+              <a-col :span="10">
+                <a-form-item
+                  :label="$t('page.givingHospitality.applyForm.giftHospTitle')"
+                  :name="['personList', index, 'positionTitle']"
+                  :rules="{
+                    required: true,
+                    message: $t('page.givingHospitality.applyForm.giftHospTitle_validation'),
+                    trigger: 'change'
+                  }"
+                >
+                  <a-input v-model:value="person.positionTitle"></a-input>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </template>
+        </template>
       </a-form>
     </a-modal>
   </div>

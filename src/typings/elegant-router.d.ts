@@ -39,7 +39,7 @@ declare module "@elegant-router/types" {
     "legal_giving-hospitality": "/legal/giving-hospitality";
     "legal_receving-gifts": "/legal/receving-gifts";
     "legal_receving-hospitality": "/legal/receving-hospitality";
-    "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
+    "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat|admin-login)?";
     "manage": "/manage";
     "manage_function": "/manage/function";
     "manage_group": "/manage/group";

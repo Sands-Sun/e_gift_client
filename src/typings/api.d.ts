@@ -73,6 +73,8 @@ declare namespace Api {
       personName: string;
       positionTitle: string;
       description: string;
+      unitValue: number | undefined;
+      volume: number | undefined;
       key: number;
     }
 
@@ -104,6 +106,8 @@ declare namespace Api {
       unitValue: number;
       volume: number;
       remark: string;
+      useCase: string;
+      disableUseCase: unknown;
       reason: string;
       reasonType: string;
       reference: string;
@@ -189,6 +193,7 @@ declare namespace Api {
       reason: string;
       reasonType: string;
       status: string;
+      totalValue: number;
       companyList: GiftCompany[];
       fileAttach: FileAttach;
       giftsRef: GivingGiftRef;

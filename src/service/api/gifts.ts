@@ -5,6 +5,7 @@ const api_url = {
   group_save: '/gifts/group/save',
   // group_update: '/gifts/group/update',
   process_task_list: '/process//task/page',
+  process_current_run_task_count: 'process/task/current/run-count',
   giving_hospitality_list: '/hospitality/giving/page',
   giving_hospitaltiy_save: '/hospitality/giving/save',
   giving_hospitality_cancel: '/hospitality/giving/cancel',
@@ -158,6 +159,14 @@ export function updateReceivingGifts(param: any) {
   });
 }
 
+export function saveReceivingUseCase(param: any) {
+  return request({
+    url: `gifts/receiving/save/user-case/${param.applicationId}`,
+    method: 'post',
+    data: param
+  });
+}
+
 export function deleteDraftReceivingGifts(applicationId: string) {
   return request({
     url: `gifts/receiving/draft/delete/${applicationId}`,
@@ -237,6 +246,35 @@ export function fetchGivingGiftsList(queryParam: any) {
 export function fetchGivingHospitalityList(queryParam: any) {
   return request<Api.Gifts.TableListResponse>({
     url: api_url.giving_hospitality_list,
+    method: 'post',
+    data: queryParam
+  });
+}
+
+export function copyGivingGifts(applicationId: string) {
+  return request({
+    url: `gifts/giving/copy/${applicationId}`,
+    method: 'post'
+  });
+}
+
+export function copyReceivingGifts(applicationId: string) {
+  return request({
+    url: `gifts/receiving/copy/${applicationId}`,
+    method: 'post'
+  });
+}
+
+export function copyGivingHospitality(applicationId: string) {
+  return request({
+    url: `hospitality/giving/copy/${applicationId}`,
+    method: 'post'
+  });
+}
+
+export function getcurrRunTaskCount(queryParam: any) {
+  return request({
+    url: api_url.process_current_run_task_count,
     method: 'post',
     data: queryParam
   });

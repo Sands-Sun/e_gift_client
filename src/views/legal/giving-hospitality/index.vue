@@ -2,6 +2,7 @@
 import { $t } from '@/locales';
 import {
   cancelGivingHospitality,
+  copyGivingHospitality,
   deleteDraftGivingHospitality,
   fetchGivingHospitalityList,
   fuzzySearchUserList,
@@ -33,6 +34,7 @@ const openCancelModal = ref<boolean>(false);
 const uploadFileList = ref([] as any);
 const openApplyDrawerModal = ref<boolean>(false);
 const expandSearchFields = ref(true);
+const expandPolicyDescription = ref(true);
 const listTableLoading = ref(true);
 const showAddPersonModal = ref<boolean>(false);
 const givingHospitalityFromStatus = reactive({ disableStatus: false, descTypeHistory: false, actionStatus: '' });
@@ -85,8 +87,8 @@ const applyModelRef = reactive<{
   date: Dayjs;
   companyList: Api.Gifts.GiftCompany[];
   hospActivities: unknown[];
-  expensePerHead: number;
-  headCount: number;
+  expensePerHead: number | undefined;
+  headCount: number | undefined;
   estimatedTotalExpense: number | undefined;
   remark: string;
   fileId: unknown;
@@ -172,6 +174,8 @@ const clearApplyModel = () => {
   applyModelRef.headCount = undefined;
   applyModelRef.estimatedTotalExpense = 0;
   applyModelRef.remark = '';
+  uploadFileList.value = [];
+  givingHospitalityFromStatus.disableStatus = false;
 };
 
 const openAddPersonModal = (item: Api.Gifts.GiftCompany) => {
@@ -206,6 +210,8 @@ const addCompany = () => {
         isGoSoc: '',
         isBayerCustomer: '',
         description: '',
+        unitValue: undefined,
+        volume: undefined,
         companyId: -1,
         key: Date.now()
       }
@@ -245,6 +251,8 @@ const addPerson = () => {
     positionTitle: '',
     isGoSoc: '',
     isBayerCustomer: '',
+    unitValue: undefined,
+    volume: undefined,
     description: '',
     companyId: -1,
     key: Date.now()
@@ -330,6 +338,18 @@ const beforeUpload: UploadProps['beforeUpload'] = file => {
   return isExcel || Upload.LIST_IGNORE;
 };
 
+const getTemplateUrl = () => {
+  let tempSuffix;
+  if (userInfo.companyCode === '0813') {
+    tempSuffix = '0813';
+  } else if (userInfo.companyCode === '2614' || userInfo.companyCode === '1391') {
+    tempSuffix = '2614_1391';
+  } else {
+    tempSuffix = '1954_1955_0882';
+  }
+  return `${baseURL}/sys/download/template?module=CompanyPerson&fileName=eHospCompanyPersonTemplate_${tempSuffix}.xlsx`;
+};
+
 // 搜索按钮，
 const getListDataByCondition = async (pag?: { pageSize: number; current: number }) => {
   // get search date
@@ -362,6 +382,14 @@ const closeCancelModal = () => {
   openCancelModal.value = false;
 };
 
+const closeApplyDrawerModal = () => {
+  openApplyDrawerModal.value = false;
+  uploadFileList.value.length = 0;
+  givingHospitalityFromStatus.disableStatus = false;
+  ccApplyOptions.value.length = 0;
+  userState.data = [];
+};
+
 const onSubmitCancel = () => {
   hospCancelFormRef.value
     .validate()
@@ -381,7 +409,7 @@ const onSubmitCancel = () => {
             console.log('success!');
             hospCancelFormRef.value?.resetFields();
             closeCancelModal();
-            // closeApplyDrawerModal();
+            closeApplyDrawerModal();
             getListDataByCondition();
           }
         },
@@ -429,6 +457,8 @@ const resetFromFields = (updateStatus = false) => {
           isGoSoc: '',
           isBayerCustomer: '',
           companyId: -1,
+          unitValue: undefined,
+          volume: undefined,
           description: '',
           key: Date.now()
         }
@@ -437,36 +467,10 @@ const resetFromFields = (updateStatus = false) => {
   }
 };
 
-const closeApplyDrawerModal = () => {
-  openApplyDrawerModal.value = false;
-  uploadFileList.value.length = 0;
-  givingHospitalityFromStatus.disableStatus = false;
-  ccApplyOptions.value.length = 0;
-  userState.data = [];
-};
-
 // 前置验证
 const perVerification = (): Promise<void> => {
   return new Promise((resolve, reject) => {
-    if (applyModelRef.expensePerHead <= 300) {
-      applyModelRef.expensePerHead = 0;
-      Modal.warning({
-        title: '系统提示',
-        content: h('div', {}, [
-          h(
-            'p',
-            '针对非政府官员，如果提供招待人均费用≤人民币300元则无需申请E-hospitality系统。您可直接在Concur中进行报销。'
-          )
-        ]),
-        onOk() {
-          console.log('ok');
-        }
-      });
-
-      reject(new Error('非政府官员且人均小于 300'));
-      return;
-    }
-    const personArr = [];
+    const personArr: Api.Gifts.GiftPerson[] = [];
     applyModelRef.companyList.forEach(c => {
       c.personList.forEach(p => {
         if (p.personName && p.positionTitle) {
@@ -476,10 +480,10 @@ const perVerification = (): Promise<void> => {
     });
     if (!applyModelRef.fileId && applyModelRef.headCount !== personArr.length) {
       Modal.warning({
-        title: '人员与数量不符',
+        title: $t('form.common.person_quantity_notMatch'),
         content: h('div', {}, [
-          h('p', `提供人员：${personArr.length}`),
-          h('p', `受邀人数量：${applyModelRef.headCount}`)
+          h('p', `${$t('page.givingHospitality.applyForm.giftHospEmployeePop_HeadCount')}: ${personArr.length}`),
+          h('p', `${$t('page.givingHospitality.applyForm.giftHeadCount')}: ${applyModelRef.headCount}`)
         ]),
         onOk() {
           console.log('ok');
@@ -488,8 +492,118 @@ const perVerification = (): Promise<void> => {
       reject(new Error('人员与数量不符'));
       return;
     }
+    const allNoGeovPerson = personArr.every(p => p.isGoSoc !== 'Yes');
+    console.log('allNoGeovPerson: ', allNoGeovPerson);
+    if (allNoGeovPerson && applyModelRef.expensePerHead && applyModelRef.expensePerHead <= 300) {
+      applyModelRef.expensePerHead = 0;
+      Modal.warning({
+        title: $t('form.common.system_prompt'),
+        content: h('div', {}, [h('p', $t('page.givingHospitality.applyForm.gitfHospNoGovLessThanNotify_message'))]),
+        onOk() {
+          console.log('ok');
+        }
+      });
+
+      reject(new Error('非政府官员且人均小于 300'));
+      return;
+    }
     resolve();
   });
+};
+
+const showApplyDrawerModal = async (type: string, item?: any) => {
+  resetFromFields(type === 'Modify');
+  console.log(`type: ${type}item: `, item);
+  givingHospitalityFromStatus.actionStatus = type;
+  console.log('show apply drawer type:', type);
+  if (type === 'Create') {
+    console.log('create...');
+    applyOptions.value.unshift({
+      label: `${userInfo.firstName} ${userInfo.lastName} <${userInfo.email}>`,
+      value: userInfo.email
+    });
+    applyModelRef.applyName = applyOptions.value[0];
+  }
+  if (type === 'Modify' && item && item.applicationId) {
+    item.loading = true;
+    console.log('item: {}', item);
+    const { data, error } = await getGivingHospitalityByApplicationId(item.applicationId);
+    if (!error) {
+      givingHospitalityFromStatus.actionStatus = data.status;
+      applyModelRef.applicationId = data.applicationId;
+      applyModelRef.actionType = data.status;
+      applyModelRef.reference = data.reference;
+      applyOptions.value.unshift({
+        label: `${data.sfUserAppliedName} <${data.sfUserAppliedEmail}>`,
+        value: data.sfUserAppliedEmail,
+        userId: data.sfUserIdAppliedFor
+      });
+      applyModelRef.applyName = applyOptions.value[0];
+      if (data.copyToUsers) {
+        data.copyToUsers.forEach((user: any) => {
+          // 排除申请人信息
+          if (user.copytoEmail !== userInfo.email) {
+            ccApplyOptions.value.push({
+              label: `${user.copytoFirstName} ${user.copytoLastName} <${user.copytoEmail}>`,
+              value: user.copytoEmail,
+              userId: user.sfUserIdCopyTo
+            });
+          }
+        });
+      }
+      if (data.fileAttach) {
+        const attach = data.fileAttach;
+        uploadFileList.value.push({
+          uid: attach.id,
+          name: attach.origFileName,
+          size: Number.parseInt(attach.fileSize, 2),
+          url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+        });
+      }
+      applyModelRef.applyCCName = ccApplyOptions.value.map((v: any) => v.value);
+      applyModelRef.expensePerHead = data.hospRef.expensePerHead;
+      applyModelRef.headCount = data.hospRef.headCount;
+      applyModelRef.hospitalityType = data.hospRef.hospitalityType;
+      applyModelRef.hospPlace = data.hospRef.hospPlace;
+      applyModelRef.date = dayjs(data.hospRef.hospitalityDate);
+      data.companyList.forEach(c => {
+        const company = {
+          id: c.id,
+          companyName: c.companyName,
+          description: c.description,
+          key: Date.now(),
+          personList: [] as any
+        };
+        c.personList.forEach(p => {
+          const person = {
+            id: p.id,
+            personName: p.personName,
+            positionTitle: p.positionTitle,
+            isGoSoc: p.isGoSoc,
+            isBayerCustomer: p.isBayerCustomer,
+            companyId: p.companyId,
+            description: p.description,
+            key: Date.now()
+          };
+          company.personList.push(person);
+        });
+        applyModelRef.companyList.push(company);
+      });
+      applyModelRef.reason = data.reason;
+      // applyModelRef.isHandedOver = data.isHandedOver;
+      applyModelRef.remark = data.remark;
+      //  hadle history reocrd
+
+      console.log('success:', data);
+
+      if (data.status !== 'Draft') {
+        applyModelRef.hospActivities = data.hospActivities;
+        givingHospitalityFromStatus.disableStatus = true;
+      }
+    }
+    item.loading = false;
+  }
+  openApplyDrawerModal.value = true;
 };
 
 // 保存提交
@@ -560,6 +674,8 @@ const onModifyApply = (value: string) => {
           } else if (value === 'Delete') {
             console.log('modify delete draft...');
             confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
+          } else if (value === 'Copy') {
+            confirmContent = `${$t('common.confirm')} ${$t('common.copy')} ?`;
           }
           Modal.confirm({
             title: $t('common.tip'),
@@ -579,6 +695,13 @@ const onModifyApply = (value: string) => {
               } else if (value === 'Delete') {
                 console.log('modify delete draft...');
                 await deleteDraftGivingHospitality(requestParam.applicationId);
+              } else if (value === 'Copy') {
+                // debugger;
+                const item = await copyGivingHospitality(requestParam.applicationId);
+                console.log('copyApplicationId: ', item.data);
+                showApplyDrawerModal('Modify', { applicationId: item.data, loading: false });
+                getListDataByCondition();
+                return;
               }
               resetFromFields();
               closeApplyDrawerModal();
@@ -615,102 +738,6 @@ const resetApplyFrom = () => {
       console.log('cancel');
     }
   });
-};
-
-const showApplyDrawerModal = async (type: string, item?: any) => {
-  resetFromFields(type === 'Modify');
-  console.log(`type: ${type}item: `, item);
-  givingHospitalityFromStatus.actionStatus = type;
-  console.log('show apply drawer type:', type);
-  if (type === 'Create') {
-    console.log('create...');
-    applyOptions.value.unshift({
-      label: `${userInfo.firstName} ${userInfo.lastName} <${userInfo.email}>`,
-      value: userInfo.email
-    });
-    applyModelRef.applyName = applyOptions.value[0];
-  }
-  if (type === 'Modify' && item && item.applicationId) {
-    item.loading = true;
-    console.log('item: {}', item);
-    const { data, error } = await getGivingHospitalityByApplicationId(item.applicationId);
-    if (!error) {
-      givingHospitalityFromStatus.actionStatus = data.status;
-      applyModelRef.applicationId = data.applicationId;
-      applyModelRef.actionType = data.status;
-      applyModelRef.reference = data.reference;
-      applyOptions.value.unshift({
-        label: `${data.sfUserAppliedName} <${data.sfUserAppliedEmail}>`,
-        value: data.sfUserAppliedEmail,
-        userId: data.sfUserIdAppliedFor
-      });
-      applyModelRef.applyName = applyOptions.value[0];
-      if (data.copyToUsers) {
-        data.copyToUsers.forEach((user: any) => {
-          // 排除申请人信息
-          if (user.copytoEmail !== userInfo.email) {
-            ccApplyOptions.value.push({
-              label: `${user.copytoFirstName} ${user.copytoLastName} <${user.copytoEmail}>`,
-              value: user.copytoEmail,
-              userId: user.sfUserIdCopyTo
-            });
-          }
-        });
-      }
-      if (data.fileAttach) {
-        const attach = data.fileAttach;
-        uploadFileList.value.push({
-          uid: attach.id,
-          name: attach.origFileName,
-          size: Number.parseInt(attach.fileSize, 2),
-          url: `${baseURL}/sys/download/file?fileId=${attach.id}`
-        });
-      }
-
-      applyModelRef.applyCCName = ccApplyOptions.value.map((v: any) => v.value);
-      applyModelRef.expensePerHead = data.hospRef.expensePerHead;
-      applyModelRef.headCount = data.hospRef.headCount;
-      applyModelRef.hospitalityType = data.hospRef.hospitalityType;
-      applyModelRef.hospPlace = data.hospRef.hospPlace;
-      applyModelRef.date = dayjs(data.hospRef.hospitalityDate);
-      data.companyList.forEach(c => {
-        const company = {
-          id: c.id,
-          companyName: c.companyName,
-          description: c.description,
-          key: Date.now(),
-          personList: [] as any
-        };
-        c.personList.forEach(p => {
-          const person = {
-            id: p.id,
-            personName: p.personName,
-            positionTitle: p.positionTitle,
-            isGoSoc: p.isGoSoc,
-            isBayerCustomer: p.isBayerCustomer,
-            companyId: p.companyId,
-            description: p.description,
-            key: Date.now()
-          };
-          company.personList.push(person);
-        });
-        applyModelRef.companyList.push(company);
-      });
-      applyModelRef.reason = data.reason;
-      // applyModelRef.isHandedOver = data.isHandedOver;
-      applyModelRef.remark = data.remark;
-      //  hadle history reocrd
-
-      console.log('success:', data);
-
-      if (data.status !== 'Draft') {
-        applyModelRef.hospActivities = data.hospActivities;
-        givingHospitalityFromStatus.disableStatus = true;
-      }
-    }
-    item.loading = false;
-  }
-  openApplyDrawerModal.value = true;
 };
 
 // 重置search表单
@@ -858,31 +885,40 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
-
-        <a-descriptions :title="$t('page.givingHospitality.policy.title')" layout="vertical">
-          <a-descriptions-item
-            v-for="(item, index) in $tm(`page.givingHospitality.policy.desc_${userInfo.companyCode}`)"
-            :key="index"
-            :span="3"
-            :label="item.label"
-          >
-            <ul style="list-style-position: outside">
-              <li v-for="(detail, index) in item.items" :key="detail" style="text-indent: -1em">
-                &emsp;{{ index + 1 }}. {{ detail.value }}
-                <template v-if="detail.items.length > 0">
-                  <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail" style="text-indent: -1em">
-                    &emsp;&emsp;{{ subIndex + 1 }} ) {{ subDetail.value }}
-                    <template v-if="subDetail && subDetail.items && subDetail.items.length > 0">
-                      <li v-for="subsDetail in subDetail.items" :key="subsDetail" style="text-indent: -1em">
-                        &emsp;&emsp;&emsp; • {{ subsDetail.value }}
-                      </li>
-                    </template>
-                  </li>
-                </template>
-              </li>
-            </ul>
-          </a-descriptions-item>
-        </a-descriptions>
+        <a-row justify="end">
+          <a-col>
+            <a-button type="link" :disabled="false" @click="expandPolicyDescription = !expandPolicyDescription">
+              <template v-if="expandPolicyDescription">{{ $t('common.shrink') }}</template>
+              <template v-else>{{ $t('common.expand') }}</template>
+            </a-button>
+          </a-col>
+        </a-row>
+        <div v-show="expandPolicyDescription">
+          <a-descriptions :title="$t('page.givingHospitality.policy.title')" layout="vertical">
+            <a-descriptions-item
+              v-for="(item, index) in $tm(`page.givingHospitality.policy.desc_${userInfo.companyCode}`)"
+              :key="index"
+              :span="3"
+              :label="item.label"
+            >
+              <ul style="list-style-position: outside">
+                <li v-for="(detail, index) in item.items" :key="detail" style="text-indent: -1em">
+                  &emsp;{{ index + 1 }}. {{ detail.value }}
+                  <template v-if="detail.items.length > 0">
+                    <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail" style="text-indent: -1em">
+                      &emsp;&emsp;{{ subIndex + 1 }} ) {{ subDetail.value }}
+                      <template v-if="subDetail && subDetail.items && subDetail.items.length > 0">
+                        <li v-for="subsDetail in subDetail.items" :key="subsDetail" style="text-indent: -1em">
+                          &emsp;&emsp;&emsp; • {{ subsDetail.value }}
+                        </li>
+                      </template>
+                    </li>
+                  </template>
+                </li>
+              </ul>
+            </a-descriptions-item>
+          </a-descriptions>
+        </div>
         <a-descriptions :title="$t('page.givingHospitality.applyForm.givingHospitalityInfo')" />
 
         <a-row :gutter="24">
@@ -941,8 +977,8 @@ watch(
           </a-col>
         </a-row>
 
-        <a-row :gutter="24">
-          <a-col span="7">
+        <a-row>
+          <a-col :flex="1">
             <a-form-item
               name="date"
               :label="$t('page.givingHospitality.applyForm.giftGivingDate')"
@@ -962,7 +998,7 @@ watch(
               />
             </a-form-item>
           </a-col>
-          <a-col span="5">
+          <a-col :flex="1">
             <a-form-item
               name="expensePerHead"
               :label="$t('page.givingHospitality.applyForm.giftExpensePerHead')"
@@ -977,8 +1013,9 @@ watch(
               ></a-input-number>
             </a-form-item>
           </a-col>
-          <a-col span="5">
+          <a-col :flex="2">
             <a-form-item
+              style="white-space: normal"
               name="headCount"
               :label="$t('page.givingHospitality.applyForm.giftHeadCount')"
               :rules="[{ required: true, message: $t('page.givingHospitality.applyForm.giftHeadCount_validation') }]"
@@ -990,7 +1027,7 @@ watch(
               ></a-input-number>
             </a-form-item>
           </a-col>
-          <a-col span="5">
+          <a-col :flex="1">
             <a-form-item
               :label="$t('form.common.totalPrice')"
               name="estimatedTotalExpense"
@@ -1063,10 +1100,7 @@ watch(
             </a-form-item>
           </a-col>
           <a-col span="4">
-            <a-button
-              type="link"
-              :href="`${baseURL}/sys/download/template?module=CompanyPerson&fileName=eHospCompanyPersonTemplate.xlsx`"
-            >
+            <a-button type="link" :href="getTemplateUrl()">
               {{ $t('form.common.upload_template') }}
             </a-button>
           </a-col>
@@ -1074,12 +1108,7 @@ watch(
         <a-row :gutter="24">
           <a-col span="24">
             <a-form-item :label="$t('page.givingHospitality.applyForm.remark')" name="remark">
-              <a-textarea
-                v-model:value="applyModelRef.remark"
-                :rows="4"
-                :placeholder="$t('page.givingHospitality.applyForm.remark_validation')"
-                allow-clear
-              />
+              <a-textarea v-model:value="applyModelRef.remark" :rows="4" allow-clear />
             </a-form-item>
           </a-col>
         </a-row>
@@ -1138,6 +1167,18 @@ watch(
               </a-button>
               <a-button style="margin: 1px" @click="resetApplyFrom">
                 {{ $t('common.reset') }}
+              </a-button>
+            </template>
+            <!--增加复制按钮-->
+            <template
+              v-else-if="
+                givingHospitalityFromStatus.actionStatus === 'Cancelled' ||
+                givingHospitalityFromStatus.actionStatus === 'Rejected' ||
+                givingHospitalityFromStatus.actionStatus === 'Approved'
+              "
+            >
+              <a-button type="primary" html-type="submit" @click.prevent="onModifyApply('Copy')">
+                {{ $t('common.copy') }}
               </a-button>
             </template>
             <!---表单只读-->
@@ -1346,7 +1387,7 @@ watch(
             <a-row :gutter="24">
               <a-col :span="10">
                 <a-form-item
-                  label="招待者类别"
+                  :label="$t('page.givingHospitality.applyForm.gitfHospEmployeeIsGoSoc')"
                   :name="['personList', index, 'isGoSoc']"
                   :rules="{
                     required: true,
@@ -1364,32 +1405,34 @@ watch(
                   </a-select>
                 </a-form-item>
               </a-col>
-              <a-col :span="10">
-                <a-form-item
-                  :label="$t('page.givingGifts.applyForm.giftIsBayerCustomer')"
-                  :name="['personList', index, 'isBayerCustomer']"
-                  :rules="{
-                    required: true,
-                    message: $t('form.common.select_validation'),
-                    trigger: 'change'
-                  }"
-                >
-                  <a-select v-model:value="person.isBayerCustomer">
-                    <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
-                    <a-select-option value="No">{{ $t('form.common.option_no') }}</a-select-option>
-                    <a-select-option value="Not Applicable">
-                      {{ $t('form.common.option_not_Applicable') }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
+              <template v-if="userInfo.companyCode === '2614' || userInfo.companyCode === '1391'">
+                <a-col :span="10">
+                  <a-form-item
+                    :label="$t('page.givingHospitality.applyForm.giftHospEmployeeIsBayerCustomer')"
+                    :name="['personList', index, 'isBayerCustomer']"
+                    :rules="{
+                      required: true,
+                      message: $t('form.common.select_validation'),
+                      trigger: 'change'
+                    }"
+                  >
+                    <a-select v-model:value="person.isBayerCustomer">
+                      <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
+                      <a-select-option value="No">{{ $t('form.common.option_no') }}</a-select-option>
+                      <a-select-option value="Not Applicable">
+                        {{ $t('form.common.option_not_Applicable') }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+              </template>
             </a-row>
           </template>
           <template v-else>
             <a-row :gutter="24">
               <a-col :span="10">
                 <a-form-item
-                  label="招待者类别"
+                  :label="$t('page.givingHospitality.applyForm.gitfHospEmployeeIsGoSoc')"
                   :name="['personList', index, 'isGoSoc']"
                   :rules="{
                     required: true,
@@ -1416,12 +1459,12 @@ watch(
           <a-row :gutter="24">
             <a-col :span="10">
               <a-form-item
-                :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
+                :label="$t('page.givingHospitality.applyForm.giftHospEmployeeName')"
                 :dropdown-match-select-width="false"
                 :name="['personList', index, 'personName']"
                 :rules="{
                   required: true,
-                  message: $t('page.receivingGifts.applyForm.giftGiverEmployeeName_validation'),
+                  message: $t('page.givingHospitality.applyForm.giftHospEmployeeName_validation'),
                   trigger: 'change'
                 }"
               >
@@ -1431,11 +1474,11 @@ watch(
 
             <a-col :span="10">
               <a-form-item
-                :label="$t('page.receivingGifts.applyForm.giftGiverTitle')"
+                :label="$t('page.givingHospitality.applyForm.giftHospTitle')"
                 :name="['personList', index, 'positionTitle']"
                 :rules="{
                   required: true,
-                  message: $t('page.receivingGifts.applyForm.giftGiverTitle_validation'),
+                  message: $t('page.givingHospitality.applyForm.giftHospTitle_validation'),
                   trigger: 'change'
                 }"
               >

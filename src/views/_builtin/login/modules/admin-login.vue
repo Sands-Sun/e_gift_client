@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
 import { useAntdForm, useFormRules } from '@/hooks/common/form';
 import { useRouterPush } from '@/hooks/common/router';
 import { $t } from '@/locales';
 import { useAuthStore } from '@/store/modules/auth';
+import { reactive } from 'vue';
 
 defineOptions({
   name: 'AdminLogin'
@@ -49,7 +49,7 @@ async function handleSubmit() {
     </AFormItem>
     <ASpace direction="vertical" size="large" class="w-full">
       <AButton type="primary" block size="large" shape="round" :loading="authStore.loginLoading" @click="handleSubmit">
-        登陆
+        {{ $t('route.login') }}
       </AButton>
     </ASpace>
   </AForm>

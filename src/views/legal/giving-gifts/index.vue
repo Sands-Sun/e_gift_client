@@ -2,6 +2,7 @@
 import { $t } from '@/locales';
 import {
   cancelGivingGifts,
+  copyGivingGifts,
   deleteDraftGivingGifts,
   fetchGivingGiftsList,
   fuzzySearchUserList,
@@ -33,6 +34,7 @@ const openCancelModal = ref<boolean>(false);
 const uploadFileList = ref([] as any);
 const openApplyDrawerModal = ref<boolean>(false);
 const expandSearchFields = ref(true);
+const expandPolicyDescription = ref(true);
 const listTableLoading = ref(true);
 const showReasonDesc = ref(false);
 const showAddPersonModal = ref<boolean>(false);
@@ -45,7 +47,6 @@ const addPersonModalFormRef = ref<FormInstance>();
 const searchRangeDate = ref<[Dayjs, Dayjs]>();
 const applySearch = ref<string>('');
 const userState = reactive({ data: [] as any, value: [] as any, ccValue: [] as any, fetching: true });
-const giftCompanyPersonState = reactive({ data: [] as any, value: [] as any });
 const applyFormCancelModelRef = reactive({ remark: undefined, applicationId: '' });
 const searchFormRef = ref<FormInstance>();
 let currentCompanyState = reactive<{
@@ -130,8 +131,9 @@ const applyModelRef = reactive<{
   giftsActivities: unknown[];
   isGoSoc: string;
   isBayerCustomer: string;
-  unitValue: number;
-  volume: number;
+  unitValue: number | undefined;
+  volume: number | undefined;
+  totalValue: number | undefined;
   remark: string;
   fileId: unknown;
 }>({
@@ -154,6 +156,7 @@ const applyModelRef = reactive<{
   // givingTitle: '',
   unitValue: undefined as any,
   volume: undefined as any,
+  totalValue: undefined as any,
   remark: '',
   fileId: undefined
 });
@@ -281,6 +284,7 @@ const clearApplyModel = () => {
   applyModelRef.reason = '';
   applyModelRef.reasonType = '';
   applyModelRef.giftDescType = '';
+  applyModelRef.giftDesc = '';
   applyModelRef.isGoSoc = '';
   applyModelRef.isBayerCustomer = '';
   applyModelRef.date = dayjs();
@@ -289,6 +293,8 @@ const clearApplyModel = () => {
   applyModelRef.unitValue = undefined;
   applyModelRef.volume = undefined;
   applyModelRef.remark = '';
+  uploadFileList.value = [];
+  givingGiftFromStatus.disableStatus = false;
 };
 
 const resetFromFields = (updateStatus = false) => {
@@ -310,6 +316,8 @@ const resetFromFields = (updateStatus = false) => {
           isGoSoc: '',
           isBayerCustomer: '',
           companyId: -1,
+          unitValue: undefined,
+          volume: undefined,
           description: '',
           key: Date.now()
         }
@@ -371,6 +379,7 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       applyModelRef.applyCCName = ccApplyOptions.value.map((v: any) => v.value);
       applyModelRef.unitValue = data.giftsRef.unitValue;
       applyModelRef.volume = data.giftsRef.volume;
+      applyModelRef.totalValue = data.totalValue;
       applyModelRef.date = dayjs(data.giftsRef.givenDate);
       // applyModelRef.givenCompany = data.giftsRef.givenCompany;
       // applyModelRef.givenPersons = data.giftsRef.givingPerson;
@@ -390,6 +399,8 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
             personName: p.personName,
             positionTitle: p.positionTitle,
             companyId: p.companyId,
+            unitValue: p.unitValue,
+            volume: p.volume,
             description: p.description,
             key: Date.now()
           };
@@ -403,10 +414,10 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       handleChangeReasonType(applyModelRef.reasonType);
       applyModelRef.reason = data.reason;
       applyModelRef.giftDescType = data.giftsRef.giftDescType;
+      applyModelRef.giftDesc = data.giftsRef.giftDesc;
       applyModelRef.isGoSoc = data.giftsRef.isGoSoc;
       // applyModelRef.isHandedOver = data.isHandedOver;
       applyModelRef.remark = data.remark;
-      //  hadle history reocrd
 
       console.log('success:', data);
 
@@ -426,7 +437,6 @@ const closeApplyDrawerModal = () => {
   givingGiftFromStatus.disableStatus = false;
   givingGiftFromStatus.descTypeHistory = false;
   ccApplyOptions.value.length = 0;
-  giftCompanyPersonState.data = [];
   userState.data = [];
 };
 
@@ -519,7 +529,7 @@ const perVerification = (): Promise<void> => {
     if (!applyModelRef.fileId && applyModelRef.volume !== personArr.length) {
       Modal.warning({
         title: '人员与数量不符',
-        content: h('div', {}, [h('p', `接收人员：${personArr.length}`), h('p', `数量：${applyModelRef.volume}`)]),
+        content: h('div', {}, [h('p', `接受人员：${personArr.length}`), h('p', `数量：${applyModelRef.volume}`)]),
         onOk() {
           console.log('ok');
         }
@@ -533,110 +543,119 @@ const perVerification = (): Promise<void> => {
 
 // 修改提交
 const onModifyApply = (value: string) => {
-  perVerification()
+  // perVerification()
+  //   .then(() => {
+  givingGiftFormRef?.value
+    ?.validate()
     .then(() => {
-      givingGiftFormRef?.value
-        ?.validate()
-        .then(() => {
-          let confirmContent = '';
-          if (value === 'Draft') {
+      let confirmContent = '';
+      if (value === 'Draft') {
+        console.log('update draft...');
+        confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+      } else if (value === 'Submit') {
+        console.log('modify submit...');
+        confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+      } else if (value === 'Delete') {
+        console.log('modify delete draft...');
+        confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
+      } else if (value === 'Copy') {
+        confirmContent = `${$t('common.confirm')} ${$t('common.copy')} ?`;
+      }
+
+      Modal.confirm({
+        title: $t('common.tip'),
+        icon: createVNode(ExclamationCircleOutlined),
+        content: confirmContent,
+        okText: $t('common.confirm'),
+        cancelText: $t('common.cancel'),
+        async onOk() {
+          const requestParam = toRaw(applyModelRef);
+          requestParam.actionType = value;
+          requestParam.applyForId = requestParam.applyName.userId;
+          requestParam.copyToUserEmails = requestParam.applyCCName;
+          console.log(requestParam);
+          if (value === 'Draft' || value === 'Submit') {
             console.log('update draft...');
-            confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
-          } else if (value === 'Submit') {
-            console.log('modify submit...');
-            confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+            await updateGivingGifts(requestParam);
           } else if (value === 'Delete') {
             console.log('modify delete draft...');
-            confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
+            await deleteDraftGivingGifts(requestParam.applicationId);
+          } else if (value === 'Copy') {
+            // debugger;
+            const item = await copyGivingGifts(requestParam.applicationId);
+            console.log('copyApplicationId: ', item.data);
+            showApplyDrawerModal('Modify', { applicationId: item.data, loading: false });
+            getListDataByCondition();
+            return;
           }
-
-          Modal.confirm({
-            title: $t('common.tip'),
-            icon: createVNode(ExclamationCircleOutlined),
-            content: confirmContent,
-            okText: $t('common.confirm'),
-            cancelText: $t('common.cancel'),
-            async onOk() {
-              const requestParam = toRaw(applyModelRef);
-              requestParam.actionType = value;
-              requestParam.applyForId = requestParam.applyName.userId;
-              requestParam.copyToUserEmails = requestParam.applyCCName;
-              console.log(requestParam);
-              if (value === 'Draft' || value === 'Submit') {
-                console.log('update draft...');
-                await updateGivingGifts(requestParam);
-              } else if (value === 'Delete') {
-                console.log('modify delete draft...');
-                await deleteDraftGivingGifts(requestParam.applicationId);
-              }
-              resetFromFields();
-              closeApplyDrawerModal();
-              getListDataByCondition();
-            },
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            onCancel() {
-              console.log('cancel');
-            }
-          });
-        })
-        .catch(err => {
-          console.log('error', err);
-        });
+          resetFromFields();
+          closeApplyDrawerModal();
+          getListDataByCondition();
+        },
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onCancel() {
+          console.log('cancel');
+        }
+      });
     })
     .catch(err => {
-      console.log('error per validation', err);
+      console.log('error', err);
     });
+  //   })
+  //   .catch(err => {
+  //     console.log('error per validation', err);
+  //   });
 };
 
 // 保存提交
 const onSubmitApply = (value: string) => {
-  perVerification()
+  // perVerification()
+  //   .then(() => {
+  givingGiftFormRef?.value
+    ?.validate()
     .then(() => {
-      givingGiftFormRef?.value
-        ?.validate()
-        .then(() => {
-          let confirmContent = '';
-          if (value === 'Draft') {
-            console.log('update draft...');
-            confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
-          } else if (value === 'Submit') {
-            console.log('modify submit...');
-            confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+      let confirmContent = '';
+      if (value === 'Draft') {
+        console.log('update draft...');
+        confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+      } else if (value === 'Submit') {
+        console.log('modify submit...');
+        confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+      }
+      console.log(`submit type ${value}`);
+      Modal.confirm({
+        title: $t('common.tip'),
+        icon: createVNode(ExclamationCircleOutlined),
+        content: confirmContent,
+        okText: $t('common.confirm'),
+        cancelText: $t('common.cancel'),
+        async onOk() {
+          const requestParam = toRaw(applyModelRef);
+          requestParam.actionType = value;
+          requestParam.applyForId = requestParam.applyName.userId;
+          requestParam.copyToUserEmails = requestParam.applyCCName;
+          console.log(requestParam);
+          const { error } = await saveGivingGifts(requestParam);
+          if (!error) {
+            console.log('success!');
+            resetFromFields();
+            closeApplyDrawerModal();
+            getListDataByCondition();
           }
-          console.log(`submit type ${value}`);
-          Modal.confirm({
-            title: $t('common.tip'),
-            icon: createVNode(ExclamationCircleOutlined),
-            content: confirmContent,
-            okText: $t('common.confirm'),
-            cancelText: $t('common.cancel'),
-            async onOk() {
-              const requestParam = toRaw(applyModelRef);
-              requestParam.actionType = value;
-              requestParam.applyForId = requestParam.applyName.userId;
-              requestParam.copyToUserEmails = requestParam.applyCCName;
-              console.log(requestParam);
-              const { error } = await saveGivingGifts(requestParam);
-              if (!error) {
-                console.log('success!');
-                resetFromFields();
-                closeApplyDrawerModal();
-                getListDataByCondition();
-              }
-            },
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            onCancel() {
-              console.log('cancel');
-            }
-          });
-        })
-        .catch(err => {
-          console.log('error', err);
-        });
+        },
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onCancel() {
+          console.log('cancel');
+        }
+      });
     })
     .catch(err => {
-      console.log('error per validation', err);
+      console.log('error', err);
     });
+  //   })
+  //   .catch(err => {
+  //     console.log('error per validation', err);
+  //   });
 };
 
 const onFinishSearch = (values: any) => {
@@ -689,6 +708,8 @@ const addCompany = () => {
         isBayerCustomer: '',
         description: '',
         companyId: -1,
+        unitValue: undefined,
+        volume: undefined,
         key: Date.now()
       }
     ]
@@ -734,6 +755,8 @@ const addPerson = () => {
     isBayerCustomer: '',
     description: '',
     companyId: -1,
+    unitValue: undefined,
+    volume: undefined,
     key: Date.now()
   });
 };
@@ -787,16 +810,44 @@ onMounted(async () => {
 // });
 
 watch(
-  () => [userState.value, giftCompanyPersonState.value],
-  ([newVal1, newVal3], [oldVal1, oldVal3]) => {
-    console.log('newVal1:', newVal1);
-    console.log('oldVal1:', oldVal1);
-    console.log('newVal3:', newVal3);
-    console.log('oldVal3:', oldVal3);
+  () => [userState.value, applyModelRef.companyList],
+  ([newUserVal, newCompanyList], [oldUserVal, oldCompanyList]) => {
+    // debugger;
+    console.log('newUserVal:', newUserVal);
+    console.log('newCompanyList:', newCompanyList);
+    console.log('oldUserVal: ', oldUserVal);
+    console.log('oldCompanyList: ', oldCompanyList);
     userState.data = [];
     userState.fetching = false;
-    giftCompanyPersonState.data = [];
-  }
+
+    let totalValue = 0;
+    let totalVolume = 0;
+    let maxUnitValue = 0;
+    newCompanyList.forEach(c => {
+      let totalValueByComp = 0;
+      c.personList.forEach(p => {
+        let totalValueByPerson = 0;
+        if (p.unitValue && p.volume) {
+          if (p.unitValue > maxUnitValue) {
+            maxUnitValue = p.unitValue;
+          }
+          totalValueByPerson += p.unitValue * p.volume;
+          totalVolume += p.volume;
+          // console.log('person >>> unitVal: %s, volume: %s, total: %s', p.unitValue, p.volume, totalValueByPerson);
+        }
+        totalValueByComp += totalValueByPerson;
+        // console.log('company >>> totalValueByComp: %s', totalValueByComp);
+      });
+
+      totalValue += totalValueByComp;
+    });
+    // console.log('totalValue: %s, totalVolume: %s, maxUnitValue: %s', totalValue, totalVolume, maxUnitValue);
+
+    applyModelRef.volume = totalVolume === 0 ? undefined : totalVolume;
+    applyModelRef.unitValue = maxUnitValue;
+    applyModelRef.totalValue = totalValue === 0 ? undefined : totalValue;
+  },
+  { deep: true }
 );
 </script>
 
@@ -907,31 +958,40 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
-
-        <a-descriptions :title="$t('page.givingGifts.policy.title')" layout="vertical">
-          <a-descriptions-item
-            v-for="(item, index) in $tm(`page.givingGifts.policy.desc_${userInfo.companyCode}`)"
-            :key="index"
-            :span="3"
-            :label="item.label"
-          >
-            <ul style="list-style-position: outside">
-              <li v-for="(detail, index) in item.items" :key="detail" style="text-indent: -1em">
-                &emsp;{{ index + 1 }}. {{ detail.value }}
-                <template v-if="detail.items.length > 0">
-                  <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail" style="text-indent: -1em">
-                    &emsp;&emsp;{{ subIndex + 1 }} ) {{ subDetail.value }}
-                    <template v-if="subDetail && subDetail.items && subDetail.items.length > 0">
-                      <li v-for="subsDetail in subDetail.items" :key="subsDetail" style="text-indent: -1em">
-                        &emsp;&emsp;&emsp; • {{ subsDetail.value }}
-                      </li>
-                    </template>
-                  </li>
-                </template>
-              </li>
-            </ul>
-          </a-descriptions-item>
-        </a-descriptions>
+        <a-row justify="end">
+          <a-col>
+            <a-button type="link" :disabled="false" @click="expandPolicyDescription = !expandPolicyDescription">
+              <template v-if="expandPolicyDescription">{{ $t('common.shrink') }}</template>
+              <template v-else>{{ $t('common.expand') }}</template>
+            </a-button>
+          </a-col>
+        </a-row>
+        <div v-show="expandPolicyDescription">
+          <a-descriptions :title="$t('page.givingGifts.policy.title')" layout="vertical">
+            <a-descriptions-item
+              v-for="(item, index) in $tm(`page.givingGifts.policy.desc_${userInfo.companyCode}`)"
+              :key="index"
+              :span="3"
+              :label="item.label"
+            >
+              <ul style="list-style-position: outside">
+                <li v-for="(detail, index) in item.items" :key="detail" style="text-indent: -1em">
+                  &emsp;{{ index + 1 }}. {{ detail.value }}
+                  <template v-if="detail.items.length > 0">
+                    <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail" style="text-indent: -1em">
+                      &emsp;&emsp;{{ subIndex + 1 }} ) {{ subDetail.value }}
+                      <template v-if="subDetail && subDetail.items && subDetail.items.length > 0">
+                        <li v-for="subsDetail in subDetail.items" :key="subsDetail" style="text-indent: -1em">
+                          &emsp;&emsp;&emsp; • {{ subsDetail.value }}
+                        </li>
+                      </template>
+                    </li>
+                  </template>
+                </li>
+              </ul>
+            </a-descriptions-item>
+          </a-descriptions>
+        </div>
 
         <a-descriptions :title="$t('page.givingGifts.applyForm.givingGiftInfo')" />
         <template
@@ -941,12 +1001,12 @@ watch(
           <a-row :gutter="24">
             <a-col span="12">
               <a-form-item
-                :label="$t('page.givingGifts.applyForm.giftReason_label')"
+                :label="$t('page.givingGifts.applyForm.giftReason_type_label')"
                 name="reasonType"
                 :rules="[
                   {
                     required: true,
-                    message: $t('page.givingGifts.applyForm.giftReason_label_validation')
+                    message: $t('page.givingGifts.applyForm.giftReason_type_label_validation')
                   }
                 ]"
               >
@@ -974,7 +1034,7 @@ watch(
                   :rules="[
                     {
                       required: true,
-                      message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
+                      message: $t('page.givingGifts.applyForm.giftDesc_type_label_validation')
                     }
                   ]"
                 >
@@ -1000,7 +1060,7 @@ watch(
                   :rules="[
                     {
                       required: true,
-                      message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
+                      message: $t('page.givingGifts.applyForm.giftDesc_type_label_validation')
                     }
                   ]"
                 >
@@ -1023,18 +1083,18 @@ watch(
           <a-row v-show="showReasonDesc" :gutter="24">
             <a-col span="24">
               <a-form-item
-                :label="$t('page.givingGifts.applyForm.giftDesc_label')"
+                :label="$t('page.givingGifts.applyForm.giftReason_label')"
                 name="reason"
                 :rules="[
                   {
                     required: true,
-                    message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
+                    message: $t('page.givingGifts.applyForm.giftReason_label_validation')
                   }
                 ]"
               >
                 <a-input
                   v-model:value="applyModelRef.reason"
-                  :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
+                  :placeholder="$t('page.givingGifts.applyForm.giftReason_label_validation')"
                 ></a-input>
               </a-form-item>
             </a-col>
@@ -1047,15 +1107,15 @@ watch(
               <a-col span="12">
                 <a-form-item
                   name="giftDescType"
-                  :label="$t('page.givingGifts.applyForm.giftDesc_label')"
+                  :label="$t('page.givingGifts.applyForm.giftDesc_type_label')"
                   :rules="[
                     {
                       required: true,
-                      message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
+                      message: $t('page.givingGifts.applyForm.giftDesc_type_label_validation')
                     }
                   ]"
                 >
-                  <a-select v-model:value="applyModelRef.giftDescType" @change="handleChange">
+                  <a-select v-model:value="applyModelRef.giftDescType">
                     <a-select-option
                       value="Promotional Supplies Gifts"
                       :title="$t('form.common.option_giftDesc_HCP_Promotional_Supplies')"
@@ -1075,18 +1135,18 @@ watch(
             <template v-else>
               <a-col span="10">
                 <a-form-item
-                  :label="$t('page.givingGifts.applyForm.giftDesc_label')"
-                  name="giftDesc"
+                  :label="$t('page.givingGifts.applyForm.giftDesc_type_label')"
+                  name="giftDescType"
                   :rules="[
                     {
                       required: true,
-                      message: $t('page.givingGifts.applyForm.giftDesc_label_validation')
+                      message: $t('page.givingGifts.applyForm.giftDesc_type_label')
                     }
                   ]"
                 >
                   <a-input
-                    v-model:value="applyModelRef.giftDesc"
-                    :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
+                    v-model:value="applyModelRef.giftDescType"
+                    :placeholder="$t('page.givingGifts.applyForm.giftDesc_type_label_validation')"
                   ></a-input>
                 </a-form-item>
               </a-col>
@@ -1175,8 +1235,25 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
+        <!--添加礼品名称-->
+        <!--
+ <a-row :gutter="24">
+          <a-col span="14">
+            <a-form-item
+              name="giftDesc"
+              :label="$t('page.givingGifts.applyForm.giftDesc_label')"
+              :rules="[{ required: true, message: $t('page.givingGifts.applyForm.giftDesc_label_validation') }]"
+            >
+              <a-input
+                v-model:value="applyModelRef.giftDesc"
+                :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
+              ></a-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+-->
         <a-row :gutter="24">
-          <a-col span="7">
+          <a-col span="5">
             <a-form-item
               name="date"
               :label="$t('page.givingGifts.applyForm.giftGivingDate')"
@@ -1196,7 +1273,30 @@ watch(
               />
             </a-form-item>
           </a-col>
+          <a-col span="7">
+            <a-form-item
+              name="giftDesc"
+              :label="$t('page.givingGifts.applyForm.giftDesc_label')"
+              :rules="[{ required: true, message: $t('page.givingGifts.applyForm.giftDesc_label_validation') }]"
+            >
+              <a-input
+                v-model:value="applyModelRef.giftDesc"
+                :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
+              ></a-input>
+            </a-form-item>
+          </a-col>
           <a-col span="5">
+            <a-form-item
+              name="volume"
+              :label="$t('form.common.quantity')"
+              :rules="[{ required: true, message: $t('form.common.quantity_validation') }]"
+            >
+              <a-input-number v-model:value="applyModelRef.volume" :min="1" disabled="true"></a-input-number>
+            </a-form-item>
+          </a-col>
+
+          <!--
+ <a-col span="5">
             <a-form-item
               name="unitValue"
               :label="$t('form.common.unitPrice')"
@@ -1222,14 +1322,11 @@ watch(
               ></a-input-number>
             </a-form-item>
           </a-col>
+-->
           <a-col span="5">
             <a-form-item :label="$t('form.common.totalPrice')">
               <a-input-number
-                :value="
-                  isNaN(applyModelRef.unitValue * applyModelRef.volume)
-                    ? undefined
-                    : applyModelRef.unitValue * applyModelRef.volume
-                "
+                :value="applyModelRef.totalValue"
                 addon-before="￥"
                 style="width: 195px"
                 :step="0.01"
@@ -1307,12 +1404,7 @@ watch(
         <a-row :gutter="24">
           <a-col span="24">
             <a-form-item :label="$t('page.givingGifts.applyForm.remark')" name="remark">
-              <a-textarea
-                v-model:value="applyModelRef.remark"
-                :rows="4"
-                :placeholder="$t('page.givingGifts.applyForm.remark_validation')"
-                allow-clear
-              />
+              <a-textarea v-model:value="applyModelRef.remark" :rows="4" allow-clear />
             </a-form-item>
           </a-col>
         </a-row>
@@ -1324,7 +1416,10 @@ watch(
           <a-descriptions-item :label="$t('form.common.operationInfo')" span="4">
             <ul>
               <li v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
-                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <template v-if="item.sfUserIdSubmitter === 9999">&nbsp; {{ index + 1 }}. System &nbsp;</template>
+                <template v-else>
+                  &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                </template>
                 <strong>{{ item.action }}</strong>
                 &nbsp; at &nbsp;
                 {{ item.createdDate }}
@@ -1335,7 +1430,10 @@ watch(
           <a-descriptions-item :label="$t('form.common.remarkInfo')" span="4">
             <ul>
               <li v-for="(item, index) in applyModelRef.giftsActivities" :key="item.appActivityDataId">
-                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <template v-if="item.sfUserIdSubmitter === 9999">&nbsp; {{ index + 1 }}. System &nbsp;</template>
+                <template v-else>
+                  &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                </template>
                 <strong>wrote at {{ item.createdDate }}</strong>
                 &nbsp;
                 {{ item.remark }}
@@ -1373,6 +1471,19 @@ watch(
                 {{ $t('common.reset') }}
               </a-button>
             </template>
+            <!--增加复制按钮-->
+            <template
+              v-else-if="
+                givingGiftFromStatus.actionStatus === 'Cancelled' ||
+                givingGiftFromStatus.actionStatus === 'Rejected' ||
+                givingGiftFromStatus.actionStatus === 'Approved'
+              "
+            >
+              <a-button type="primary" html-type="submit" @click.prevent="onModifyApply('Copy')">
+                {{ $t('common.copy') }}
+              </a-button>
+            </template>
+
             <!---表单只读-->
             <template
               v-else-if="
@@ -1591,45 +1702,96 @@ watch(
       @ok="onSubmitAddPerson"
     >
       <a-form ref="addPersonModalFormRef" :model="currentCompanyState" :disabled="givingGiftFromStatus.disableStatus">
-        <a-row v-for="(person, index) in currentCompanyState.personList" :key="person.key" :gutter="24">
-          <a-col span="10">
-            <a-form-item
-              :label="$t('page.givingGifts.applyForm.giftGivingEmployeeName')"
-              :name="['personList', index, 'personName']"
-              :rules="{
-                required: true,
-                message: $t('page.givingGifts.applyForm.giftGivingEmployeeName_validation'),
-                trigger: 'change'
-              }"
-            >
-              <a-input v-model:value="person.personName"></a-input>
-            </a-form-item>
-          </a-col>
+        <template v-for="(person, index) in currentCompanyState.personList" :key="person.key">
+          <a-divider orientation="left" />
+          <a-row :gutter="24">
+            <a-col span="12">
+              <a-form-item
+                :label-col="{ span: 10 }"
+                :wrapper-col="{ span: 14 }"
+                :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
+                :name="['personList', index, 'personName']"
+                :rules="{
+                  required: true,
+                  message: $t('page.receivingGifts.applyForm.giftGiverEmployeeName_validation'),
+                  trigger: 'change'
+                }"
+              >
+                <a-input v-model:value="person.personName"></a-input>
+              </a-form-item>
+            </a-col>
 
-          <a-col span="10">
-            <a-form-item
-              :label="$t('page.givingGifts.applyForm.giftGivingTitle')"
-              :name="['personList', index, 'positionTitle']"
-              :rules="{
-                required: true,
-                message: $t('page.givingGifts.applyForm.giftGivingTitle_validation'),
-                trigger: 'change'
-              }"
-            >
-              <a-input v-model:value="person.positionTitle"></a-input>
-            </a-form-item>
-          </a-col>
+            <a-col span="12">
+              <a-form-item
+                :label-col="{ span: 12 }"
+                :wrapper-col="{ span: 12 }"
+                :label="$t('page.receivingGifts.applyForm.giftGiverTitle_validation')"
+                :name="['personList', index, 'positionTitle']"
+                :rules="{
+                  required: true,
+                  message: $t('page.receivingGifts.applyForm.giftGiverTitle'),
+                  trigger: 'change'
+                }"
+              >
+                <a-input v-model:value="person.positionTitle"></a-input>
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row :gutter="24">
+            <a-col span="10">
+              <a-form-item
+                :label-col="{ span: 8 }"
+                :wrapper-col="{ span: 14 }"
+                :label="$t('form.common.unitPrice')"
+                :name="['personList', index, 'unitValue']"
+                :rules="{
+                  required: true,
+                  message: $t('form.common.unitPrice_validation'),
+                  trigger: 'change'
+                }"
+              >
+                <a-input-number
+                  v-model:value="person.unitValue"
+                  :style="{ width: '100px' }"
+                  :placeholder="$t('form.common.unitPrice_validation')"
+                  :min="1"
+                  :step="0.01"
+                ></a-input-number>
+              </a-form-item>
+            </a-col>
 
-          <a-col span="4">
-            <PlusCircleOutlined class="dynamic-add-del-button" @click="addPerson" />
-            &nbsp;
-            <MinusCircleOutlined
-              v-if="checkFirstPerson()"
-              class="dynamic-add-del-button"
-              @click="removePerson(person)"
-            />
-          </a-col>
-        </a-row>
+            <a-col span="10">
+              <a-form-item
+                :label-col="{ span: 11 }"
+                :wrapper-col="{ span: 14 }"
+                :label="$t('form.common.quantity')"
+                :name="['personList', index, 'volume']"
+                :rules="{
+                  required: true,
+                  message: $t('form.common.quantity_validation'),
+                  trigger: 'change'
+                }"
+              >
+                <a-input-number
+                  v-model:value="person.volume"
+                  :style="{ width: '100px' }"
+                  :placeholder="$t('form.common.quantity_validation')"
+                  :min="1"
+                ></a-input-number>
+              </a-form-item>
+            </a-col>
+
+            <a-col span="4">
+              <PlusCircleOutlined class="dynamic-add-del-button" @click="addPerson" />
+              &nbsp;
+              <MinusCircleOutlined
+                v-if="checkFirstPerson()"
+                class="dynamic-add-del-button"
+                @click="removePerson(person)"
+              />
+            </a-col>
+          </a-row>
+        </template>
       </a-form>
     </a-modal>
   </div>

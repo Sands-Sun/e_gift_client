@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { $t } from '@/locales';
+import { getcurrRunTaskCount } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
+import { onMounted, reactive } from 'vue';
 
 defineOptions({
   name: 'HeaderBanner'
@@ -14,24 +15,40 @@ interface StatisticData {
   title: string;
   value: string;
 }
-
-const statisticData = computed<StatisticData[]>(() => [
-  // {
-  //   id: 0,
-  //   title: $t('page.home.projectCount'),
-  //   value: '25'
-  // },
+const statisticData = reactive<StatisticData[]>([
   {
-    id: 1,
+    id: -1,
     title: $t('page.home.todo'),
-    value: '4/16'
+    value: ''
   }
-  // {
-  //   id: 2,
-  //   title: $t('page.home.message'),
-  //   value: '12'
-  // }
 ]);
+
+// const statisticData = computed<StatisticData[]>(() => [
+//   {
+//     id: 0,
+//     title: $t('page.home.projectCount'),
+//     value: '25'
+//   },
+//   {
+//     id: 1,
+//     title: $t('page.home.todo'),
+//     value: '4/16'
+//   },
+//   {
+//     id: 2,
+//     title: $t('page.home.message'),
+//     value: '12'
+//   }
+// ]);
+
+onMounted(async () => {
+  const currRunTaskCount = await getcurrRunTaskCount({});
+  if (currRunTaskCount?.data) {
+    statisticData[0].id = 1;
+    statisticData[0].value = currRunTaskCount?.data;
+    statisticData[0].title = $t('page.home.todo');
+  }
+});
 </script>
 
 <template>

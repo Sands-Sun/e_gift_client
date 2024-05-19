@@ -268,6 +268,8 @@ declare namespace App {
         enable: string;
         disable: string;
         status: string;
+        save: string;
+        copy: string;
         submit: string;
         approve: string;
         agreeApprove: string;
@@ -478,6 +480,14 @@ declare namespace App {
             giftEstimatedTotalExpense_validation: string;
             giftHospPlace: string;
             giftHospPlace_validation: string;
+            giftHospEmployeeName: string;
+            giftHospEmployeeName_validation: string;
+            gitfHospEmployeeIsGoSoc: string;
+            giftHospEmployeeIsBayerCustomer: string;
+            giftHospTitle: string;
+            giftHospTitle_validation: string;
+            giftHospEmployeePop_HeadCount: string;
+            gitfHospNoGovLessThanNotify_message: string;
           };
           policy: {
             title: string;
@@ -497,9 +507,12 @@ declare namespace App {
             givingGiftInfo: string;
             giftReason_label: string;
             giftReason_label_validation: string;
+            giftReason_type_label: string;
+            giftReason_type_label_validation: string;
             giftDesc_label: string;
             giftDesc_label_validation: string;
             giftDesc_type_label: string;
+            giftDesc_type_label_validation: string;
             giftGivingDate: string;
             giftGivingDate_validation: string;
             giftGivingCompanyName: string;
@@ -527,6 +540,7 @@ declare namespace App {
             receivingGiftInfo: string;
             remark: string;
             remark_validation: string;
+            usageScenairo: string;
             giftRecipient: string;
             giftGiverCompanyName: string;
             giftGiverCompanyName_validation: string;
@@ -536,12 +550,14 @@ declare namespace App {
             giftGiverTitle_validation: string;
             giftReceivingDate: string;
             giftReceivingDate_validation: string;
+            giftReason_type_label: string;
+            giftReason_type_label_validation: string;
             giftReason_label: string;
             giftReason_label_validation: string;
-            giftReason_desc_label: string;
             giftDesc_label: string;
             giftDesc_label_validation: string;
             giftDesc_type_label: string;
+            giftDesc_type_label_validation: string;
           };
           policy: {
             title: string;
@@ -622,6 +638,7 @@ declare namespace App {
           cancelReson: string;
           approveComment: string;
           addPerson: string;
+          viewPerson: string;
           historyLog: string;
           operationInfo: string;
           remarkInfo: string;
@@ -633,6 +650,8 @@ declare namespace App {
           option_not_Applicable: string;
           upload_person_label: string;
           upload_template: string;
+          system_prompt: string;
+          person_quantity_notMatch: string;
           option_giftReason_NewYear: string;
           option_giftReason_Mid_Autumn: string;
           option_Other: string;

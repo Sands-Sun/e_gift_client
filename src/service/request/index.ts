@@ -37,6 +37,7 @@ export const request = createFlatRequest<App.Service.Response>(
       return response.data.data;
     },
     onError(error) {
+      // debugger;
       // when the request is fail, you can show error message
       let message = error.message;
 

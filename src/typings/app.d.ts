@@ -249,7 +249,7 @@ declare namespace App {
 
     type PolicyDescItem = {
       value: string;
-      items: Array<any> | unknown;
+      items: Array<PolicyDescItem> | unknown;
     };
 
     type Schema = {
@@ -268,6 +268,8 @@ declare namespace App {
         enable: string;
         disable: string;
         status: string;
+        save: string;
+        copy: string;
         submit: string;
         approve: string;
         agreeApprove: string;
@@ -294,6 +296,10 @@ declare namespace App {
         userCenter: string;
         logout: string;
         logoutConfirm: string;
+        search: string;
+        reset: string;
+        operate: string;
+        confirmDelete: string;
       };
       theme: {
         themeSchema: { title: string } & Record<UnionKey.ThemeScheme, string>;
@@ -449,8 +455,48 @@ declare namespace App {
           applyForm: {
             userFirstName: string;
             userLastName: string;
-            userCwid: string;
+            userChineseName: string;
+            userEnglishName: string;
             userEmail: string;
+          };
+        };
+        givingHospitality: {
+          applyForm: {
+            givingHospitalityRequestTitle: string;
+            remark: string;
+            remark_validation: string;
+            givingHospitalityInfo: string;
+            giftReason_label: string;
+            giftReason_label_validation: string;
+            giftGivingDate: string;
+            giftGivingDate_validation: string;
+            giftHospitalityType: string;
+            giftHospitalityType_validation: string;
+            giftExpensePerHead: string;
+            giftExpensePerHead_validation: string;
+            giftHeadCount: string;
+            giftHeadCount_validation: string;
+            giftEstimatedTotalExpense: string;
+            giftEstimatedTotalExpense_validation: string;
+            giftHospPlace: string;
+            giftHospPlace_validation: string;
+            giftHospEmployeeName: string;
+            giftHospEmployeeName_validation: string;
+            gitfHospEmployeeIsGoSoc: string;
+            giftHospEmployeeIsBayerCustomer: string;
+            giftHospTitle: string;
+            giftHospTitle_validation: string;
+            giftHospEmployeePop_HeadCount: string;
+            gitfHospNoGovLessThanNotify_message: string;
+          };
+          policy: {
+            title: string;
+            desc_1954: Array<PolicyDesc>;
+            desc_1955: Array<PolicyDesc>;
+            desc_0813: Array<PolicyDesc>;
+            desc_0882: Array<PolicyDesc>;
+            desc_1391: Array<PolicyDesc>;
+            desc_2614: Array<PolicyDesc>;
           };
         };
         givingGifts: {
@@ -461,17 +507,26 @@ declare namespace App {
             givingGiftInfo: string;
             giftReason_label: string;
             giftReason_label_validation: string;
+            giftReason_type_label: string;
+            giftReason_type_label_validation: string;
             giftDesc_label: string;
             giftDesc_label_validation: string;
             giftDesc_type_label: string;
+            giftDesc_type_label_validation: string;
             giftGivingDate: string;
             giftGivingDate_validation: string;
             giftGivingCompanyName: string;
             giftGivingCompanyName_validation: string;
             giftGivingEmployeeName: string;
             giftGivingEmployeeName_validation: string;
+            giftGivingTitle: string;
+            giftGivingTitle_validation: string;
             giftRecipientCategory: string;
             giftIsBayerCustomer: string;
+            givingDesc_type_option_medicine_noticeTitle: string;
+            givingDesc_type_option_medicine_noticeContent: string;
+            giftGiving_HCP_option_noticeTitle: string;
+            givingGiving_HCP_option_noticeContent: string;
           };
           policy: {
             title: string;
@@ -489,6 +544,7 @@ declare namespace App {
             receivingGiftInfo: string;
             remark: string;
             remark_validation: string;
+            usageScenairo: string;
             giftRecipient: string;
             giftGiverCompanyName: string;
             giftGiverCompanyName_validation: string;
@@ -498,12 +554,14 @@ declare namespace App {
             giftGiverTitle_validation: string;
             giftReceivingDate: string;
             giftReceivingDate_validation: string;
+            giftReason_type_label: string;
+            giftReason_type_label_validation: string;
             giftReason_label: string;
             giftReason_label_validation: string;
-            giftReason_desc_label: string;
             giftDesc_label: string;
             giftDesc_label_validation: string;
             giftDesc_type_label: string;
+            giftDesc_type_label_validation: string;
           };
           policy: {
             title: string;
@@ -540,6 +598,34 @@ declare namespace App {
             backTab: string;
           };
         };
+        manage: {
+          common: {
+            status: {
+              enable: string;
+              disable: string;
+            };
+          };
+          role: {
+            title: string;
+            roleName: string;
+            roleStatus: string;
+            roleDesc: string;
+            form: {
+              roleName: string;
+              roleStatus: string;
+            };
+            common: {
+              addTitle: string;
+              editTitle: string;
+            };
+          };
+          table: {
+            index: string;
+            desc: string;
+            status: string;
+            roleName: string;
+          };
+        };
       };
       form: {
         common: {
@@ -556,16 +642,21 @@ declare namespace App {
           cancelReson: string;
           approveComment: string;
           addPerson: string;
+          viewPerson: string;
           historyLog: string;
           operationInfo: string;
           remarkInfo: string;
           option_draft: string;
           option_inProcess: string;
           option_complete: string;
+          option_giftReason_Other: string;
           upload_file: string;
+          upload_file_success: string;
           option_not_Applicable: string;
           upload_person_label: string;
           upload_template: string;
+          system_prompt: string;
+          person_quantity_notMatch: string;
           option_giftReason_NewYear: string;
           option_giftReason_Mid_Autumn: string;
           option_Other: string;
@@ -575,6 +666,7 @@ declare namespace App {
           option_giftDesc_Cash_Equivalents: string;
           option_giftDesc_Present: string;
           option_giftDesc_Cultural_Courtesy: string;
+          option_giftDesc_HCP_Promotional_Supplies: string;
           option_giftDesc_Promotional_Supplies: string;
           option_giftDesc_Other: string;
           option_go_sco_Government_Official: string;
@@ -586,15 +678,22 @@ declare namespace App {
         searchFrom: {
           applyStatus: string;
           applyType: string;
+          givingGifts: string;
+          givingHospitality: string;
         };
         applicateInfo: {
           applicateInfoTitle: string;
+          formFillerInfoTitle: string;
           formFiller: string;
           applyForCwid: string;
           formFiller_placeHolder: string;
           applyFor: string;
           applyFor_validation: string;
           applyFor_placeHolder: string;
+          countryHead: string;
+          deptHead: string;
+          deptHead_validation: string;
+          deptHead_tooltip: string;
           applyCC: string;
           applyDate: string;
           employeeNo: string;

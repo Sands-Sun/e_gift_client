@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Modal } from 'ant-design-vue';
 import { useRouterPush } from '@/hooks/common/router';
 import { $t } from '@/locales';
 import { useAuthStore } from '@/store/modules/auth';
+import { Modal } from 'ant-design-vue';
 
 defineOptions({
   name: 'UserAvatar'
@@ -37,12 +37,14 @@ function logout() {
     </ButtonIcon>
     <template #overlay>
       <AMenu>
-        <AMenuItem @click="routerPushByKey('user-center')">
+        <!--
+ <AMenuItem @click="routerPushByKey('user-center')">
           <div class="flex-center gap-8px">
             <SvgIcon icon="ph:user-circle" class="text-icon" />
             {{ $t('common.userCenter') }}
           </div>
         </AMenuItem>
+-->
         <AMenuDivider />
         <AMenuItem @click="logout">
           <div class="flex-center gap-8px">

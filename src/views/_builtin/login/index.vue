@@ -7,6 +7,7 @@ import { useAppStore } from '@/store/modules/app';
 import { useThemeStore } from '@/store/modules/theme';
 import { loginModuleRecord } from '@/constants/app';
 import PwdLogin from './modules/pwd-login.vue';
+import AdminLogin from './modules/admin-login.vue';
 
 interface Props {
   /** The login module */
@@ -26,7 +27,10 @@ interface LoginModule {
   component: Component;
 }
 
-const modules: LoginModule[] = [{ key: 'pwd-login', label: loginModuleRecord['pwd-login'], component: PwdLogin }];
+const modules: LoginModule[] = [
+  { key: 'pwd-login', label: loginModuleRecord['pwd-login'], component: PwdLogin },
+  { key: 'admin-login', label: loginModuleRecord['admin-login'], component: AdminLogin }
+];
 
 const activeModule = computed(() => {
   const findItem = modules.find(item => item.key === props.module);

@@ -1,5 +1,16 @@
 import { request } from '../request';
 
+export function fetchAdminLogin(CWID: string, password: string) {
+  return request<Api.Auth.LoginToken>({
+    url: '/sys/adminLogin',
+    method: 'post',
+    data: {
+      CWID,
+      password
+    }
+  });
+}
+
 /**
  * Login
  *
@@ -14,13 +25,17 @@ export function fetchLogin() {
 }
 
 /** Get user info */
-export function fetchGetUserInfo() {
-  return request<Api.Auth.UserInfo>({ url: '/sys/user/getUserInfo' });
+export function fetchGetUserInfo(token: string) {
+  return request<Api.Auth.UserInfo>({ url: '/sys/user/getUserInfo', method: 'get', params: { token } });
 }
 
 /** Get user info by id */
-export function fetchGetUserInfoById(userId: string) {
-  return request<Api.Auth.UserInfo>({ url: `/sys/user/get/${userId}` });
+export function fetchGetUserInfoById(userId: string, includeSupervisor?: boolean) {
+  return request<Api.Auth.UserInfo>({
+    url: includeSupervisor
+      ? `/sys/user/get/${userId}&includeSupervisor=${includeSupervisor}`
+      : `/sys/user/get/${userId}`
+  });
 }
 
 /**

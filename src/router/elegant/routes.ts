@@ -47,6 +47,64 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'apply',
+    path: '/apply',
+    component: 'layout.base',
+    meta: {
+      title: 'apply',
+      i18nKey: 'route.apply',
+      icon: 'ic:baseline-gavel',
+      order: 2
+    },
+    children: [
+      {
+        name: 'apply_giving-gifts',
+        path: '/apply/giving-gifts',
+        component: 'view.apply_giving-gifts',
+        meta: {
+          title: 'apply_giving-gifts',
+          i18nKey: 'route.apply_giving-gifts',
+          icon: 'mdi:cart-variant',
+          order: 1
+        }
+      },
+      {
+        name: 'apply_giving-hospitality',
+        path: '/apply/giving-hospitality',
+        component: 'view.apply_giving-hospitality',
+        meta: {
+          title: 'apply_giving-hospitality',
+          i18nKey: 'route.apply_giving-hospitality',
+          icon: 'material-symbols-light:lunch-dining',
+          order: 3
+        }
+      },
+      {
+        name: 'apply_receving-gifts',
+        path: '/apply/receving-gifts',
+        component: 'view.apply_receving-gifts',
+        meta: {
+          title: 'apply_receving-gifts',
+          i18nKey: 'route.apply_receving-gifts',
+          icon: 'material-symbols:text-select-move-back-word-outline',
+          order: 2
+        }
+      },
+      {
+        name: 'apply_receving-hospitality',
+        path: '/apply/receving-hospitality',
+        component: 'view.apply_receving-hospitality',
+        meta: {
+          title: 'apply_receving-hospitality',
+          i18nKey: 'route.apply_receving-hospitality',
+          icon: 'mdi:hamburger-plus',
+          order: 4,
+          hideInMenu: true
+        }
+      }
+    ]
+  },
+  {
     name: 'function',
     path: '/function',
     component: 'layout.base',
@@ -136,66 +194,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
-    name: 'legal',
-    path: '/legal',
-    component: 'layout.base',
-    meta: {
-      title: 'legal',
-      i18nKey: 'route.legal',
-      icon: 'ic:baseline-gavel',
-      order: 2
-    },
-    children: [
-      {
-        name: 'legal_giving-gifts',
-        path: '/legal/giving-gifts',
-        component: 'view.legal_giving-gifts',
-        meta: {
-          title: 'legal_giving-gifts',
-          i18nKey: 'route.legal_giving-gifts',
-          icon: 'mdi:cart-variant',
-          order: 1
-        }
-      },
-      {
-        name: 'legal_giving-hospitality',
-        path: '/legal/giving-hospitality',
-        component: 'view.legal_giving-hospitality',
-        meta: {
-          title: 'legal_giving-hospitality',
-          i18nKey: 'route.legal_giving-hospitality',
-          icon: 'material-symbols-light:lunch-dining',
-          order: 3
-        }
-      },
-      {
-        name: 'legal_receving-gifts',
-        path: '/legal/receving-gifts',
-        component: 'view.legal_receving-gifts',
-        meta: {
-          title: 'legal_receving-gifts',
-          i18nKey: 'route.legal_receving-gifts',
-          icon: 'material-symbols:text-select-move-back-word-outline',
-          order: 2
-        }
-      },
-      {
-        name: 'legal_receving-hospitality',
-        path: '/legal/receving-hospitality',
-        component: 'view.legal_receving-hospitality',
-        meta: {
-          title: 'legal_receving-hospitality',
-          i18nKey: 'route.legal_receving-hospitality',
-          icon: 'mdi:hamburger-plus',
-          order: 4,
-          hideInMenu: true
-        }
-      }
-    ]
-  },
-  {
     name: 'login',
-    path: '/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?',
+    path: '/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat|admin-login)?',
     component: 'layout.blank$view.login',
     props: true,
     meta: {

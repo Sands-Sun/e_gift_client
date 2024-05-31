@@ -8,14 +8,15 @@ import type { Rule } from 'ant-design-vue/es/form';
 import { $t } from '@/locales';
 import { fetchGroupList, fuzzySearchUserList, getGroupById, saveGroup, updateGroup } from '@/service/api';
 import { debounce } from 'lodash-es';
-import { computed, createVNode, onMounted, reactive, ref, toRaw } from 'vue';
+import { createVNode, nextTick, onMounted, reactive, ref, toRaw, watch } from 'vue';
 const groupForm = Form.useForm;
 const listTableLoading = ref(true);
 const openGroupModal = ref<boolean>(false);
 const applySearch = ref<string>('');
 const listDataSource = ref([] as any);
 const searchFormRef = ref<FormInstance>();
-const userState = reactive({ data: [] as any, value: [] as any, fetching: true });
+const userState = reactive({ data: [] as any, fetching: true });
+const applyOptions = ref<SelectProps['options']>([]);
 const groupFormModelRef = reactive({
   action: '',
   id: undefined,
@@ -124,6 +125,7 @@ const { resetFields, validate, validateInfos } = groupForm(groupFormModelRef, gr
 
 const closeGroupModal = () => {
   openGroupModal.value = false;
+  userState.data = [];
 };
 
 const listPagination = ref({
@@ -226,13 +228,13 @@ const onApplySearch = (searchValue: string) => {
   loadUserData(searchValue);
 };
 
-const applyOptions = computed<SelectProps['options']>(() =>
-  userState.data.map((user: any) => ({
-    label: `${user.firstName} ${user.lastName} <${user.email}>`,
-    value: user.email,
-    userId: user.sfUserId
-  }))
-);
+// const applyOptions = computed<SelectProps['options']>(() =>
+//   userState.data.map((user: any) => ({
+//     label: `${user.firstName} ${user.lastName} <${user.email}>`,
+//     value: user.email,
+//     userId: user.sfUserId
+//   }))
+// );
 
 const showGroupModal = async (type: string, item?: any) => {
   resetFields();
@@ -248,16 +250,24 @@ const showGroupModal = async (type: string, item?: any) => {
     const { data, error } = await getGroupById(item.id);
     if (!error) {
       if (data.userToGroups) {
+        const options = [] as any;
         data.userToGroups.forEach((user: any) => {
-          applyOptions.value.push({
-            label: `${user.userFirstName} ${user.userLastName} <${user.userEmail}>`,
-            value: user.userEmail,
-            userId: user.userId
+          options.push({
+            firstName: user.userFirstName,
+            lastName: user.userLastName,
+            email: user.userEmail
           });
+          userState.data = options;
+          groupFormModelRef.bindPersons = options.map((v: any) => v.email);
+          // applyOptions.value.push({
+          //   label: `${user.userFirstName} ${user.userLastName} <${user.userEmail}>`,
+          //   value: user.userEmail,
+          //   userId: user.userId
+          // });
         });
       }
       groupFormModelRef.id = item.id;
-      groupFormModelRef.bindPersons = applyOptions.value.map((v: any) => v.value);
+      // groupFormModelRef.bindPersons = applyOptions.value.map((v: any) => v.value);
       groupFormModelRef.status = data.markDeleted === 'N';
       groupFormModelRef.fullName = data.fullName;
       groupFormModelRef.groupCode = data.groupCode;
@@ -281,13 +291,29 @@ const handleTableChange = (pag: { pageSize: number; current: number }, filters: 
 };
 
 const resetSearchForm = () => {
-  searchFormRef?.value?.resetFields();
+  nextTick(() => {
+    searchFormRef?.value?.resetFields();
+    getListDataByCondition();
+  });
 };
 
 const onFinishSearch = (values: any) => {
   console.log('Received values of form: ', values);
   console.log('formState: ', searchFormModelRef);
 };
+
+watch(
+  () => [userState.data],
+  ([newUserVal], [oldUserVal]) => {
+    console.log('newUserVal:', newUserVal);
+    console.log('oldUserVal: ', oldUserVal);
+    applyOptions.value = userState.data.map((user: any) => ({
+      label: `${user.firstName} ${user.lastName} <${user.email}>`,
+      value: user.email
+    }));
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   const listData = await fetchGroupList({});
@@ -414,10 +440,18 @@ onMounted(async () => {
           </a-col>
           <a-col :span="5" style="text-align: right">
             <a-space :size="5">
-              <a-button type="primary" html-type="submit" @click="getListDataByCondition()">
-                {{ $t('common.search') }}
+              <a-button type="primary" ghost html-type="submit" @click="getListDataByCondition()">
+                <div class="flex-y-center gap-8px">
+                  <icon-ic-round-search class="text-icon" />
+                  <span>{{ $t('common.search') }}</span>
+                </div>
               </a-button>
-              <a-button style="margin: 1px" @click="resetSearchForm()">{{ $t('common.reset') }}</a-button>
+              <a-button style="margin: 1px" @click="resetSearchForm()">
+                <div class="flex-y-center gap-8px">
+                  <icon-ic-round-refresh class="text-icon" />
+                  <span>{{ $t('common.reset') }}</span>
+                </div>
+              </a-button>
             </a-space>
           </a-col>
         </a-row>
@@ -450,7 +484,7 @@ onMounted(async () => {
               {{ $t('common.viewDetail') }}
             </a-button>
           </template>
-          <template v-else-if="column.key === 'mark_Deleted'">
+          <template v-else-if="column.key === 'MARK_DELETED'">
             <span>
               <template v-if="record.markDeleted === 'Y'">
                 <a-tag color="red">{{ $t('common.disable') }}</a-tag>

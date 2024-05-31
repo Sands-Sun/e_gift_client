@@ -25,6 +25,11 @@ declare module "@elegant-router/types" {
     "404": "/404";
     "500": "/500";
     "about": "/about";
+    "apply": "/apply";
+    "apply_giving-gifts": "/apply/giving-gifts";
+    "apply_giving-hospitality": "/apply/giving-hospitality";
+    "apply_receving-gifts": "/apply/receving-gifts";
+    "apply_receving-hospitality": "/apply/receving-hospitality";
     "function": "/function";
     "function_hide-child": "/function/hide-child";
     "function_hide-child_one": "/function/hide-child/one";
@@ -34,12 +39,7 @@ declare module "@elegant-router/types" {
     "function_tab": "/function/tab";
     "home": "/home";
     "inbox": "/inbox";
-    "legal": "/legal";
-    "legal_giving-gifts": "/legal/giving-gifts";
-    "legal_giving-hospitality": "/legal/giving-hospitality";
-    "legal_receving-gifts": "/legal/receving-gifts";
-    "legal_receving-hospitality": "/legal/receving-hospitality";
-    "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
+    "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat|admin-login)?";
     "manage": "/manage";
     "manage_function": "/manage/function";
     "manage_group": "/manage/group";
@@ -93,10 +93,10 @@ declare module "@elegant-router/types" {
     | "404"
     | "500"
     | "about"
+    | "apply"
     | "function"
     | "home"
     | "inbox"
-    | "legal"
     | "login"
     | "manage"
     | "multi-menu"
@@ -123,6 +123,10 @@ declare module "@elegant-router/types" {
     | "500"
     | "login"
     | "about"
+    | "apply_giving-gifts"
+    | "apply_giving-hospitality"
+    | "apply_receving-gifts"
+    | "apply_receving-hospitality"
     | "function_hide-child_one"
     | "function_hide-child_three"
     | "function_hide-child_two"
@@ -130,10 +134,6 @@ declare module "@elegant-router/types" {
     | "function_tab"
     | "home"
     | "inbox"
-    | "legal_giving-gifts"
-    | "legal_giving-hospitality"
-    | "legal_receving-gifts"
-    | "legal_receving-hospitality"
     | "manage_function"
     | "manage_group"
     | "manage_role"

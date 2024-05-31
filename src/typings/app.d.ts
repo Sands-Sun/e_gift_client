@@ -523,6 +523,10 @@ declare namespace App {
             giftGivingTitle_validation: string;
             giftRecipientCategory: string;
             giftIsBayerCustomer: string;
+            givingDesc_type_option_medicine_noticeTitle: string;
+            givingDesc_type_option_medicine_noticeContent: string;
+            giftGiving_HCP_option_noticeTitle: string;
+            givingGiving_HCP_option_noticeContent: string;
           };
           policy: {
             title: string;
@@ -647,6 +651,7 @@ declare namespace App {
           option_complete: string;
           option_giftReason_Other: string;
           upload_file: string;
+          upload_file_success: string;
           option_not_Applicable: string;
           upload_person_label: string;
           upload_template: string;
@@ -678,12 +683,17 @@ declare namespace App {
         };
         applicateInfo: {
           applicateInfoTitle: string;
+          formFillerInfoTitle: string;
           formFiller: string;
           applyForCwid: string;
           formFiller_placeHolder: string;
           applyFor: string;
           applyFor_validation: string;
           applyFor_placeHolder: string;
+          countryHead: string;
+          deptHead: string;
+          deptHead_validation: string;
+          deptHead_tooltip: string;
           applyCC: string;
           applyDate: string;
           employeeNo: string;

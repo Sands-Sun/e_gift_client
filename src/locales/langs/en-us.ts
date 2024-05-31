@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'E-Gift System'
+    title: 'E-Gift/Hospitality System'
   },
   common: {
     tip: 'Tip',
@@ -23,8 +23,8 @@ const local: App.I18n.Schema = {
     confirmApprove: 'Confirm Approve?',
     saveDraft: 'Save Draft',
     reset: 'Reset',
-    newGroupCreate: 'New Create User Group',
-    newApplyCreate: 'New Create Application',
+    newGroupCreate: 'New User Group',
+    newApplyCreate: 'New Application',
     viewDetail: 'View Detail',
     editSuccess: 'Edit Success',
     delete: 'Delete',
@@ -143,18 +143,18 @@ const local: App.I18n.Schema = {
     'function_hide-child_one': 'Hide Child',
     'function_hide-child_two': 'Two',
     'function_hide-child_three': 'Three',
-    legal: 'FA',
-    'legal_giving-gifts': 'giving gifts',
-    'legal_receving-gifts': 'receving gifts',
-    'legal_giving-hospitality': 'giving hospitality',
-    'legal_receving-hospitality': 'receving hospitality',
-    manage: 'System Manage',
-    manage_user: 'User Manage',
+    apply: 'Apply for',
+    'apply_giving-gifts': 'Giving Gifts',
+    'apply_receving-gifts': 'Receving Gifts',
+    'apply_giving-hospitality': 'Giving Hospitality',
+    'apply_receving-hospitality': 'Receving Hospitality',
+    manage: 'System MGT',
+    manage_user: 'User MGT',
     'manage_user-detail': 'User Detail',
-    manage_role: 'Role Manage',
-    manage_group: 'Group Manage',
-    manage_route: 'Route Manage',
-    manage_function: 'Function Manage',
+    manage_role: 'Role MGT',
+    manage_group: 'Group MGT',
+    manage_route: 'Route MGT',
+    manage_function: 'Function MGT',
     'multi-menu': 'Multi Menu',
     'multi-menu_first': 'Menu One',
     'multi-menu_first_child': 'Menu One Child',
@@ -225,7 +225,7 @@ const local: App.I18n.Schema = {
       devDep: 'Development Dependency'
     },
     home: {
-      greeting: '{userName}, welcome to use e-gifts system !',
+      greeting: '{userName}, welcome to use e-Gift/Hospitality system !',
       weatherDesc: 'Today is cloudy to clear, 20℃ - 25℃!',
       projectCount: 'Project Count',
       todo: 'Todo',
@@ -255,15 +255,15 @@ const local: App.I18n.Schema = {
       applyForm: {
         groupRequestTitle: 'User Group Management',
         groupName: 'Group Name',
-        groupName_validation: 'please input group name',
+        groupName_validation: 'Please input group name',
         fullName: 'Full Name',
-        fullName_validation: 'please input full name',
+        fullName_validation: 'Please input full name',
         groupCode: 'Group Code',
-        groupCode_validation: 'please input group code',
+        groupCode_validation: 'Please input group code',
         bindPerson: 'Bind Person',
-        bindPerson_validation: 'please select bind person',
+        bindPerson_validation: 'Please select bind person',
         remark: 'Remark',
-        remark_validation: 'please input remark'
+        remark_validation: 'Please input remark'
       }
     },
     manageUser: {
@@ -281,29 +281,29 @@ const local: App.I18n.Schema = {
         remark: 'Remarks',
         remark_validation: 'Please fill in hospitality remarks',
         givingHospitalityInfo: 'Giving Hospitality Information',
-        giftReason_label: 'Why are you going to provide this hospitable activity?',
-        giftReason_label_validation: 'please input provide this hopitable reson',
+        giftReason_label: 'Why are you going to provide this hospitable activity',
+        giftReason_label_validation: 'Please input provide this hopitable reson',
         giftGivingDate: 'Date of Activity',
-        giftGivingDate_validation: 'please select date of activity',
+        giftGivingDate_validation: 'Please select date of activity',
         giftHospitalityType: 'Please describe the hospitable activity',
         giftHospitalityType_validation: 'Such as: meals, tea breaks, etc',
         giftExpensePerHead: 'Estimated expense per head',
-        giftExpensePerHead_validation: 'please input estimated expense per head',
+        giftExpensePerHead_validation: 'Please input estimated expense per head',
         giftHeadCount: 'Number of invitees',
-        giftHeadCount_validation: 'please input number of invitees',
+        giftHeadCount_validation: 'Please input number of invitees',
         giftEstimatedTotalExpense: 'Estimated total expense',
-        giftEstimatedTotalExpense_validation: 'please input estimated total expense',
+        giftEstimatedTotalExpense_validation: 'Please input estimated total expense',
         giftHospPlace: 'Name of the place',
-        giftHospPlace_validation: 'please input take please',
-        giftHospEmployeeName: 'Receiving person name',
-        giftHospEmployeeName_validation: 'please input receiving person name',
-        gitfHospEmployeeIsGoSoc: 'person  recipients',
+        giftHospPlace_validation: 'Please input take place',
+        giftHospEmployeeName: 'Name of recipient',
+        giftHospEmployeeName_validation: 'Please input recipient name',
+        gitfHospEmployeeIsGoSoc: 'Categories of recipients',
         giftHospEmployeeIsBayerCustomer: 'Is the recipient a current Bayer customer?',
         giftHospTitle: 'person title',
-        giftHospTitle_validation: 'please input person title',
+        giftHospTitle_validation: 'Please input person title',
         giftHospEmployeePop_HeadCount: 'invitees',
         gitfHospNoGovLessThanNotify_message:
-          'For non-government officials, if the per capita cost of hospitality is less than RMB 300, they do not need to apply for the E-hospitality system. You can reimburse directly in Concur.'
+          'For non-government officials, if the per capita cost of hospitality is less than RMB 300, they do not need to apply for the E-Gift/Hospitality system. You can reimburse directly in Concur.'
       },
       policy: {
         title: 'Policy Reminder',
@@ -313,12 +313,12 @@ const local: App.I18n.Schema = {
             items: [
               {
                 value:
-                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding eGift application in the reimbursement system.',
+                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding e-Gift/Hospitality application in the reimbursement system.',
                 items: []
               },
               {
                 value:
-                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding eGift record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding e-Gift/Hospitality record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
                 items: []
               }
             ]
@@ -370,12 +370,12 @@ const local: App.I18n.Schema = {
             items: [
               {
                 value:
-                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding eGift application in the reimbursement system.',
+                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding e-Gift/Hospitality application in the reimbursement system.',
                 items: []
               },
               {
                 value:
-                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding eGift record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding e-Gift/Hospitality record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
                 items: []
               }
             ]
@@ -423,48 +423,46 @@ const local: App.I18n.Schema = {
         ],
         desc_0813: [
           {
-            label: 'Note',
+            label: 'The provision of hospitality to 3rd parties is subject to all of following conditions',
             items: [
               {
-                value: 'If total expense per head is less than RMB 300 no approval is required.               ',
+                value: 'Based on reasonable causes which are business related,',
+                items: []
+              },
+              {
+                value: 'On proper occasions consistent with cultural customs and/or business practices,',
+                items: []
+              },
+              {
+                value: 'Not in a wasteful, extravagant or inappropriate place, ',
+                items: []
+              },
+              {
+                value: 'Not to choose a location or format that could negatively affect Bayer’s reputation,',
+                items: []
+              },
+              {
+                value: 'Approval flow:',
+                items: [
+                  { value: 'For hospitality ≤CNY 300 Yuan per capita, no need to apply in E-hospitality,' },
+                  {
+                    value:
+                      'For hospitality between CNY 300 Yuan and 500 Yuan(included) per capita, the line manager and department head (CMT member or other equivalent management team members)’s pre-approval is needed,'
+                  },
+                  {
+                    value:
+                      'Providing hospitality ＞CNY 500 Yuan per capita is allowed only in rare cases with appropriate reasons. It must be approved in advance by line manager, department head and Compliance Department.'
+                  }
+                ]
+              },
+              {
+                value:
+                  'Given the special status of government officials, careful assessment of the reasonableness and necessity is required when providing meals for them. Additionally, if the counterpart unit has stricter standards, Bayer must respect and adhere to those stricter standards. Discussions during meals must not involve ongoing government investigations or Bayer-related qualifications under review by the government official. In cases of special circumstance, prior approval from the line manager, department head, and Compliance Department, is required. For expenses ≤ CNY 300 Yuan per capita, approval from the line manager is necessary, while for expenses ＞ 300 RMB per capita, pre-approval from the line manager, department head and the Compliance Department is required.',
                 items: []
               },
               {
                 value:
-                  "If total expense per head is between RMB 300 and RMB 1000, line manager's prior approval is needed. ",
-                items: []
-              },
-              {
-                value:
-                  'If total expense per head is more than RMB 1000 or the total expense for the group is more than RMB 6000, prior approval of line manager and subgroup compliance officer is needed.',
-                items: []
-              },
-              {
-                value:
-                  'If invitee is government official or employee of state owned company, prior approval of line manager and subgroup compliance officer is needed.',
-                items: []
-              }
-            ]
-          },
-          {
-            label: 'The hospitable activity shall fulfill all of the following criteria:',
-            items: [
-              { value: 'Serving a Legitimate Purpose', items: [] },
-              { value: 'Consistent with Pre-Valuing Business Practice', items: [] },
-              { value: 'Reasonable and Appropriate', items: [] },
-              { value: 'Within the Expense Guidelines Stipulated', items: [] }
-            ]
-          },
-          {
-            label: ' The hospitable activity must NOT be',
-            items: [
-              { value: 'Lavish', items: [] },
-              { value: 'Extravagant', items: [] },
-              { value: 'Located in or near illegal activity', items: [] },
-              { value: 'Attached to the giving of gifts not in accordance with this Guideline or Table', items: [] },
-              {
-                value:
-                  'Provided in a place of ill-repute (eg strip club or in an inappropriate Bar) or of a similar nature',
+                  'In PH/CH/CS business scenarios, hospitality giving must adhere to the respective Business Unit’s Bayer Gift and Hospitality Guidelines.',
                 items: []
               }
             ]
@@ -476,12 +474,12 @@ const local: App.I18n.Schema = {
             items: [
               {
                 value:
-                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding eGift application in the reimbursement system.',
+                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding e-Gift/Hospitality application in the reimbursement system.',
                 items: []
               },
               {
                 value:
-                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding eGift record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding e-Gift/Hospitality record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
                 items: []
               }
             ]
@@ -532,41 +530,44 @@ const local: App.I18n.Schema = {
             label: 'Note',
             items: [
               {
-                value: 'Only gifts and hospitality with non-promotion nature shall be pre-applied in eGift system.',
-                items: []
-              },
-              { value: 'If unit price is less than RMB 300, no approval is needed.', items: [] },
-              {
                 value:
-                  'If unit price is more than RMB 300 (including 300), approvals from Department Head, BCS Country Head and Compliance are needed.',
+                  'Only external hospitality provided out of any promotional event shall be pre-applied in eHospitality system. Hospitalities provided in promotional events shall be applied in Opera system.',
                 items: []
               },
               {
                 value:
-                  'For gifts or hospitality offered to state personnel, approval from Compliance is always needed.',
+                  'If per person cost does not exceed RMB 300 (no government official involved), no approval is needed under eHospitality system for reimbursement purpose.',
+                items: []
+              },
+              {
+                value:
+                  'If per person cost is more than RMB 300 but not more than RMB 500 (including RMB 500), pre-approvals from line manager and Department Head are needed. If per person cost is more than RMB 500, pre-approval from compliance BP is also needed.',
+                items: []
+              },
+              {
+                value:
+                  'For hospitality provided to government officials within RMB 300 per person (including RMB 300), pre-approval from line manager is needed. If above RMB 300, pre-approval from Department Head and Compliance BP are also needed.',
                 items: []
               }
             ]
           },
           {
-            label: 'The hospitable activity shall fulfill all of the following criteria:',
+            label: 'The hospitality shall fulfill all of the following criteria',
             items: [
-              { value: 'Serving a Legitimate Purpose', items: [] },
-              { value: 'Consistent with Pre-Valuing Business Practice', items: [] },
-              { value: 'Reasonable and Appropriate', items: [] },
-              { value: 'Within the Expense Guidelines Stipulated', items: [] }
+              { value: 'Serving a legitimate purpose', items: [] },
+              { value: 'Consistent with common business practice pre-evaluated by applicant', items: [] },
+              { value: 'Reasonable and appropriate', items: [] }
             ]
           },
           {
-            label: ' The hospitable activity must NOT be',
+            label: 'The hospitality must NOT be',
             items: [
               { value: 'Lavish', items: [] },
               { value: 'Extravagant', items: [] },
-              { value: 'Located in or near illegal activity', items: [] },
-              { value: 'Attached to the giving of gifts not in accordance with this Guideline or Table', items: [] },
+              { value: 'Located in or near illegal place', items: [] },
+              { value: 'Breach any compliance policy on providing hospitalities', items: [] },
               {
-                value:
-                  'Provided in a place of ill-repute (eg strip club or in an inappropriate Bar) or of a similar nature',
+                value: 'Provided in an infamous place (e.g. strip club or inappropriate bar) or of a similar nature',
                 items: []
               }
             ]
@@ -627,26 +628,32 @@ const local: App.I18n.Schema = {
       applyForm: {
         givingGiftRequestTitle: 'Giving Gift Request Form',
         remark: 'Remark',
-        remark_validation: 'please input remark',
+        remark_validation: 'Please input remark',
         givingGiftInfo: 'Giving Gift Information',
         giftReason_type_label: 'The scene of giving gifts',
-        giftReason_type_label_validation: 'please input the scene of giving gifts',
+        giftReason_type_label_validation: 'Please input the scene of giving gifts',
         giftReason_label: 'Reasons for giving gifts',
-        giftReason_label_validation: 'please input the reson',
+        giftReason_label_validation: 'Please input the reson',
         giftDesc_label: 'Gift Description',
-        giftDesc_label_validation: 'please input gift description',
-        giftDesc_type_label: 'gift description type',
-        giftDesc_type_label_validation: 'please select gift description type',
-        giftGivingDate: 'Giving Date ',
-        giftGivingDate_validation: 'please select giving date',
-        giftGivingCompanyName: 'Name of empolyer of recipient',
-        giftGivingCompanyName_validation: 'please input Name of empolyer of recipient',
+        giftDesc_label_validation: 'Please input gift description',
+        giftDesc_type_label: 'Gift description type',
+        giftDesc_type_label_validation: 'Please select gift description type',
+        giftGivingDate: 'Giving Date',
+        giftGivingDate_validation: 'Please select giving date',
+        giftGivingCompanyName: "Recipient's Company/Entity Name",
+        giftGivingCompanyName_validation: "Please input recipient's Company/Entity Name",
         giftGivingEmployeeName: 'Name of recipient',
-        giftGivingEmployeeName_validation: 'please input Name of recipient',
+        giftGivingEmployeeName_validation: 'Please input Name of recipient',
         giftGivingTitle: 'Title of recipient',
-        giftGivingTitle_validation: 'please input title of recipient',
-        giftRecipientCategory: 'Recipient category? ',
-        giftIsBayerCustomer: 'Is the recipient a current Bayer customer? '
+        giftGivingTitle_validation: 'Please input title of recipient',
+        giftRecipientCategory: 'Recipient Category',
+        giftIsBayerCustomer: 'Is the recipient a current Bayer customer',
+        givingDesc_type_option_medicine_noticeTitle: 'Gift Medicine Notice',
+        givingDesc_type_option_medicine_noticeContent:
+          'It is prohibited to give prescription drugs and Class A over-the-counter drugs as gifts. Other drugs are not allowed in principle. In very special cases, the line manager, the department manager (CMT member) and the compliance department should be donated after prior evaluation and approval. Please specify the reason for your gift in Remark.',
+        giftGiving_HCP_option_noticeTitle: 'Recipient Category Notice',
+        givingGiving_HCP_option_noticeContent:
+          'Gifts to healthcare professionals (HCP) must also meet the BHC Gift Hospitality guidelines, Please refer to the BHC Gift Hospitality Guidelines. If the organizer of the event includes a business department, the business department should apply directly.'
       },
       policy: {
         title: 'Policy Reminder',
@@ -729,13 +736,23 @@ const local: App.I18n.Schema = {
             label: 'Note',
             items: [
               {
-                value: 'Only gifts and hospitality with non-promotion nature shall be pre-applied in eGift system.',
+                value:
+                  'Sending out any gift to external personnel out of promotional events shall be pre-applied in EGift system. Sending out any gift in promotional events shall be applied in Opera system.',
                 items: []
               },
-              { value: 'If unit price is less than RMB 300, no approval is needed. ', items: [] },
               {
                 value:
-                  'If unit price is more than RMB 300 (including 300), approvals from Department Head, BCS Country Head and Compliance are needed.',
+                  'If unit price of the gift is more than RMB 300 (excluding RMB 300), pre-approvals from line manager, Department Head, BCS Country Head and Compliance BP in EGift system are needed.',
+                items: []
+              },
+              {
+                value:
+                  'Sending out any promotional gift to external personnel shall be pre-approved by line manager. Sending out any custom gift (limited to Spring Festival and Mid-Autumn Festival) to external personnel shall be pre-approved by line manager and Department Head.',
+                items: []
+              },
+              {
+                value:
+                  'Sending out gift below RMB 200/ unit to any government official shall be pre-approved by line manager and Department Head. Gifts over RMB 200/ unit are not allowed to be given to any government official in principle.Employees are not allowed to send or receive any cash or cash equivalent as gifts. Employees should notify compliance BP to register and manage the gifts in case any cash, cash equivalent or gifts over RMB 300 are received.',
                 items: []
               }
             ]
@@ -746,13 +763,23 @@ const local: App.I18n.Schema = {
             label: 'Note',
             items: [
               {
-                value: 'Only gifts and hospitality with non-promotion nature shall be pre-applied in eGift system.',
+                value:
+                  'Sending out any gift to external personnel out of promotional events shall be pre-applied in EGift system. Sending out any gift in promotional events shall be applied in Opera system.',
                 items: []
               },
-              { value: 'If unit price is less than RMB 300, no approval is needed. ', items: [] },
               {
                 value:
-                  'If unit price is more than RMB 300 (including 300), approvals from Department Head, BCS Country Head and Compliance are needed.',
+                  'If unit price of the gift is more than RMB 300 (excluding RMB 300), pre-approvals from line manager, Department Head, BCS Country Head and Compliance BP in EGift system are needed.',
+                items: []
+              },
+              {
+                value:
+                  'Sending out any promotional gift to external personnel shall be pre-approved by line manager. Sending out any custom gift (limited to Spring Festival and Mid-Autumn Festival) to external personnel shall be pre-approved by line manager and Department Head.',
+                items: []
+              },
+              {
+                value:
+                  'Sending out gift below RMB 200/ unit to any government official shall be pre-approved by line manager and Department Head. Gifts over RMB 200/ unit are not allowed to be given to any government official in principle.Employees are not allowed to send or receive any cash or cash equivalent as gifts. Employees should notify compliance BP to register and manage the gifts in case any cash, cash equivalent or gifts over RMB 300 are received.',
                 items: []
               }
             ]
@@ -762,14 +789,46 @@ const local: App.I18n.Schema = {
           {
             label: 'Note',
             items: [
-              { value: 'If total value is less than RMB 300, no approval is needed.', items: [] },
-              { value: "If total value is between RMB 300 and RMB 500, line manager's approval is needed.", items: [] },
               {
                 value:
-                  'If total value is more than RMB 500 or recipient is government official or employee of state owned company, approval of line manager and subgroup compliance officer is needed. ',
+                  'Gifts should be given based on reasonable business scenarios. It should be legal and compliant. Gifts shall not be given for the purpose of obtaining improper benefits.',
                 items: []
               },
-              { value: 'Please make one request for each company you are giving gifts to.', items: [] }
+              {
+                value:
+                  'Gifts should be provided at appropriated meetings, events or other business occasions. It should meet the minimum quantity principle.',
+                items: []
+              },
+              {
+                value:
+                  'Sending out any promotional gift to external personnel shall be pre-approved by line manager. Sending out any custom gift (limited to Spring Festival and Mid-Autumn Festival) to external personnel shall be pre-approved by line manager and Department Head.',
+                items: []
+              },
+              {
+                value:
+                  'Do not give items with strong personal attributs (like cigarettes, alcohol, entertainment events, sports tickets ets.) or cash or cash equivalents.',
+                items: []
+              },
+              {
+                value: 'Choose proper gifts without high price:',
+                items: [
+                  { value: 'Promotional aids: ≤ RMB 300 Yuan + line managers’ approval in advance.' },
+                  {
+                    value:
+                      'In principle, gifts ＞RMB 300 Yuan are not allowed. For special cases, department head (CMT member or other equivalent management team member) and Compliance Department’s in-advance approval is a must.'
+                  }
+                ]
+              },
+              {
+                value: 'Gift to government official/HCP:',
+                items: [
+                  { value: 'Gifts with unit price ≤ RMB 200 Yuan/person requires line manager’s in-advance approval.' },
+                  {
+                    value:
+                      'Please carefully evaluate the rationality and necessity of gifts with unit price ＞ RMB 200 Yuan/person, and obtain line manager, department head and Compliance Department’s approval in advance.'
+                  }
+                ]
+              }
             ]
           }
         ],
@@ -816,26 +875,27 @@ const local: App.I18n.Schema = {
       applyForm: {
         acceptGiftRequestTitle: 'Accpect Gift Request Form',
         receivingGiftInfo: 'Receiving Gift Information',
-        remark: 'Remark (Please fill in with the detailed Gift name)',
-        remark_validation: 'please input remark',
-        usageScenairo: 'Usage scenario',
-        giftRecipient: 'Gift recipient',
-        giftGiverCompanyName: 'Name of giver company',
-        giftGiverCompanyName_validation: 'please input name of giver company',
+        // remark: 'Remark (Please fill in with the detailed Gift name)',
+        remark: 'Remark',
+        remark_validation: 'Please input remark',
+        usageScenairo: 'Usage Scenario',
+        giftRecipient: 'Gift Recipient',
+        giftGiverCompanyName: "Provider's company name",
+        giftGiverCompanyName_validation: 'Please input name of giver company',
         giftGiverEmployeeName: 'Name of giver',
-        giftGiverEmployeeName_validation: 'please input giver name',
+        giftGiverEmployeeName_validation: 'Please input giver name',
         giftGiverTitle: 'Title of giver',
-        giftGiverTitle_validation: 'please input title of giver',
+        giftGiverTitle_validation: 'Please input title of giver',
         giftReceivingDate: 'Receiving Date',
-        giftReceivingDate_validation: 'please select receiving date',
-        giftReason_type_label: 'The scene of giving gifts',
-        giftReason_type_label_validation: 'please input the scene of giving gifts',
-        giftReason_label: 'Reasons for giving gifts',
-        giftReason_label_validation: 'please input the reson',
+        giftReceivingDate_validation: 'Please select receiving date',
+        giftReason_type_label: 'The scene of receiving gifts',
+        giftReason_type_label_validation: 'Please input the scene of receiving gifts',
+        giftReason_label: 'Reasons for receiving gifts',
+        giftReason_label_validation: 'Please input the reson',
         giftDesc_label: 'Gift Description',
-        giftDesc_label_validation: 'please input gift description',
-        giftDesc_type_label: 'gift description type',
-        giftDesc_type_label_validation: 'please input gift description type'
+        giftDesc_label_validation: 'Please input gift description',
+        giftDesc_type_label: 'Gift description type',
+        giftDesc_type_label_validation: 'Please input gift description type'
       },
       policy: {
         title: 'Policy Reminder',
@@ -1107,17 +1167,18 @@ const local: App.I18n.Schema = {
   },
   form: {
     common: {
-      upload_file: 'Uppload Attachment',
+      upload_file: 'Upload Attachment',
+      upload_file_success: 'File: {fileName} uploaded successfully !',
       option_yes: 'Yes',
       option_no: 'No',
       unitPrice: 'Unit Price',
-      unitPrice_validation: 'please input unit price',
+      unitPrice_validation: 'Please input unit price',
       quantity: 'Quantity',
-      quantity_validation: 'please input quantity',
+      quantity_validation: 'Please input quantity',
       totalPrice: 'Total Value',
       reference: 'Reference No',
-      reference_placeHolder: 'please input reference no',
-      totalPrice_validation: 'please input total value',
+      reference_placeHolder: 'Please input reference no',
+      totalPrice_validation: 'Please input total value',
       cancelReson: 'Fill In Cancel Reson',
       approveComment: 'Fill In Approve Comment',
       addPerson: 'Add person',
@@ -1129,8 +1190,8 @@ const local: App.I18n.Schema = {
       option_inProcess: 'In-Process',
       option_complete: 'Complete',
       option_not_Applicable: 'Not Applicable',
-      upload_person_label: 'File (you can attach a list of names)',
-      upload_template: 'template download',
+      upload_person_label: 'Attachment (you can add a file with multiple names)',
+      upload_template: 'Template download',
       system_prompt: 'System prompt',
       person_quantity_notMatch: 'The personnel do not match the quantity',
       option_giftReason_Other:
@@ -1140,9 +1201,9 @@ const local: App.I18n.Schema = {
       option_Other: 'Other',
       option_giftDesc_Company_Branded_Gift: 'Company Branded Gift',
       option_giftDesc_Cultural_Courtesy: 'Cultural Courtesy Gifts',
-      option_giftDesc_HCP_Promotional_Supplies: 'Promotional AIDS products (with company or brand logo)',
-      option_giftDesc_Promotional_Supplies:
+      option_giftDesc_HCP_Promotional_Supplies:
         'Promotional AIDS for HCP when promoting OTC products (with company or brand logo)',
+      option_giftDesc_Promotional_Supplies: 'Promotional AIDS products (with company or brand logo)',
       option_giftDesc_Other: 'Other Gifts',
       option_giftDesc_General_Gift: 'General Gift',
       option_giftDesc_Medicine: 'Medicine',
@@ -1152,21 +1213,27 @@ const local: App.I18n.Schema = {
       option_go_sco_Government_Non_Official: 'Non Government Official',
       option_go_sco_Distributor: 'Distributor',
       option_go_sco_HCP: 'HCP',
-      select_validation: 'please select'
+      select_validation: 'Please select'
     },
     applicateInfo: {
       applicateInfoTitle: 'Applicant Information',
+      formFillerInfoTitle: 'Creator Information',
       formFiller: 'Creator',
       applyForCwid: 'CWID',
-      formFiller_placeHolder: 'please input creator',
+      formFiller_placeHolder: 'Please input creator',
       applyFor: 'Apply For',
-      applyFor_validation: 'please select applicant',
-      applyFor_placeHolder: 'please input applicant',
+      applyFor_validation: 'Please select applicant',
+      applyFor_placeHolder: 'Please input applicant',
+      countryHead: 'Country Head',
+      deptHead: 'Department Head',
+      deptHead_validation: 'Please select the department manager of your department',
+      deptHead_tooltip:
+        'A department manager is usually the highest-ranking employee in a department and is usually a member of the management team. Your department manager is not shown in the drop-down list below, Please email: {emails} to add (and copy your compliance BP).',
       applyCC: 'Copy to',
       applyDate: 'Apply Date',
       employeeNo: 'Employee No.',
       employeeLe: 'Employee Le',
-      employeeLe_placeHolder: 'please input employee Le',
+      employeeLe_placeHolder: 'Please input employee Le',
       department: 'Dept.',
       supervisor: 'Line Manager',
       costCenter: 'Cost Center',

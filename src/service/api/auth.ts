@@ -30,8 +30,12 @@ export function fetchGetUserInfo(token: string) {
 }
 
 /** Get user info by id */
-export function fetchGetUserInfoById(userId: string) {
-  return request<Api.Auth.UserInfo>({ url: `/sys/user/get/${userId}` });
+export function fetchGetUserInfoById(userId: string, includeSupervisor?: boolean) {
+  return request<Api.Auth.UserInfo>({
+    url: includeSupervisor
+      ? `/sys/user/get/${userId}&includeSupervisor=${includeSupervisor}`
+      : `/sys/user/get/${userId}`
+  });
 }
 
 /**

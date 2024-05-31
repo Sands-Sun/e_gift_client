@@ -18,7 +18,12 @@ import dayjs from 'dayjs';
 import { computed, createVNode, onMounted, reactive, ref, toRaw } from 'vue';
 let authStore: any;
 let userInfo: Api.Auth.UserInfo;
-const applyUserInfo = reactive<{ userInfo: Api.Auth.UserInfo | undefined; supervisor: Api.Auth.UserInfo | undefined }>({
+const applyUserInfo = reactive<{
+  creatorUserInfo: Api.Auth.UserInfo | undefined;
+  userInfo: Api.Auth.UserInfo | undefined;
+  supervisor: Api.Auth.UserInfo | undefined;
+}>({
+  creatorUserInfo: undefined,
   userInfo: undefined,
   supervisor: undefined
 });
@@ -40,6 +45,7 @@ const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === '
 const { baseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
 const userState = reactive({ data: [] as any, value: [] as any, ccValue: [] as any, fetching: true });
 const giftCompanyPersonState = reactive({ data: [] as any, value: [] as any });
+const deptHeadGroupUserState = reactive({ data: [] as any, hidden: true });
 const approvalModelRef = reactive({ comment: undefined, approve: '', processType: '', taskId: '', applicationId: '' });
 let currentCompanyState = reactive<{
   companyName: string;
@@ -52,7 +58,7 @@ let currentCompanyState = reactive<{
 });
 const searchFormModelRef = reactive({
   userId: '',
-  userName: '',
+  applicant: '',
   reference: '',
   companyCode: '',
   creator: '',
@@ -105,9 +111,11 @@ const applyModelRef = reactive<{
   requestType: string;
   actionType: string;
   applicationId: string;
+  createDate: string;
   reference: string;
   applyName: string;
   applyForId: number;
+  deptHead: string;
   copyToUserEmails: string[];
   applyCCName: string[];
   reason: string;
@@ -135,9 +143,11 @@ const applyModelRef = reactive<{
   requestType: '',
   actionType: '',
   applicationId: '',
+  createDate: dayjs().format('YYYY-MM-DD'),
   reference: '',
   applyName: undefined as any,
   applyForId: undefined as any,
+  deptHead: undefined as any,
   copyToUserEmails: [] as any,
   applyCCName: [],
   reason: '',
@@ -162,6 +172,13 @@ const applyModelRef = reactive<{
   remark: '',
   fileId: undefined
 });
+
+const deptHeadGroupUserOptions = computed<SelectProps['options']>(() =>
+  deptHeadGroupUserState.data.map((item: any) => ({
+    label: `${item.userFirstName} ${item.userLastName} <${item.userEmail}>`,
+    value: item.userEmail
+  }))
+);
 
 const ccApplyOptions = computed<SelectProps['options']>(() =>
   userState.data.map((user: any) => ({
@@ -275,12 +292,23 @@ const showApplyGivingGift = (data: any) => {
   applyModelRef.giftsActivities = data.giftsActivities;
 };
 
-const fillInApplyUserInfo = async (userId: string) => {
-  console.info('fill in apply user info:', userId);
-  const { error, data } = await fetchGetUserInfoById(userId);
-  if (!error) {
-    applyUserInfo.userInfo = data;
-    applyUserInfo.supervisor = data.supervisor;
+const fillInApplyUserInfo = async (applyUserId: string, creatorUserId: string) => {
+  // debugger;
+  console.info(`fill in apply user info: ${applyUserId} creator user: ${creatorUserId}`);
+  const applyUserData = await fetchGetUserInfoById(applyUserId);
+  if (!applyUserData.error) {
+    applyUserInfo.userInfo = applyUserData.data;
+    applyUserInfo.supervisor = applyUserData.data.supervisor;
+    if (applyUserId === creatorUserId) {
+      applyUserInfo.creatorUserInfo = applyUserData.data;
+    } else {
+      console.log('creator and apply user are not same...');
+      const creatorUserData = await fetchGetUserInfoById(creatorUserId, false);
+      if (!creatorUserData.error) {
+        applyUserInfo.creatorUserInfo = creatorUserData.data;
+      }
+    }
+
     console.log(`companycode:${userInfo.companyCode}`);
   }
 };
@@ -330,10 +358,12 @@ const showApplyDrawerModal = async (item?: any) => {
         : await getGivingHospitalityByApplicationId(item.applicationId);
 
     if (!error) {
-      fillInApplyUserInfo(data.sfUserIdAppliedFor).then(() => {
+      // debugger;
+      fillInApplyUserInfo(data.sfUserIdAppliedFor, data.sfUserIdCreator).then(() => {
         applyModelRef.applicationId = data.applicationId;
         applyModelRef.actionType = data.status;
         applyModelRef.reference = data.reference;
+        applyModelRef.createDate = dayjs(data.createdDate).format('YYYY-MM-DD');
         applyOptions.value.unshift({
           label: `${data?.sfUserAppliedName} <${data?.sfUserAppliedEmail}>`,
           value: data?.sfUserAppliedEmail,
@@ -351,6 +381,15 @@ const showApplyDrawerModal = async (item?: any) => {
               });
             }
           });
+        }
+        if (data.deptHeadGroup && data.deptHeadGroup.userToGroups.length > 0) {
+          const deptHeadUser = data.deptHeadGroup.userToGroups[0];
+          deptHeadGroupUserOptions.value.push({
+            label: `${deptHeadUser.userFirstName} ${deptHeadUser.userLastName} <${deptHeadUser.userEmail}>`,
+            value: deptHeadUser.userEmail
+          });
+          deptHeadGroupUserState.hidden = false;
+          applyModelRef.deptHead = deptHeadUser.userEmail;
         }
         if (data.fileAttach) {
           const attach = data.fileAttach;
@@ -458,6 +497,7 @@ const resetSearchForm = () => {
   searchFormModelRef.beginDate = '';
   searchFormModelRef.endDate = '';
   searchFormRef?.value?.resetFields();
+  getListDataByCondition();
 };
 
 const onFinishSearch = (values: any) => {
@@ -534,9 +574,9 @@ onMounted(async () => {
               </a-form-item>
             </a-col>
             <a-col span="5">
-              <a-form-item :label="$t('form.applicateInfo.applyFor')" name="userName">
+              <a-form-item :label="$t('form.applicateInfo.applyFor')" name="applicant">
                 <a-input
-                  v-model:value="searchFormModelRef.userName"
+                  v-model:value="searchFormModelRef.applicant"
                   :placeholder="$t('form.applicateInfo.applyFor_placeHolder')"
                 ></a-input>
               </a-form-item>
@@ -560,16 +600,24 @@ onMounted(async () => {
               </a-form-item>
             </a-col>
             <a-col span="10">
-              <a-form-item :label="$t('page.receivingGifts.applyForm.giftReceivingDate')" name="searchRangeDate">
+              <a-form-item :label="$t('form.applicateInfo.applyDate')" name="searchRangeDate">
                 <a-range-picker v-model:value="searchRangeDate" />
               </a-form-item>
             </a-col>
             <a-col span="8" style="text-align: right">
               <a-space :size="5">
-                <a-button type="primary" html-type="submit" @click="getListDataByCondition()">
-                  {{ $t('common.search') }}
+                <a-button type="primary" ghost html-type="submit" @click="getListDataByCondition()">
+                  <div class="flex-y-center gap-8px">
+                    <icon-ic-round-search class="text-icon" />
+                    <span>{{ $t('common.search') }}</span>
+                  </div>
                 </a-button>
-                <a-button style="margin: 1px" @click="resetSearchForm()">{{ $t('common.reset') }}</a-button>
+                <a-button style="margin: 1px" @click="resetSearchForm()">
+                  <div class="flex-y-center gap-8px">
+                    <icon-ic-round-refresh class="text-icon" />
+                    <span>{{ $t('common.reset') }}</span>
+                  </div>
+                </a-button>
               </a-space>
             </a-col>
           </a-row>
@@ -626,8 +674,16 @@ onMounted(async () => {
       :open="openApplyDrawerModal"
       @close="closeApplyDrawerModal"
     >
-      <a-descriptions :title="$t('form.applicateInfo.applicateInfoTitle')">
+      <a-descriptions :title="$t('form.applicateInfo.formFillerInfoTitle')">
         <a-descriptions-item :label="$t('form.applicateInfo.formFiller')">
+          {{ applyUserInfo?.creatorUserInfo?.firstName }} {{ applyUserInfo?.creatorUserInfo?.lastName }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="$t('form.applicateInfo.applyDate')">
+          {{ applyModelRef.createDate }}
+        </a-descriptions-item>
+      </a-descriptions>
+      <a-descriptions :title="$t('form.applicateInfo.applicateInfoTitle')">
+        <a-descriptions-item :label="$t('form.applicateInfo.applyFor')">
           {{ applyUserInfo?.userInfo?.firstName }} {{ applyUserInfo?.userInfo?.lastName }}
         </a-descriptions-item>
         <a-descriptions-item :label="$t('form.applicateInfo.employeeNo')">
@@ -707,6 +763,35 @@ onMounted(async () => {
             </a-form-item>
           </a-col>
         </a-row>
+        <template v-if="!deptHeadGroupUserState.hidden">
+          <a-row :gutter="24">
+            <a-col span="10">
+              <a-form-item
+                :label="$t('form.applicateInfo.deptHead')"
+                name="deptHead"
+                :rules="[
+                  {
+                    required: true,
+                    message: $t('form.applicateInfo.deptHead_validation')
+                  }
+                ]"
+              >
+                <a-tooltip placement="rightTop" :title="$t('form.applicateInfo.deptHead_tooltip')">
+                  <a-select
+                    v-model:value="applyModelRef.deptHead"
+                    :default-active-first-option="true"
+                    :placeholder="$t('form.common.select_validation')"
+                    show-search
+                    label-in-value
+                    :allow-clear="true"
+                    :options="deptHeadGroupUserOptions"
+                  ></a-select>
+                </a-tooltip>
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
+
         <a-row justify="end">
           <a-col>
             <a-button type="link" :disabled="false" @click="expandPolicyDescription = !expandPolicyDescription">

@@ -62,7 +62,18 @@ declare namespace Api {
       fullName: string;
       markDeleted: string;
       remark: string;
-      userToGroups: unknown[];
+      userToGroups: GiftsUserToGroup[];
+    }
+
+    interface GiftsUserToGroup {
+      id: number;
+      groupId: string;
+      markDeleted: string;
+      userCwid: string;
+      userEmail: string;
+      userFirstName: string;
+      userLastName: string;
+      userId: number;
     }
 
     interface GiftPerson {
@@ -88,6 +99,8 @@ declare namespace Api {
 
     interface ReceivingGifts {
       applicationId: string;
+      sfUserAppliedFirstName: string;
+      sfUserAppliedLastName: string;
       sfUserAppliedName: string;
       sfUserAppliedCwid: string;
       sfUserAppliedEmail: string;
@@ -151,10 +164,13 @@ declare namespace Api {
 
     interface GivingHospitality {
       applicationId: string;
+      sfUserAppliedFirstName: string;
+      sfUserAppliedLastName: string;
       sfUserAppliedName: string;
       sfUserAppliedCwid: string;
       sfUserAppliedEmail: string;
       sfUserIdAppliedFor: string;
+      sfUserIdCreator: string;
       copyToUsers: unknown[];
       costCenter: string;
       createdDate: string;
@@ -167,6 +183,7 @@ declare namespace Api {
       reason: string;
       reasonType: string;
       status: string;
+      deptHeadGroup: GiftGroup;
       companyList: GiftCompany[];
       fileAttach: FileAttach;
       hospRef: GivingHospitalityRef;
@@ -175,10 +192,13 @@ declare namespace Api {
 
     interface GivingGifts {
       applicationId: string;
+      sfUserAppliedFirstName: string;
+      sfUserAppliedLastName: string;
       sfUserAppliedName: string;
       sfUserAppliedCwid: string;
       sfUserAppliedEmail: string;
       sfUserIdAppliedFor: string;
+      sfUserIdCreator: string;
       copyToUsers: unknown[];
       costCenter: string;
       createdDate: string;
@@ -194,6 +214,7 @@ declare namespace Api {
       reasonType: string;
       status: string;
       totalValue: number;
+      deptHeadGroup: GiftGroup;
       companyList: GiftCompany[];
       fileAttach: FileAttach;
       giftsRef: GivingGiftRef;
@@ -291,6 +312,8 @@ declare namespace Api {
       firstName: string;
       lastName: string;
       chineseName: string;
+      isCountryHead: boolean;
+      isDeptHead: boolean;
       email: string;
       cwid: string;
       companyCode: string;

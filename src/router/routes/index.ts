@@ -1,12 +1,12 @@
 import type { CustomRoute, ElegantConstRoute, ElegantRoute } from '@elegant-router/types';
-import { generatedRoutes } from '../elegant/routes';
 import { layouts, views } from '../elegant/imports';
+import { generatedRoutes } from '../elegant/routes';
 import { getRoutePath, transformElegantRoutesToVueRoutes } from '../elegant/transform';
 
 export const ROOT_ROUTE: CustomRoute = {
   name: 'root',
   path: '/',
-  redirect: getRoutePath(import.meta.env.VITE_ROUTE_HOME) || '/legal/giving-gifts',
+  redirect: getRoutePath(import.meta.env.VITE_ROUTE_HOME) || '/apply/giving-gifts',
   meta: {
     title: 'root',
     constant: true

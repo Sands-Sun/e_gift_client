@@ -73,6 +73,20 @@ export function saveGroup(param: any) {
   });
 }
 
+export function feachDeptHeadGroupUsers(companyCode: string, division: string) {
+  return request<Api.Gifts.GiftsUserToGroup>({
+    url: `gifts/group/search-dept-head/${companyCode}?division=${division}`,
+    method: 'get'
+  });
+}
+
+export function feachCountryHeadGroupUsers(companyCode: string) {
+  return request<Api.Gifts.GiftsUserToGroup>({
+    url: `gifts/group/search-country-head/${companyCode}`,
+    method: 'get'
+  });
+}
+
 export function saveGivingHospitality(param: any) {
   return request({
     url: api_url.giving_hospitaltiy_save,
@@ -196,9 +210,9 @@ export function fuzzySearchGiftCompanyList(keyword: string) {
   });
 }
 
-export function fuzzySearchUserList(keyword: string) {
+export function fuzzySearchUserList(queryParam?: any) {
   return request<Array<Api.Auth.UserInfo>>({
-    url: `${api_url.fuzzy_search_user_list}?keyword=${keyword}`,
+    url: `${api_url.fuzzy_search_user_list}?keyword=${queryParam.keyword}&baseOnCompany=${queryParam.baseOnCompany}&division=${queryParam.division}`,
     method: 'get'
   });
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { fetchGetUserInfoById, fetchUserList } from '@/service/api';
 import type { FormInstance, TableColumnsType } from 'ant-design-vue';
-import { onMounted, reactive, ref, toRaw } from 'vue';
+import { nextTick, onMounted, reactive, ref, toRaw } from 'vue';
 const searchFormRef = ref<FormInstance>();
 const listTableLoading = ref(true);
 const openDrawerModal = ref<boolean>(false);
@@ -109,7 +109,10 @@ const handleTableChange = (pag: { pageSize: number; current: number }, filters: 
 };
 
 const resetSearchForm = () => {
-  searchFormRef?.value?.resetFields();
+  nextTick(() => {
+    searchFormRef?.value?.resetFields();
+    getListDataByCondition();
+  });
 };
 
 const closeDrawerModal = () => {
@@ -170,10 +173,18 @@ onMounted(async () => {
           </a-col>
           <a-col :span="5" style="text-align: right">
             <a-space :size="5">
-              <a-button type="primary" html-type="submit" @click="getListDataByCondition()">
-                {{ $t('common.search') }}
+              <a-button type="primary" ghost html-type="submit" @click="getListDataByCondition()">
+                <div class="flex-y-center gap-8px">
+                  <icon-ic-round-search class="text-icon" />
+                  <span>{{ $t('common.search') }}</span>
+                </div>
               </a-button>
-              <a-button style="margin: 1px" @click="resetSearchForm()">{{ $t('common.reset') }}</a-button>
+              <a-button style="margin: 1px" @click="resetSearchForm()">
+                <div class="flex-y-center gap-8px">
+                  <icon-ic-round-refresh class="text-icon" />
+                  <span>{{ $t('common.reset') }}</span>
+                </div>
+              </a-button>
             </a-space>
           </a-col>
         </a-row>

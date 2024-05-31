@@ -1,9 +1,9 @@
 <script setup lang="tsx">
-import { ref } from 'vue';
-import { Button, Popconfirm, Tag, message } from 'ant-design-vue';
-import { $t } from '@/locales';
 import { enableStatusOptions } from '@/constants/business';
+import { $t } from '@/locales';
 import { deleteRole, fetchAllRoutes, fetchRole, saveRole } from '@/service/api';
+import { Button, Popconfirm, message } from 'ant-design-vue';
+import { ref } from 'vue';
 
 const columns = [
   {
@@ -232,16 +232,16 @@ const handleDelete = async id => {
           <ACol :span="24" :md="12" :lg="6">
             <AFormItem class="m-0">
               <div class="w-full flex-y-center justify-end gap-12px">
-                <AButton @click="reset()">
-                  <div class="flex-y-center gap-8px">
-                    <icon-ic-round-refresh class="text-icon" />
-                    <span>{{ $t('common.reset') }}</span>
-                  </div>
-                </AButton>
                 <AButton type="primary" ghost @click="search()">
                   <div class="flex-y-center gap-8px">
                     <icon-ic-round-search class="text-icon" />
                     <span>{{ $t('common.search') }}</span>
+                  </div>
+                </AButton>
+                <AButton @click="reset()">
+                  <div class="flex-y-center gap-8px">
+                    <icon-ic-round-refresh class="text-icon" />
+                    <span>{{ $t('common.reset') }}</span>
                   </div>
                 </AButton>
               </div>

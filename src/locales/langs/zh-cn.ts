@@ -1040,8 +1040,12 @@ const local: App.I18n.Schema = {
       role: {
         title: '角色列表',
         roleName: '角色名称',
+        roleName_validation: '请输入角色名称',
         roleStatus: '角色状态',
+        roleMenu: '角色菜单',
         roleDesc: '角色描述',
+        roleDesc_validation: '请输入角色描述',
+        bindPerson: '绑定人员',
         form: {
           roleName: '',
           roleStatus: ''

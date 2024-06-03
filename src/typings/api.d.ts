@@ -298,6 +298,28 @@ declare namespace Api {
     interface SSO {
       url: string;
     }
+    interface RoleInfo {
+      id: string;
+      createDate: string;
+      createBy: string;
+      updateDate: string;
+      updateBy: string;
+      markForDelete: string;
+      roleName: string;
+      remark: string;
+      functions: string;
+    }
+
+    interface UserToRole {
+      id: string;
+      roleId: number;
+      userCwid: string;
+      userEmail: string;
+      userFirstName: string;
+      userLastName: string;
+      userId: number;
+    }
+
     interface LoginToken {
       token: string;
       userId: number;

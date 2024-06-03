@@ -208,7 +208,8 @@ const loadUserData = debounce(async (keyword: string) => {
   if (!keyword) {
     userState.data = [];
   }
-  const { data: items, error } = await fuzzySearchUserList(keyword);
+  const queryParam = { keyword, baseOnCompany: false, division: '' };
+  const { data: items, error } = await fuzzySearchUserList(queryParam);
   if (!error) {
     console.log('userInfo:', items);
     if (applySearch.value !== keyword) {
@@ -377,7 +378,7 @@ onMounted(async () => {
                 :allow-clear="true"
                 :not-found-content="userState.fetching ? null : undefined"
                 :filter-option="false"
-                placeholder="请选择"
+                :placeholder="$t('form.common.select_validation')"
                 :options="applyOptions"
                 @search="onApplySearch"
               ></a-select>

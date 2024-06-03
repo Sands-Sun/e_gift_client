@@ -1146,8 +1146,12 @@ const local: App.I18n.Schema = {
       role: {
         title: 'Role List',
         roleName: 'Name',
+        roleName_validation: 'please input role name',
         roleStatus: 'Status',
+        roleMenu: 'Role Menu',
         roleDesc: 'Role desc',
+        roleDesc_validation: 'Please input role description',
+        bindPerson: 'Bind Person',
         form: {
           roleName: '',
           roleStatus: ''

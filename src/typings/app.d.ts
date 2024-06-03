@@ -608,8 +608,12 @@ declare namespace App {
           role: {
             title: string;
             roleName: string;
+            roleName_validation: string;
             roleStatus: string;
+            roleMenu: string;
             roleDesc: string;
+            roleDesc_validation: string;
+            bindPerson: string;
             form: {
               roleName: string;
               roleStatus: string;

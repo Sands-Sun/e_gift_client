@@ -460,6 +460,35 @@ declare namespace App {
             userEmail: string;
           };
         };
+        receivingHospitality: {
+          applyForm: {
+            receivingHospitalityRequestTitle: string;
+            remark: string;
+            remark_validation: string;
+            receivingHospitalityInfo: string;
+            giftReason_label: string;
+            giftReason_label_validation: string;
+            giftReceivingDate: string;
+            giftReceivingDate_validation: string;
+            giftHospitalityType: string;
+            giftHospitalityType_validation: string;
+            giftExpensePerHead: string;
+            giftExpensePerHead_validation: string;
+            giftHeadCount: string;
+            giftHeadCount_validation: string;
+            giftEstimatedTotalExpense: string;
+            giftEstimatedTotalExpense_validation: string;
+            giftHospPlace: string;
+            giftHospPlace_validation: string;
+            giftHospEmployeeName: string;
+            giftHospEmployeeName_validation: string;
+            gitfHospEmployeeIsGoSoc: string;
+            giftHospEmployeeIsBayerCustomer: string;
+            giftHospTitle: string;
+            giftHospTitle_validation: string;
+            giftHospEmployeePop_HeadCount: string;
+          };
+        };
         givingHospitality: {
           applyForm: {
             givingHospitalityRequestTitle: string;
@@ -470,6 +499,8 @@ declare namespace App {
             giftReason_label_validation: string;
             giftGivingDate: string;
             giftGivingDate_validation: string;
+            giftGivingCompanyName: string;
+            giftGivingCompanyName_validation: string;
             giftHospitalityType: string;
             giftHospitalityType_validation: string;
             giftExpensePerHead: string;
@@ -523,6 +554,7 @@ declare namespace App {
             giftGivingTitle_validation: string;
             giftRecipientCategory: string;
             giftIsBayerCustomer: string;
+            givingDesc_type_CH_division_noticeContent: string;
             givingDesc_type_option_medicine_noticeTitle: string;
             givingDesc_type_option_medicine_noticeContent: string;
             giftGiving_HCP_option_noticeTitle: string;

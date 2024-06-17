@@ -143,6 +143,11 @@ const local: App.I18n.Schema = {
     'function_hide-child_one': 'Hide Child',
     'function_hide-child_two': 'Two',
     'function_hide-child_three': 'Three',
+    history: 'History',
+    'history_giving-gifts': 'Giving Gifts',
+    'history_receving-gifts': 'Receving Gifts',
+    'history_giving-hospitality': 'Giving Hospitality',
+    'history_receving-hospitality': 'Receving Hospitality',
     apply: 'Apply for',
     'apply_giving-gifts': 'Giving Gifts',
     'apply_receving-gifts': 'Receving Gifts',
@@ -275,6 +280,36 @@ const local: App.I18n.Schema = {
         userEmail: 'email'
       }
     },
+    receivingHospitality: {
+      applyForm: {
+        receivingHospitalityRequestTitle: 'New Receiving Hospitality Request Form',
+        remark: 'Remarks',
+        remark_validation: 'Please fill in hospitality remarks',
+        receivingHospitalityInfo: 'Receiving Hospitality Information',
+        giftReason_label: 'Why are you going to provide this hospitable activity',
+        giftReason_label_validation: 'Please input provide this hopitable reson',
+        giftReceivingDate: 'Date of Activity',
+        giftReceivingDate_validation: 'Please select date of activity',
+        giftHospitalityType: 'Please describe the hospitable activity',
+        giftHospitalityType_validation: 'Such as: meals, tea breaks, etc',
+        giftExpensePerHead: 'Estimated expense per head',
+        giftExpensePerHead_validation: 'Please input estimated expense per head',
+        giftHeadCount: 'Number of invitees',
+        giftHeadCount_validation: 'Please input number of invitees',
+        giftEstimatedTotalExpense: 'Estimated total expense',
+        giftEstimatedTotalExpense_validation: 'Please input estimated total expense',
+        giftHospPlace: 'Name of the place',
+        giftHospPlace_validation: 'Please input take place',
+        giftHospEmployeeName: 'Name of recipient',
+        giftHospEmployeeName_validation: 'Please input recipient name',
+        gitfHospEmployeeIsGoSoc: 'Categories of recipients',
+        giftHospEmployeeIsBayerCustomer: 'Is the recipient a current Bayer customer?',
+        giftHospTitle: 'person title',
+        giftHospTitle_validation: 'Please input person title',
+        giftHospEmployeePop_HeadCount: 'invitees'
+      }
+    },
+
     givingHospitality: {
       applyForm: {
         givingHospitalityRequestTitle: 'New Giving Hospitality Request Form',
@@ -285,6 +320,8 @@ const local: App.I18n.Schema = {
         giftReason_label_validation: 'Please input provide this hopitable reson',
         giftGivingDate: 'Date of Activity',
         giftGivingDate_validation: 'Please select date of activity',
+        giftGivingCompanyName: "Recipient's Company/Entity Name",
+        giftGivingCompanyName_validation: "Please input recipient's Company/Entity Name",
         giftHospitalityType: 'Please describe the hospitable activity',
         giftHospitalityType_validation: 'Such as: meals, tea breaks, etc',
         giftExpensePerHead: 'Estimated expense per head',
@@ -648,6 +685,8 @@ const local: App.I18n.Schema = {
         giftGivingTitle_validation: 'Please input title of recipient',
         giftRecipientCategory: 'Recipient Category',
         giftIsBayerCustomer: 'Is the recipient a current Bayer customer',
+        givingDesc_type_CH_division_noticeContent:
+          'Gift category: Promotional AIDS provided to HCP when promoting OTC products, gift amount > 100 yuan/person or gift category: Purchase custom gifts (only for dealers, only for Spring Festival and Mid-Autumn Festival) Gift amount > 200 yuan/person, please select "Other Gifts" to apply',
         givingDesc_type_option_medicine_noticeTitle: 'Gift Medicine Notice',
         givingDesc_type_option_medicine_noticeContent:
           'It is prohibited to give prescription drugs and Class A over-the-counter drugs as gifts. Other drugs are not allowed in principle. In very special cases, the line manager, the department manager (CMT member) and the compliance department should be donated after prior evaluation and approval. Please specify the reason for your gift in Remark.',

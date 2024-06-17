@@ -6,6 +6,7 @@ const api_url = {
   // group_update: '/gifts/group/update',
   process_task_list: '/process//task/page',
   process_current_run_task_count: 'process/task/current/run-count',
+  receiving_hospitality_list: '/hospitality/receiving/page',
   giving_hospitality_list: '/hospitality/giving/page',
   giving_hospitaltiy_save: '/hospitality/giving/save',
   giving_hospitality_cancel: '/hospitality/giving/cancel',
@@ -22,10 +23,25 @@ const api_url = {
   user_list: '/sys/user/page'
 };
 
+export function uploadFile(formData: any) {
+  return request({
+    url: `sys/upload/module/file`,
+    method: 'post',
+    data: formData
+  });
+}
+
 export function exportFile(fileId: any) {
   return request({
     url: `sys/download/file/${fileId}`,
     method: 'post'
+  });
+}
+
+export function getReceivingHospitalityByApplicationId(id: any) {
+  return request<Api.Gifts.ReceivingHospitality>({
+    url: `hospitality/receiving/get/${id}`,
+    method: 'get'
   });
 }
 
@@ -36,9 +52,23 @@ export function getGivingHospitalityByApplicationId(id: any) {
   });
 }
 
+export function getGivingHospitalityHistoryByApplicationId(id: any) {
+  return request<Api.Gifts.GivingHospitality>({
+    url: `hospitality/giving/get/history/${id}`,
+    method: 'get'
+  });
+}
+
 export function getGivingGiftsByApplicationId(id: any) {
   return request<Api.Gifts.GivingGifts>({
     url: `gifts/giving/get/${id}`,
+    method: 'get'
+  });
+}
+
+export function getGivingGiftsHistoryByApplicationId(id: any) {
+  return request<Api.Gifts.GivingGifts>({
+    url: `gifts/giving/get/history/${id}`,
     method: 'get'
   });
 }
@@ -252,6 +282,14 @@ export function fetchReceivingGiftsList(queryParam: any) {
 export function fetchGivingGiftsList(queryParam: any) {
   return request<Api.Gifts.TableListResponse>({
     url: api_url.giving_gifts_list,
+    method: 'post',
+    data: queryParam
+  });
+}
+
+export function fetchReceivingHospitalityList(queryParam: any) {
+  return request<Api.Gifts.TableListResponse>({
+    url: api_url.receiving_hospitality_list,
     method: 'post',
     data: queryParam
   });

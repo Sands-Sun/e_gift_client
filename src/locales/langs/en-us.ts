@@ -1235,6 +1235,7 @@ const local: App.I18n.Schema = {
       option_not_Applicable: 'Not Applicable',
       upload_person_label: 'Attachment (you can add a file with multiple names)',
       upload_template: 'Template download',
+      user_manual: 'User Manual download',
       system_prompt: 'System prompt',
       person_quantity_notMatch: 'The personnel do not match the quantity',
       option_giftReason_Other:

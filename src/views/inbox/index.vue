@@ -1359,7 +1359,7 @@ onMounted(async () => {
                 <a-form-item
                   :label-col="{ span: 10 }"
                   :wrapper-col="{ span: 14 }"
-                  :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
+                  :label="$t('page.givingGifts.applyForm.giftGivingEmployeeName')"
                   :name="['personList', index, 'personName']"
                 >
                   <a-input v-model:value="person.personName"></a-input>
@@ -1370,7 +1370,7 @@ onMounted(async () => {
                 <a-form-item
                   :label-col="{ span: 12 }"
                   :wrapper-col="{ span: 12 }"
-                  :label="$t('page.receivingGifts.applyForm.giftGiverTitle_validation')"
+                  :label="$t('page.givingGifts.applyForm.giftGivingTitle')"
                   :name="['personList', index, 'positionTitle']"
                 >
                   <a-input v-model:value="person.positionTitle"></a-input>

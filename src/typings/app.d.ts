@@ -691,6 +691,7 @@ declare namespace App {
           option_not_Applicable: string;
           upload_person_label: string;
           upload_template: string;
+          user_manual: string;
           system_prompt: string;
           person_quantity_notMatch: string;
           option_giftReason_NewYear: string;

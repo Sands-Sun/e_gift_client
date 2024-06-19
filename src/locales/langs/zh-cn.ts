@@ -1107,6 +1107,7 @@ const local: App.I18n.Schema = {
       upload_file_success: '文件：{fileName} 上传成功！',
       upload_person_label: '附件(您能添加一个包含多个名字的文件)',
       upload_template: '模板下载',
+      user_manual: '用户手册下载',
       system_prompt: '系统提示',
       person_quantity_notMatch: '人员与数量不符',
       unitPrice: '单价',

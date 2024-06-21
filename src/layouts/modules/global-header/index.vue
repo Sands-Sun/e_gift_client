@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useFullscreen } from '@vueuse/core';
 import { useAppStore } from '@/store/modules/app';
-import { useThemeStore } from '@/store/modules/theme';
 import { useRouteStore } from '@/store/modules/route';
-import HorizontalMenu from '../global-menu/base-menu.vue';
-import GlobalLogo from '../global-logo/index.vue';
-import GlobalBreadcrumb from '../global-breadcrumb/index.vue';
+import { useThemeStore } from '@/store/modules/theme';
+import { useFullscreen } from '@vueuse/core';
+import { computed } from 'vue';
 import { useMixMenuContext } from '../../hooks/use-mix-menu';
-import ThemeButton from './components/theme-button.vue';
+import GlobalBreadcrumb from '../global-breadcrumb/index.vue';
+import GlobalLogo from '../global-logo/index.vue';
+import HorizontalMenu from '../global-menu/base-menu.vue';
 import UserAvatar from './components/user-avatar.vue';
 
 defineOptions({
@@ -54,6 +53,7 @@ const headerMenus = computed(() => {
       <GlobalBreadcrumb v-if="!appStore.isMobile" class="ml-12px" />
     </div>
     <div class="h-full flex-y-center justify-end">
+      <UserManual />
       <FullScreen v-if="!appStore.isMobile" :full="isFullscreen" @click="toggle" />
       <LangSwitch :lang="appStore.locale" :lang-options="appStore.localeOptions" @change-lang="appStore.changeLocale" />
       <ThemeSchemaSwitch

@@ -70,6 +70,7 @@ declare module 'vue' {
     SvgIcon: typeof import('./../components/custom/svg-icon.vue')['default']
     SystemLogo: typeof import('./../components/common/system-logo.vue')['default']
     ThemeSchemaSwitch: typeof import('./../components/common/theme-schema-switch.vue')['default']
+    UserManual: typeof import('./../components/common/user-manual.vue')['default']
     WaveBg: typeof import('./../components/custom/wave-bg.vue')['default']
   }
 }

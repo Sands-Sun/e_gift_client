@@ -1,0 +1,1768 @@
+<script setup lang="ts">
+import { $t } from '@/locales';
+import {
+  cancelGivingHospitality,
+  copyGivingHospitality,
+  deleteDraftGivingHospitality,
+  feachDeptHeadGroupUsers,
+  fetchGetUserInfoById,
+  fetchGivingHospitalityList,
+  fuzzySearchUserList,
+  getGivingHospitalityByApplicationId,
+  saveGivingHospitality,
+  updateGivingHospitality
+} from '@/service/api';
+import { useAuthStore } from '@/store/modules/auth';
+import { getServiceBaseURL } from '@/utils/service';
+import type { SelectProps } from '@ant-design/icons-vue';
+import {
+  ExclamationCircleOutlined,
+  MinusCircleOutlined,
+  PlusCircleOutlined,
+  UploadOutlined
+} from '@ant-design/icons-vue';
+import type { FormInstance, TableColumnsType, UploadChangeParam, UploadProps } from 'ant-design-vue';
+import { Modal, Upload, message } from 'ant-design-vue';
+import type { Rule } from 'ant-design-vue/es/form';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { debounce } from 'lodash-es';
+import { computed, createVNode, h, nextTick, onMounted, reactive, ref, toRaw, watch } from 'vue';
+let authStore: any;
+let userInfo: Api.Auth.UserInfo;
+// let supervisorInfo: Api.Auth.UserInfo;
+const applyUserInfo = ref<Api.Auth.UserInfo>();
+const applyUserSupervisorInfo = ref<Api.Auth.UserInfo>();
+const hospCancelFormRef = ref();
+const openCancelModal = ref<boolean>(false);
+const uploadFileList = ref([] as any);
+const openApplyDrawerModal = ref<boolean>(false);
+const expandSearchFields = ref(true);
+const expandPolicyDescription = ref(true);
+const listTableLoading = ref(true);
+const showAddPersonModal = ref<boolean>(false);
+const givingHospitalityFromStatus = reactive({ disableStatus: false, descTypeHistory: false, actionStatus: '' });
+const listDataSource = ref([] as any);
+const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'N';
+const { baseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
+const givingHospitalityFormRef = ref<FormInstance>();
+const addPersonModalFormRef = ref<FormInstance>();
+const searchRangeDate = ref<[Dayjs, Dayjs]>();
+const applySearch = ref<string>('');
+const ccApplyOptions = ref<SelectProps['options']>([]);
+const applyOptions = ref<SelectProps['options']>([]);
+const userState = reactive({ data: [] as any, ccData: [] as any, fetching: true });
+const deptHeadGroupUserState = reactive({ data: [] as any, hidden: true });
+const applyFormCancelModelRef = reactive({ remark: undefined, applicationId: '' });
+const searchFormRef = ref<FormInstance>();
+let currentCompanyState = reactive<{
+  companyName: string;
+  personList: Api.Gifts.GiftPerson[];
+  key: number;
+}>({
+  companyName: '',
+  personList: [],
+  key: 0
+});
+const searchFormModelRef = reactive({
+  newVersion: 'N',
+  userId: '',
+  userName: '',
+  reference: '',
+  companyCode: '',
+  creator: '',
+  cwid: '',
+  status: '',
+  type: '',
+  beginDate: '',
+  endDate: '',
+  currentPage: 1,
+  pageSize: 5,
+  orders: [] as any[]
+});
+
+const applyModelRef = reactive<{
+  actionType: string;
+  applicationId: string;
+  createDate: string;
+  reference: string;
+  applyName: string | undefined;
+  applyForId: number;
+  deptHead: string | undefined;
+  copyToUserEmails: string[];
+  applyCCName: string[];
+  reason: string;
+  hospitalityType: string;
+  hospPlace: string;
+  date: string;
+  companyList: Api.Gifts.GiftCompany[];
+  hospActivities: unknown[];
+  expensePerHead: number | undefined;
+  headCount: number | undefined;
+  estimatedTotalExpense: number | undefined;
+  remark: string;
+  fileId: unknown;
+}>({
+  actionType: '',
+  applicationId: '',
+  createDate: dayjs().format('YYYY-MM-DD'),
+  reference: '',
+  applyName: undefined as any,
+  applyForId: undefined as any,
+  deptHead: undefined as any,
+  copyToUserEmails: [] as any,
+  applyCCName: undefined as any,
+  reason: '',
+  hospitalityType: '',
+  hospPlace: '',
+  // reasonType: '',
+  // giftDescType: '',
+  // giftDesc: '',
+  date: dayjs().format('YYYY-MM-DD'),
+  companyList: [],
+  hospActivities: [] as any,
+  // isGoSoc: '',
+  // isBayerCustomer: '',
+  // givingTitle: '',
+  expensePerHead: undefined as any, // 估计人均费用
+  headCount: undefined as any, // 受邀人人数
+  estimatedTotalExpense: undefined as any, // 估计的总费用
+  remark: '',
+  fileId: undefined
+});
+
+const listPagination = ref({
+  current: 1,
+  pageSize: 5,
+  total: 0
+});
+
+const columns: TableColumnsType = [
+  {
+    title: 'form.applicateInfo.applyFor',
+    width: 100,
+    dataIndex: 'sfUserAppliedName',
+    key: 'SF_USER_APPLIED_NAME',
+    fixed: 'left'
+  },
+  {
+    title: 'form.applicateInfo.applyDate',
+    sorter: true,
+    width: 100,
+    dataIndex: 'createdDate',
+    key: 'ba.CREATED_DATE',
+    fixed: 'left'
+  },
+  { title: 'form.common.reference', sorter: true, dataIndex: 'reference', key: 'REFERENCE', width: 120 },
+  { title: 'form.applicateInfo.applyForCwid', dataIndex: 'sfUserAppliedCwid', key: 'SF_USER_APPLIED_CWID', width: 100 },
+  { title: 'form.applicateInfo.department', dataIndex: 'department', key: 'DEPARTMENT', width: 150 },
+  { title: 'form.applicateInfo.employeeLe', dataIndex: 'employeeLe', key: 'COMPANY_CODE', width: 150 },
+  { title: 'form.searchFrom.applyType', dataIndex: 'requestType', key: 'requestType', width: 150 },
+  {
+    title: 'page.givingHospitality.applyForm.giftGivingDate',
+    sorter: true,
+    width: 100,
+    dataIndex: 'hospitalityDate',
+    key: 'HOSPITALITY_DATE'
+  },
+  { title: 'form.searchFrom.applyStatus', sorter: true, dataIndex: 'status', key: 'status', width: 150 },
+  {
+    title: 'common.action',
+    key: 'operation',
+    fixed: 'right',
+    width: 100
+  }
+];
+
+// 清空记录
+const clearApplyModel = () => {
+  applyModelRef.actionType = '';
+  applyModelRef.applicationId = '';
+  applyModelRef.reference = '';
+  applyModelRef.deptHead = undefined;
+  applyModelRef.applyName = undefined;
+  applyModelRef.applyForId = -1;
+  applyModelRef.copyToUserEmails = [];
+  applyModelRef.applyCCName = [];
+  applyModelRef.reason = '';
+  applyModelRef.hospitalityType = '';
+  applyModelRef.hospPlace = '';
+  applyModelRef.date = dayjs().format('YYYY-MM-DD');
+  applyModelRef.companyList = [];
+  applyModelRef.hospActivities = [];
+  applyModelRef.expensePerHead = undefined;
+  applyModelRef.headCount = undefined;
+  applyModelRef.estimatedTotalExpense = 0;
+  applyModelRef.remark = '';
+  uploadFileList.value = [];
+  givingHospitalityFromStatus.disableStatus = false;
+  deptHeadGroupUserState.hidden = true;
+};
+
+const openAddPersonModal = (item: Api.Gifts.GiftCompany) => {
+  currentCompanyState = item;
+  showAddPersonModal.value = true;
+};
+
+const removeCompany = (item: Api.Gifts.GiftCompany) => {
+  if (givingHospitalityFromStatus.disableStatus) {
+    return;
+  }
+  const index = applyModelRef.companyList.indexOf(item);
+  if (index !== -1) {
+    applyModelRef.companyList.splice(index, 1);
+  }
+};
+
+const addCompany = () => {
+  if (givingHospitalityFromStatus.disableStatus) {
+    return;
+  }
+  applyModelRef.companyList.push({
+    id: -1,
+    description: '',
+    companyName: '',
+    key: Date.now(),
+    personList: [
+      {
+        id: -1,
+        personName: '',
+        positionTitle: '',
+        isGoSoc: '',
+        isBayerCustomer: '',
+        description: '',
+        unitValue: undefined,
+        volume: undefined,
+        companyId: -1,
+        key: Date.now()
+      }
+    ]
+  });
+};
+
+const removePerson = (person: Api.Gifts.GiftPerson) => {
+  if (givingHospitalityFromStatus.disableStatus) {
+    return;
+  }
+  const applyCompany = applyModelRef.companyList.filter(c => c.key === currentCompanyState.key);
+  if (applyCompany) {
+    const index = applyCompany[0].personList.indexOf(person);
+    if (index !== -1) {
+      applyCompany[0].personList.splice(index, 1);
+    }
+  }
+};
+
+const checkFirstPerson = () => {
+  const applyCompany = applyModelRef.companyList.filter(c => c.key === currentCompanyState.key);
+  let result;
+  if (applyCompany.length > 0) {
+    result = applyCompany[0].personList.length > 1;
+  }
+  return result;
+};
+
+const addPerson = () => {
+  if (givingHospitalityFromStatus.disableStatus) {
+    return;
+  }
+  currentCompanyState.personList.push({
+    id: -1,
+    personName: '',
+    positionTitle: '',
+    isGoSoc: '',
+    isBayerCustomer: '',
+    unitValue: undefined,
+    volume: undefined,
+    description: '',
+    companyId: -1,
+    key: Date.now()
+  });
+};
+
+const onSubmitAddPerson = () => {
+  addPersonModalFormRef?.value?.validate().then(() => {
+    showAddPersonModal.value = false;
+  });
+};
+
+const onCancelAddPerson = () => {
+  addPersonModalFormRef?.value?.resetFields();
+  showAddPersonModal.value = false;
+};
+
+const getDeptHeadTooltip = () => {
+  return $t('form.applicateInfo.deptHead_tooltip', { emails: 'zhe.sun.ext@bayer.com, dengzhuo.wang.ext@bayer.com' });
+};
+
+const disabledAfterCurrentDate = (current: Dayjs) => {
+  // Can not select days after today and today
+  return current && current > dayjs().endOf('day');
+};
+
+const loadDeptHeadGroupUserData = debounce(async () => {
+  if (!userInfo.companyCode) {
+    deptHeadGroupUserState.data = [];
+  }
+  const { data: items, error } = await feachDeptHeadGroupUsers(userInfo.companyCode, userInfo.division);
+  if (!error) {
+    deptHeadGroupUserState.data = items;
+    console.log('users: ', deptHeadGroupUserState);
+  }
+}, 800);
+
+const applyFormCancelRules: Record<string, Rule[]> = reactive({
+  remark: [{ required: true, message: $t('form.common.cancelReson') }]
+});
+
+const loadUserData = debounce(async (keyword: string, type: string, baseOnCompany: boolean) => {
+  if (!keyword) {
+    type === 'apply' ? (userState.data = []) : (userState.ccData = []);
+  }
+  const queryParam = { keyword, baseOnCompany, division: '' };
+  if (baseOnCompany && userInfo.companyCode === '0882') {
+    queryParam.division = userInfo.division;
+  }
+  const { data: items, error } = await fuzzySearchUserList(queryParam);
+  if (!error) {
+    console.log('userInfo:', items);
+    if (applySearch.value !== keyword) {
+      return;
+    }
+    type === 'apply' ? (userState.data = items) : (userState.ccData = items);
+    userState.fetching = false;
+    console.log('users: ', userState);
+  }
+}, 800);
+
+const onApplySearch = (searchValue: string) => {
+  applySearch.value = searchValue;
+  userState.data = [];
+  userState.fetching = true;
+  console.log('Search:', searchValue);
+  loadUserData(searchValue, 'apply', true);
+};
+
+const onApplyCCSearch = (searchValue: string) => {
+  applySearch.value = searchValue;
+  userState.ccData = [];
+  userState.fetching = true;
+  console.log('Search:', searchValue);
+  loadUserData(searchValue, 'applyCC', false);
+};
+
+const deptHeadGroupUserOptions = computed<SelectProps['options']>(() =>
+  deptHeadGroupUserState.data.map((item: any) => ({
+    label: `${item.userFirstName} ${item.userLastName} <${item.userEmail}>`,
+    value: item.userEmail
+  }))
+);
+
+// const ccApplyOptions = computed<SelectProps['options']>(() =>
+//   userState.data.map((user: any) => ({
+//     label: `${user.firstName} ${user.lastName} <${user.email}>`,
+//     value: user.email
+//   }))
+// );
+
+// const applyOptions = computed<SelectProps['options']>(() =>
+//   userState.data.map((user: any) => ({
+//     label: `${user.firstName} ${user.lastName} <${user.email}>`,
+//     value: user.email
+//   }))
+// );
+
+const handleChangeApplyUser = (item: any) => {
+  console.log('apply user option: ', item);
+  if (item) {
+    applyModelRef.applyName = item.value;
+  }
+};
+
+const handleChangeDeptHeadUser = (item: any) => {
+  console.log('department user option: ', item);
+  if (item) {
+    applyModelRef.deptHead = item.value;
+  }
+};
+
+const handleChangeTotalExpense = (value: any) => {
+  console.log(value);
+  if (value) {
+    applyModelRef.estimatedTotalExpense = value;
+  }
+};
+
+const handleUploadChange = ({ file, fileList }: UploadChangeParam) => {
+  if (file.status === 'done') {
+    message.success(
+      $t('form.common.upload_file_success', {
+        fileName: `${file.name}`
+      })
+    );
+    applyModelRef.fileId = fileList[0].response?.data?.id;
+    fileList.forEach(f => {
+      f.url = `${baseURL}/sys/download/file?fileId=${applyModelRef.fileId}`;
+    });
+  } else if (file.status === 'error') {
+    message.error(`${file.name} file upload failed.`);
+  }
+};
+const beforeUpload: UploadProps['beforeUpload'] = file => {
+  const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  if (!isExcel) {
+    message.error(`${file.name} is not a xlsx file`);
+  }
+  return isExcel || Upload.LIST_IGNORE;
+};
+
+const getTemplateUrl = () => {
+  let tempSuffix;
+  if (userInfo.companyCode === '0813') {
+    tempSuffix = '0813';
+  } else if (userInfo.companyCode === '2614' || userInfo.companyCode === '1391') {
+    tempSuffix = '2614_1391';
+  } else {
+    tempSuffix = '1954_1955_0882';
+  }
+  return `${baseURL}/sys/download/template?module=CompanyPerson&fileName=eHospCompanyPersonTemplate_${tempSuffix}.xlsx`;
+};
+
+// 搜索按钮，
+const getListDataByCondition = async (pag?: { pageSize: number; current: number }) => {
+  // get search date
+  listTableLoading.value = true;
+  if (typeof searchRangeDate.value !== 'undefined') {
+    searchFormModelRef.beginDate = searchRangeDate.value[0].format('YYYY-MM-DD');
+    searchFormModelRef.endDate = searchRangeDate.value[1].format('YYYY-MM-DD');
+  }
+  searchFormModelRef.currentPage = pag?.current ? pag?.current : 1;
+  searchFormModelRef.pageSize = pag?.pageSize ? pag?.pageSize : 5;
+  const { data: queryResult, error } = await fetchGivingHospitalityList(searchFormModelRef);
+  console.log(queryResult);
+  listDataSource.value = [];
+  if (!error) {
+    if (queryResult.list !== null && queryResult.list?.length > 0) {
+      listDataSource.value = queryResult?.list;
+      listPagination.value.total = queryResult?.totalCount ? queryResult?.totalCount : 0;
+      listPagination.value.current = queryResult?.currPage ? queryResult?.currPage : 1;
+      listPagination.value.pageSize = queryResult?.pageSize ? queryResult?.pageSize : 5;
+    }
+  }
+  listTableLoading.value = false;
+};
+
+const showCancelModal = () => {
+  openCancelModal.value = true;
+};
+
+const closeCancelModal = () => {
+  openCancelModal.value = false;
+};
+
+const closeApplyDrawerModal = () => {
+  openApplyDrawerModal.value = false;
+  uploadFileList.value.length = 0;
+  givingHospitalityFromStatus.disableStatus = false;
+  applyOptions.value.length = 0;
+  ccApplyOptions.value.length = 0;
+  userState.data = [];
+  userState.ccData = [];
+};
+
+const onSubmitCancel = () => {
+  hospCancelFormRef.value
+    .validate()
+    .then(() => {
+      Modal.confirm({
+        title: $t('common.tip'),
+        icon: createVNode(ExclamationCircleOutlined),
+        content: $t('common.confirmCancel'),
+        okText: $t('common.confirm'),
+        cancelText: $t('common.cancel'),
+        async onOk() {
+          const requestParam = toRaw(applyFormCancelModelRef);
+          requestParam.applicationId = applyModelRef.applicationId;
+          console.log(requestParam);
+          const { error } = await cancelGivingHospitality(requestParam);
+          if (!error) {
+            console.log('success!');
+            hospCancelFormRef.value?.resetFields();
+            closeCancelModal();
+            closeApplyDrawerModal();
+            getListDataByCondition();
+          }
+        },
+        onCancel() {
+          console.log('cancel');
+        }
+      });
+    })
+    .catch(error => {
+      console.log('error', error);
+    });
+};
+
+// 表格修改
+const handleTableChange = (pag: { pageSize: number; current: number }, filters: any, sorter: any) => {
+  console.log('filter: ', filters);
+  searchFormModelRef.orders = [];
+  if (sorter.columnKey) {
+    searchFormModelRef.orders.push({ column: sorter.columnKey, type: sorter.order === 'ascend' ? 'ASC' : 'DESC' });
+  }
+  getListDataByCondition(pag);
+};
+
+const onFinishSearch = (values: any) => {
+  console.log('Received values of form: ', values);
+  console.log('searchFormModelRef: ', searchFormModelRef);
+};
+
+const resetFromFields = (updateStatus = false) => {
+  givingHospitalityFormRef?.value?.resetFields();
+  addPersonModalFormRef?.value?.resetFields();
+  clearApplyModel();
+
+  if (!updateStatus && applyModelRef.companyList.length === 0) {
+    applyModelRef.companyList.push({
+      id: -1,
+      companyName: '',
+      description: '',
+      key: Date.now(),
+      personList: [
+        {
+          id: -1,
+          personName: '',
+          positionTitle: '',
+          isGoSoc: '',
+          isBayerCustomer: '',
+          companyId: -1,
+          unitValue: undefined,
+          volume: undefined,
+          description: '',
+          key: Date.now()
+        }
+      ]
+    });
+  }
+};
+
+// 前置验证
+const perVerification = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const personArr: Api.Gifts.GiftPerson[] = [];
+    applyModelRef.companyList.forEach(c => {
+      c.personList.forEach(p => {
+        if (p.personName && p.positionTitle) {
+          personArr.push(p);
+        }
+      });
+    });
+    if (!applyModelRef.fileId && applyModelRef.headCount !== personArr.length) {
+      Modal.warning({
+        title: $t('form.common.person_quantity_notMatch'),
+        content: h('div', {}, [
+          h('p', `${$t('page.givingHospitality.applyForm.giftHospEmployeePop_HeadCount')}: ${personArr.length}`),
+          h('p', `${$t('page.givingHospitality.applyForm.giftHeadCount')}: ${applyModelRef.headCount}`)
+        ]),
+        onOk() {
+          console.log('ok');
+        }
+      });
+      reject(new Error('人员与数量不符'));
+      return;
+    }
+    const allNoGeovPerson = personArr.every(p => p.isGoSoc !== 'Yes');
+    console.log('allNoGeovPerson: ', allNoGeovPerson);
+    if (allNoGeovPerson && applyModelRef.expensePerHead && applyModelRef.expensePerHead <= 300) {
+      applyModelRef.expensePerHead = 0;
+      Modal.warning({
+        title: $t('form.common.system_prompt'),
+        content: h('div', {}, [h('p', $t('page.givingHospitality.applyForm.gitfHospNoGovLessThanNotify_message'))]),
+        onOk() {
+          console.log('ok');
+        }
+      });
+
+      reject(new Error('非政府官员且人均小于 300'));
+      return;
+    }
+    resolve();
+  });
+};
+
+const showApplyDrawerModal = async (type: string, item?: any) => {
+  resetFromFields(type === 'Modify');
+  console.log(`type: ${type}item: `, item);
+  givingHospitalityFromStatus.actionStatus = type;
+  console.log('show apply drawer type:', type);
+  if (type === 'Create') {
+    console.log('create...');
+    userState.data = [
+      {
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
+        email: userInfo.email,
+        sfUserId: userInfo.sfUserId
+      }
+    ];
+    applyModelRef.applyName = userInfo.email;
+    setTimeout(() => {
+      openApplyDrawerModal.value = true;
+    }, 500);
+    return;
+  }
+  if (type === 'Modify' && item && item.applicationId) {
+    item.loading = true;
+    console.log('item: {}', item);
+    const { data, error } = await getGivingHospitalityByApplicationId(item.applicationId);
+    if (!error) {
+      givingHospitalityFromStatus.actionStatus = data.status;
+      applyModelRef.createDate = dayjs(data.createdDate).format('YYYY-MM-DD');
+      applyModelRef.applicationId = data.applicationId;
+      applyModelRef.actionType = data.status;
+      applyModelRef.reference = data.reference;
+      userState.data = [
+        {
+          firstName: data.sfUserAppliedFirstName,
+          lastName: data.sfUserAppliedLastName,
+          email: data.sfUserAppliedEmail,
+          sfUserId: data.sfUserIdAppliedFor
+        }
+      ];
+      applyModelRef.applyName = data.sfUserAppliedEmail;
+
+      if (data.copyToUsers) {
+        const ccOptions = [] as any;
+        data.copyToUsers.forEach((user: any) => {
+          // 排除申请人信息
+          if (user.copytoEmail !== userInfo.email) {
+            ccOptions.push({
+              firstName: user.copytoFirstName,
+              lastName: user.copytoLastName,
+              email: user.copytoEmail
+            });
+            // ccApplyOptions.value.push({
+            //   label: `${user.copytoFirstName} ${user.copytoLastName} <${user.copytoEmail}>`,
+            //   value: user.copytoEmail,
+            //   userId: user.sfUserIdCopyTo
+            // });
+          }
+        });
+        userState.ccData = ccOptions;
+        applyModelRef.applyCCName = ccOptions.map((v: any) => v.email);
+      }
+      if (data.deptHeadGroup && data.deptHeadGroup.userToGroups.length > 0) {
+        deptHeadGroupUserState.hidden = false;
+        const deptHeadUser = data.deptHeadGroup.userToGroups[0];
+        applyModelRef.deptHead = deptHeadUser.userEmail;
+      }
+      if (data.fileAttach) {
+        const attach = data.fileAttach;
+        uploadFileList.value.push({
+          uid: attach.id,
+          name: attach.origFileName,
+          size: Number.parseInt(attach.fileSize, 2),
+          url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+        });
+      }
+      applyModelRef.expensePerHead = data.hospRef.expensePerHead;
+      applyModelRef.headCount = data.hospRef.headCount;
+      applyModelRef.hospitalityType = data.hospRef.hospitalityType;
+      applyModelRef.hospPlace = data.hospRef.hospPlace;
+      applyModelRef.date = dayjs(data.hospRef.hospitalityDate).format('YYYY-MM-DD');
+      data.companyList.forEach(c => {
+        const company = {
+          id: c.id,
+          companyName: c.companyName,
+          description: c.description,
+          key: Date.now(),
+          personList: [] as any
+        };
+        c.personList.forEach(p => {
+          const person = {
+            id: p.id,
+            personName: p.personName,
+            positionTitle: p.positionTitle,
+            isGoSoc: p.isGoSoc,
+            isBayerCustomer: p.isBayerCustomer,
+            companyId: p.companyId,
+            description: p.description,
+            key: Date.now()
+          };
+          company.personList.push(person);
+        });
+        applyModelRef.companyList.push(company);
+      });
+      applyModelRef.reason = data.reason;
+      // applyModelRef.isHandedOver = data.isHandedOver;
+      applyModelRef.remark = data.remark;
+      //  hadle history reocrd
+
+      console.log('success:', data);
+
+      if (data.status !== 'Draft') {
+        applyModelRef.hospActivities = data.hospActivities;
+        givingHospitalityFromStatus.disableStatus = true;
+      }
+    }
+    setTimeout(() => {
+      item.loading = false;
+      openApplyDrawerModal.value = true;
+    }, 1000);
+  }
+};
+
+// 保存提交
+const onSubmitApply = (value: string) => {
+  perVerification()
+    .then(() => {
+      givingHospitalityFormRef?.value
+        ?.validate()
+        .then(() => {
+          let confirmContent = '';
+          if (value === 'Draft') {
+            console.log('update draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+          } else if (value === 'Submit') {
+            console.log('modify submit...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+          }
+          console.log(`submit type ${value}`);
+          Modal.confirm({
+            title: $t('common.tip'),
+            icon: createVNode(ExclamationCircleOutlined),
+            content: confirmContent,
+            okText: $t('common.confirm'),
+            cancelText: $t('common.cancel'),
+            async onOk() {
+              // debugger;
+              const requestParam = toRaw(applyModelRef);
+              requestParam.actionType = value;
+              // requestParam.applyForId = requestParam.applyName.userId;
+              requestParam.copyToUserEmails = requestParam.applyCCName;
+              console.log(requestParam);
+              console.log(requestParam.date.toString());
+              const { error } = await saveGivingHospitality(requestParam);
+              if (!error) {
+                console.log('success!');
+                resetFromFields();
+                closeApplyDrawerModal();
+                getListDataByCondition();
+              }
+            },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onCancel() {
+              console.log('cancel');
+            }
+          });
+        })
+        .catch(err => {
+          console.log('error', err);
+        });
+    })
+    .catch(err => {
+      console.log('error per validation', err);
+    });
+};
+
+// 修改提交
+const onModifyApply = (value: string) => {
+  perVerification()
+    .then(() => {
+      givingHospitalityFormRef?.value
+        ?.validate()
+        .then(() => {
+          let confirmContent = '';
+          if (value === 'Draft') {
+            console.log('update draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.saveDraft')} ?`;
+          } else if (value === 'Submit') {
+            console.log('modify submit...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.submit')} ?`;
+          } else if (value === 'Delete') {
+            console.log('modify delete draft...');
+            confirmContent = `${$t('common.confirm')} ${$t('common.delete')} ?`;
+          } else if (value === 'Copy') {
+            confirmContent = `${$t('common.confirm')} ${$t('common.copy')} ?`;
+          }
+          Modal.confirm({
+            title: $t('common.tip'),
+            icon: createVNode(ExclamationCircleOutlined),
+            content: confirmContent,
+            okText: $t('common.confirm'),
+            cancelText: $t('common.cancel'),
+            async onOk() {
+              // debugger;
+              const requestParam = toRaw(applyModelRef);
+              requestParam.actionType = value;
+              // requestParam.applyForId = requestParam.applyName.userId;
+              requestParam.copyToUserEmails = requestParam.applyCCName;
+              // const applyDate = requestParam.date.format('YYYY-MM-DD');
+              console.log(requestParam);
+              console.log(requestParam.date.toString());
+              if (value === 'Draft' || value === 'Submit') {
+                console.log('update draft...');
+                await updateGivingHospitality(requestParam);
+              } else if (value === 'Delete') {
+                console.log('modify delete draft...');
+                await deleteDraftGivingHospitality(requestParam.applicationId);
+              } else if (value === 'Copy') {
+                // debugger;
+                const item = await copyGivingHospitality(requestParam.applicationId);
+                console.log('copyApplicationId: ', item.data);
+                showApplyDrawerModal('Modify', { applicationId: item.data, loading: false });
+                getListDataByCondition();
+                return;
+              }
+              resetFromFields();
+              closeApplyDrawerModal();
+              getListDataByCondition();
+            },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            onCancel() {
+              console.log('cancel');
+            }
+          });
+        })
+        .catch(err => {
+          console.log('error', err);
+        });
+    })
+    .catch(err => {
+      console.log('error per validation', err);
+    });
+};
+
+// 重置申请列表
+const resetApplyFrom = () => {
+  Modal.confirm({
+    title: $t('common.tip'),
+    icon: createVNode(ExclamationCircleOutlined),
+    content: `${$t('common.confirm')} ${$t('common.reset')} ?`,
+    okText: $t('common.confirm'),
+    cancelText: $t('common.cancel'),
+    async onOk() {
+      resetFromFields();
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onCancel() {
+      console.log('cancel');
+    }
+  });
+};
+
+// 重置search表单
+const resetSearchForm = () => {
+  nextTick(() => {
+    searchRangeDate.value = undefined;
+    searchFormModelRef.beginDate = '';
+    searchFormModelRef.endDate = '';
+    searchFormRef?.value?.resetFields();
+    getListDataByCondition();
+  });
+};
+
+onMounted(async () => {
+  authStore = useAuthStore();
+  userInfo = authStore.userInfo;
+  // supervisorInfo = userInfo.supervisor;
+  applyUserInfo.value = authStore.userInfo;
+  applyUserSupervisorInfo.value = authStore.userInfo;
+  console.log(`creator companycode:${userInfo.companyCode}`);
+  console.log(`apply user isDeptHead: ${applyUserInfo?.value?.isDeptHead}`);
+  console.log(`apply user isCountryHead: ${applyUserInfo?.value?.isCountryHead}`);
+  loadDeptHeadGroupUserData();
+  const listData = await fetchGivingHospitalityList({ userId: authStore.userInfo.sfUserId, newVersion: 'Y' });
+  listTableLoading.value = false;
+  if (listData?.data?.list && listData.data.list.length > 0) {
+    listDataSource.value = [];
+    listDataSource.value = listData.data.list;
+    listPagination.value.total = listData.data.totalCount;
+    listPagination.value.current = listData.data.currPage;
+    listPagination.value.pageSize = listData.data.pageSize;
+  }
+});
+
+// 重新加载申请人信息
+const fillInApplyUserInfo = async (newValue: string, oldValue: string) => {
+  if (newValue !== oldValue) {
+    // debugger;
+    const applyOpt = userState.data.filter(a => a.email === applyModelRef.applyName);
+    console.log(applyOpt);
+    if (applyOpt.length > 0) {
+      const { data, error } = await fetchGetUserInfoById(applyOpt[0].sfUserId);
+      if (!error) {
+        // console.log(data);
+        applyUserInfo.value = data;
+        applyUserSupervisorInfo.value = data.supervisor;
+      }
+    }
+  }
+};
+
+const hideDeptHeadDropDown = (newPerHead: number, newHeadCount: number) => {
+  applyModelRef.estimatedTotalExpense = Number.isNaN(newPerHead * newHeadCount) ? undefined : newPerHead * newHeadCount;
+  // 隐藏部门经理下拉列表
+  deptHeadGroupUserState.hidden = false;
+  if (applyUserInfo?.value?.isCountryHead || applyUserInfo?.value?.isDeptHead) {
+    deptHeadGroupUserState.hidden = true;
+  }
+  if (!newPerHead || newPerHead <= 300) {
+    deptHeadGroupUserState.hidden = true;
+  }
+};
+
+watch(
+  () => [
+    applyModelRef.applyName,
+    userState.data,
+    userState.ccData,
+    applyModelRef.expensePerHead,
+    applyModelRef.headCount,
+    applyModelRef.companyList
+  ],
+  (
+    [newApplyName, newUserVal, newUserCCVal, newPerHead, newHeadCount, newCompanyList],
+    [oldApplyName, oldUserVal, oldUserCCVal, oldPerHead, oldHeadCount, oldCompanyList]
+  ) => {
+    console.log('newApplyName:', newApplyName);
+    console.log('newUserVal:', newUserVal);
+    console.log('newUserCCVal:', newUserCCVal);
+    console.log('oldUserVal:', oldUserVal);
+    console.log('oldUserCCVal:', oldUserCCVal);
+    console.log('oldApplyName:', oldApplyName);
+    console.log('newPerHead: ', newPerHead);
+    console.log('newHeadCount: ', newHeadCount);
+    console.log('oldPerHead: ', oldPerHead);
+    console.log('oldHeadCount: ', oldHeadCount);
+    console.log('newCompanyList:', newCompanyList);
+    console.log('oldCompanyList:', oldCompanyList);
+
+    ccApplyOptions.value = userState.ccData.map((user: any) => ({
+      label: `${user.firstName} ${user.lastName} <${user.email}>`,
+      value: user.email
+    }));
+
+    applyOptions.value = userState.data.map((user: any) => ({
+      label: `${user.firstName} ${user.lastName} <${user.email}>`,
+      value: user.email,
+      sfUserId: user.sfUserId
+    }));
+    fillInApplyUserInfo(newApplyName, oldApplyName).then(() => {
+      hideDeptHeadDropDown(newPerHead, newHeadCount);
+    });
+  }
+);
+</script>
+
+<template>
+  <div>
+    <a-drawer
+      :title="$t('page.givingHospitality.applyForm.givingHospitalityRequestTitle')"
+      width="75%"
+      size="large"
+      :open="openApplyDrawerModal"
+      @close="closeApplyDrawerModal"
+    >
+      <a-descriptions :title="$t('form.applicateInfo.formFillerInfoTitle')" :column="2">
+        <a-descriptions-item :label="$t('form.applicateInfo.formFiller')">
+          {{ userInfo.firstName }} {{ userInfo.lastName }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="$t('form.applicateInfo.applyDate')">
+          {{ applyModelRef.createDate }}
+        </a-descriptions-item>
+        <template v-if="applyModelRef.reference !== ''">
+          <a-descriptions-item :label="$t('form.common.reference')">
+            <strong>{{ applyModelRef.reference }}</strong>
+          </a-descriptions-item>
+        </template>
+        <template v-if="applyModelRef.actionType !== ''">
+          <a-descriptions-item :label="$t('common.status')">
+            <span>
+              <template v-if="applyModelRef.actionType === 'Draft'">
+                <a-tag color="green">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="applyModelRef.actionType === 'Approved'">
+                <a-tag color="cyan">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="applyModelRef.actionType === 'Documented'">
+                <a-tag color="geekblue">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="applyModelRef.actionType === 'Rejected'">
+                <a-tag color="red">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="applyModelRef.actionType === 'Cancelled'">
+                <a-tag color="orange">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else>
+                <a-tag color="volcano">{{ applyModelRef.actionType.toUpperCase() }}</a-tag>
+              </template>
+            </span>
+          </a-descriptions-item>
+        </template>
+      </a-descriptions>
+      <a-descriptions :title="$t('form.applicateInfo.applicateInfoTitle')"></a-descriptions>
+
+      <a-form
+        ref="givingHospitalityFormRef"
+        :model="applyModelRef"
+        :disabled="givingHospitalityFromStatus.disableStatus"
+      >
+        <a-row :gutter="24">
+          <a-col span="10">
+            <a-form-item
+              :label="$t('form.applicateInfo.applyFor')"
+              name="applyName"
+              :rules="[
+                {
+                  required: true,
+                  message: $t('form.applicateInfo.applyFor_validation')
+                }
+              ]"
+            >
+              <a-select
+                v-model:value="applyModelRef.applyName"
+                :default-active-first-option="true"
+                :placeholder="$t('form.common.select_validation')"
+                show-search
+                label-in-value
+                :allow-clear="true"
+                :not-found-content="userState.fetching ? null : undefined"
+                :options="applyOptions"
+                @change="handleChangeApplyUser"
+                @search="onApplySearch"
+              ></a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-descriptions>
+          <!--
+ <a-descriptions-item :label="$t('form.applicateInfo.applyFor')">
+            {{ applyUserInfo?.firstName }} {{ applyUserInfo?.lastName }}
+          </a-descriptions-item>
+-->
+          <a-descriptions-item :label="$t('form.applicateInfo.employeeNo')">
+            {{ applyUserInfo?.employeeId }}
+          </a-descriptions-item>
+          <a-descriptions-item :label="$t('form.applicateInfo.department')">
+            {{ applyUserInfo?.orgTxt }}
+          </a-descriptions-item>
+          <a-descriptions-item :label="$t('form.applicateInfo.supervisor')">
+            {{ applyUserSupervisorInfo?.firstName }} {{ applyUserSupervisorInfo?.lastName }}
+          </a-descriptions-item>
+          <a-descriptions-item :label="$t('form.applicateInfo.costCenter')">
+            {{ applyUserInfo?.costCenter }}
+          </a-descriptions-item>
+          <a-descriptions-item :label="$t('form.applicateInfo.division')">
+            {{ applyUserInfo?.division }}
+          </a-descriptions-item>
+        </a-descriptions>
+        <a-row :gutter="24">
+          <a-col span="24">
+            <a-form-item name="applyCCName" :label="$t('form.applicateInfo.applyCC')">
+              <a-select
+                v-model:value="applyModelRef.applyCCName"
+                mode="multiple"
+                :default-active-first-option="false"
+                :allow-clear="true"
+                :not-found-content="userState.fetching ? null : undefined"
+                :filter-option="false"
+                :placeholder="$t('form.common.select_validation')"
+                :options="ccApplyOptions"
+                @search="onApplyCCSearch"
+              ></a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+
+        <template v-if="!deptHeadGroupUserState.hidden">
+          <a-row :gutter="24">
+            <a-col span="10">
+              <a-form-item
+                :label="$t('form.applicateInfo.deptHead')"
+                name="deptHead"
+                :rules="[
+                  {
+                    required: true,
+                    message: $t('form.applicateInfo.deptHead_validation')
+                  }
+                ]"
+              >
+                <a-tooltip placement="rightTop" :title="getDeptHeadTooltip()">
+                  <a-select
+                    v-model:value="applyModelRef.deptHead"
+                    :default-active-first-option="true"
+                    :placeholder="$t('form.applicateInfo.deptHead_validation')"
+                    show-search
+                    label-in-value
+                    :allow-clear="true"
+                    :not-found-content="userState.fetching ? null : undefined"
+                    :options="deptHeadGroupUserOptions"
+                    @change="handleChangeDeptHeadUser"
+                  ></a-select>
+                </a-tooltip>
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
+        <a-row justify="end">
+          <a-col>
+            <a-button type="link" :disabled="false" @click="expandPolicyDescription = !expandPolicyDescription">
+              <template v-if="expandPolicyDescription">{{ $t('common.shrink') }}</template>
+              <template v-else>{{ $t('common.expand') }}</template>
+            </a-button>
+          </a-col>
+        </a-row>
+        <div v-show="expandPolicyDescription">
+          <a-descriptions :title="$t('page.givingHospitality.policy.title')" layout="vertical">
+            <a-descriptions-item
+              v-for="(item, index) in $tm(`page.givingHospitality.policy.desc_${userInfo.companyCode}`)"
+              :key="index"
+              :span="3"
+              :label="item.label"
+            >
+              <ul style="list-style-position: outside">
+                <li v-for="(detail, index) in item.items" :key="detail" style="text-indent: -1em">
+                  &emsp;{{ index + 1 }}. {{ detail.value }}
+                  <template v-if="detail.items.length > 0">
+                    <li v-for="(subDetail, subIndex) in detail.items" :key="subDetail" style="text-indent: -1em">
+                      &emsp;&emsp;{{ subIndex + 1 }} ) {{ subDetail.value }}
+                      <template v-if="subDetail && subDetail.items && subDetail.items.length > 0">
+                        <li v-for="subsDetail in subDetail.items" :key="subsDetail" style="text-indent: -1em">
+                          &emsp;&emsp;&emsp; • {{ subsDetail.value }}
+                        </li>
+                      </template>
+                    </li>
+                  </template>
+                </li>
+              </ul>
+            </a-descriptions-item>
+          </a-descriptions>
+        </div>
+        <a-descriptions :title="$t('page.givingHospitality.applyForm.givingHospitalityInfo')" />
+
+        <a-row :gutter="24">
+          <a-col span="24">
+            <a-form-item
+              :label="$t('page.givingHospitality.applyForm.giftReason_label')"
+              name="reason"
+              :rules="[
+                {
+                  required: true,
+                  message: $t('page.givingHospitality.applyForm.giftReason_label_validation')
+                }
+              ]"
+            >
+              <a-input
+                v-model:value="applyModelRef.reason"
+                :placeholder="$t('page.givingGifts.applyForm.giftDesc_label_validation')"
+              ></a-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col span="16">
+            <a-form-item
+              :label="$t('page.givingHospitality.applyForm.giftHospitalityType')"
+              name="hospitalityType"
+              :rules="[
+                {
+                  required: true,
+                  message: $t('page.givingHospitality.applyForm.giftHospitalityType_validation')
+                }
+              ]"
+            >
+              <a-input
+                v-model:value="applyModelRef.hospitalityType"
+                :placeholder="$t('page.givingHospitality.applyForm.giftHospitalityType_validation')"
+              ></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col span="8">
+            <a-form-item
+              :label="$t('page.givingHospitality.applyForm.giftHospPlace')"
+              name="hospPlace"
+              :rules="[
+                {
+                  required: true,
+                  message: $t('page.givingHospitality.applyForm.giftHospPlace_validation')
+                }
+              ]"
+            >
+              <a-input
+                v-model:value="applyModelRef.hospPlace"
+                :placeholder="$t('page.givingHospitality.applyForm.giftHospPlace_validation')"
+              ></a-input>
+            </a-form-item>
+          </a-col>
+        </a-row>
+
+        <a-row>
+          <a-col :flex="1">
+            <a-form-item
+              name="date"
+              :label="$t('page.givingHospitality.applyForm.giftGivingDate')"
+              v-bind="{
+                rules: [
+                  {
+                    required: true,
+                    message: $t('page.givingHospitality.applyForm.giftGivingDate_validation')
+                  }
+                ]
+              }"
+            >
+              <a-date-picker
+                v-model:value="applyModelRef.date"
+                :disabled-date="disabledAfterCurrentDate"
+                format="YYYY-MM-DD"
+                value-format="YYYY-MM-DD"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :flex="1">
+            <a-form-item
+              name="expensePerHead"
+              :label="$t('page.givingHospitality.applyForm.giftExpensePerHead')"
+              :rules="[
+                { required: true, message: $t('page.givingHospitality.applyForm.giftExpensePerHead_validation') }
+              ]"
+            >
+              <a-input-number
+                v-model:value="applyModelRef.expensePerHead"
+                :placeholder="$t('page.givingHospitality.applyForm.giftExpensePerHead_validation')"
+                :step="0.01"
+              ></a-input-number>
+            </a-form-item>
+          </a-col>
+          <a-col :flex="2">
+            <a-form-item
+              style="white-space: normal"
+              name="headCount"
+              :label="$t('page.givingHospitality.applyForm.giftHeadCount')"
+              :rules="[{ required: true, message: $t('page.givingHospitality.applyForm.giftHeadCount_validation') }]"
+            >
+              <a-input-number
+                v-model:value="applyModelRef.headCount"
+                :placeholder="$t('page.givingHospitality.applyForm.giftHeadCount_validation')"
+                :min="1"
+              ></a-input-number>
+            </a-form-item>
+          </a-col>
+          <a-col :flex="1">
+            <a-form-item
+              :label="$t('form.common.totalPrice')"
+              name="estimatedTotalExpense"
+              :rules="[{ required: true, message: $t('page.givingHospitality.applyForm.giftEstimatedTotalExpense') }]"
+            >
+              <a-input-number
+                :value="applyModelRef.estimatedTotalExpense"
+                :placeholder="$t('page.givingHospitality.applyForm.giftEstimatedTotalExpense_validation')"
+                addon-before="￥"
+                style="width: 195px"
+                :step="0.01"
+                @change="handleChangeTotalExpense"
+              ></a-input-number>
+            </a-form-item>
+          </a-col>
+        </a-row>
+
+        <div v-for="(company, index) in applyModelRef.companyList" :key="company.key">
+          <a-row :gutter="24">
+            <a-col span="20">
+              <a-form-item
+                :label="$t('page.givingGifts.applyForm.giftGivingCompanyName')"
+                :name="['companyList', index, 'companyName']"
+                :rules="[
+                  {
+                    required: true,
+                    message: $t('page.givingGifts.applyForm.giftGivingCompanyName_validation'),
+                    trigger: 'change'
+                  }
+                ]"
+              >
+                <a-input v-model:value="company.companyName"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col span="4">
+              <PlusCircleOutlined class="dynamic-add-del-button" @click="addCompany" />
+              &nbsp;
+              <MinusCircleOutlined
+                v-if="applyModelRef.companyList.length > 1"
+                class="dynamic-add-del-button"
+                @click="removeCompany(company)"
+              />
+              <a-button
+                html-type="button"
+                type="dashed"
+                :disabled="false"
+                style="margin: 0 8px"
+                @click="openAddPersonModal(company)"
+              >
+                {{ $t('form.common.addPerson') }}
+              </a-button>
+            </a-col>
+          </a-row>
+        </div>
+        <a-row :gutter="24">
+          <a-col span="12">
+            <a-form-item :label="$t('form.common.upload_person_label')">
+              <a-upload
+                v-model:file-list="uploadFileList"
+                :action="`${baseURL}/sys/upload/file?module=hospitality&type=CompanyPerson`"
+                :max-count="1"
+                :before-upload="beforeUpload"
+                @change="handleUploadChange"
+              >
+                <a-button>
+                  <UploadOutlined></UploadOutlined>
+                  {{ $t('form.common.upload_file') }}
+                </a-button>
+              </a-upload>
+            </a-form-item>
+          </a-col>
+          <a-col span="4">
+            <a-button type="link" :href="getTemplateUrl()">
+              {{ $t('form.common.upload_template') }}
+            </a-button>
+          </a-col>
+        </a-row>
+        <a-row :gutter="24">
+          <a-col span="24">
+            <a-form-item :label="$t('page.givingHospitality.applyForm.remark')" name="remark">
+              <a-textarea v-model:value="applyModelRef.remark" :rows="4" allow-clear />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+
+      <!--显示历史操作记录-->
+      <template v-if="givingHospitalityFromStatus.disableStatus">
+        <a-descriptions :title="$t('form.common.historyLog')">
+          <a-descriptions-item :label="$t('form.common.operationInfo')" span="4">
+            <ul>
+              <li v-for="(item, index) in applyModelRef.hospActivities" :key="item.appActivityDataId">
+                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <strong>{{ item.action }}</strong>
+                &nbsp; at &nbsp;
+                {{ item.createdDate }}
+              </li>
+            </ul>
+          </a-descriptions-item>
+
+          <a-descriptions-item :label="$t('form.common.remarkInfo')" span="4">
+            <ul>
+              <li v-for="(item, index) in applyModelRef.hospActivities" :key="item.appActivityDataId">
+                &nbsp; {{ index + 1 }}. {{ item.userFirstName }} {{ item.userLastName }} &nbsp;
+                <strong>wrote at {{ item.createdDate }}</strong>
+                &nbsp;
+                {{ item.remark }}
+              </li>
+            </ul>
+          </a-descriptions-item>
+        </a-descriptions>
+      </template>
+
+      <a-row :gutter="24">
+        <a-col :span="24" style="text-align: right">
+          <a-space :size="5">
+            <template v-if="givingHospitalityFromStatus.actionStatus === 'Create'">
+              <a-button type="primary" html-type="submit" @click.prevent="onSubmitApply('Draft')">
+                {{ $t('common.saveDraft') }}
+              </a-button>
+              <a-button type="primary" html-type="submit" @click.prevent="onSubmitApply('Submit')">
+                {{ $t('common.submit') }}
+              </a-button>
+              <a-button style="margin: 1px" @click="resetApplyFrom">
+                {{ $t('common.reset') }}
+              </a-button>
+            </template>
+            <template v-else-if="givingHospitalityFromStatus.actionStatus === 'Draft'">
+              <a-button type="primary" html-type="submit" @click.prevent="onModifyApply('Draft')">
+                {{ $t('common.saveDraft') }}
+              </a-button>
+              <a-button type="primary" html-type="submit" @click.prevent="onModifyApply('Submit')">
+                {{ $t('common.submit') }}
+              </a-button>
+              <a-button type="primary" html-type="submit" @click.prevent="onModifyApply('Delete')">
+                {{ $t('common.delete') }}
+              </a-button>
+              <a-button style="margin: 1px" @click="resetApplyFrom">
+                {{ $t('common.reset') }}
+              </a-button>
+            </template>
+            <!--增加复制按钮-->
+            <template
+              v-else-if="
+                givingHospitalityFromStatus.actionStatus === 'Cancelled' ||
+                givingHospitalityFromStatus.actionStatus === 'Rejected' ||
+                givingHospitalityFromStatus.actionStatus === 'Approved'
+              "
+            >
+              <a-button type="primary" html-type="submit" @click.prevent="onModifyApply('Copy')">
+                {{ $t('common.copy') }}
+              </a-button>
+            </template>
+            <!---表单只读-->
+            <template
+              v-else-if="
+                givingHospitalityFromStatus.actionStatus !== 'Completed' &&
+                givingHospitalityFromStatus.actionStatus !== 'Rejected' &&
+                givingHospitalityFromStatus.actionStatus !== 'Cancelled'
+              "
+            >
+              <a-button style="margin: 1px" @click="showCancelModal">
+                {{ $t('common.cancel') }}
+              </a-button>
+            </template>
+          </a-space>
+        </a-col>
+      </a-row>
+    </a-drawer>
+
+    <a-card :title="$t('common.search')">
+      <template #extra>
+        <a-button type="link" @click="expandSearchFields = !expandSearchFields">
+          <template v-if="expandSearchFields">{{ $t('common.shrink') }}</template>
+          <template v-else>{{ $t('common.expand') }}</template>
+        </a-button>
+      </template>
+      <a-form
+        ref="searchFormRef"
+        name="advanced_search"
+        class="ant-advanced-search-form"
+        :model="searchFormModelRef"
+        @finish="onFinishSearch"
+      >
+        <div v-show="expandSearchFields">
+          <a-row :gutter="8">
+            <a-col span="6">
+              <a-form-item :label="$t('form.common.reference')" name="reference">
+                <a-input
+                  v-model:value="searchFormModelRef.reference"
+                  :placeholder="$t('form.common.reference_placeHolder')"
+                ></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col span="4">
+              <a-form-item :label="$t('form.applicateInfo.employeeLe')" name="companyCode">
+                <a-input
+                  v-model:value="searchFormModelRef.companyCode"
+                  :placeholder="$t('form.applicateInfo.employeeLe_placeHolder')"
+                ></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col span="5">
+              <a-form-item :label="$t('form.applicateInfo.formFiller')" name="creator">
+                <a-input
+                  v-model:value="searchFormModelRef.creator"
+                  :placeholder="$t('form.applicateInfo.formFiller_placeHolder')"
+                ></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col span="5">
+              <a-form-item :label="$t('form.applicateInfo.applyFor')" name="userName">
+                <a-input
+                  v-model:value="searchFormModelRef.userName"
+                  :placeholder="$t('form.applicateInfo.applyFor_placeHolder')"
+                ></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col span="4">
+              <a-form-item label="CWID" name="cwid">
+                <a-input v-model:value="searchFormModelRef.cwid"></a-input>
+              </a-form-item>
+            </a-col>
+          </a-row>
+
+          <a-row :gutter="35">
+            <a-col span="8">
+              <a-form-item :label="$t('form.searchFrom.applyStatus')" name="status">
+                <a-select v-model:value="searchFormModelRef.status" :placeholder="$t('form.common.select_validation')">
+                  <a-select-opt-group :label="$t('form.common.option_draft')">
+                    <a-select-option value="Draft">Draft</a-select-option>
+                  </a-select-opt-group>
+                  <a-select-opt-group :label="$t('form.common.option_inProcess')">
+                    <a-select-option value="For Line Manager Approval">For Line Manager Approval</a-select-option>
+                    <a-select-option value="For Subgroup Compliance Officer Approval">For SCO Approval</a-select-option>
+                  </a-select-opt-group>
+                  <a-select-opt-group :label="$t('form.common.option_complete')">
+                    <!-- <a-select-option value="Documented">Documented</a-select-option> -->
+                    <a-select-option value="Approved">Approved</a-select-option>
+                    <a-select-option value="Rejected">Rejected</a-select-option>
+                    <a-select-option value="Cancelled">Cancelled</a-select-option>
+                  </a-select-opt-group>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col span="11">
+              <a-form-item :label="$t('form.applicateInfo.applyDate')">
+                <a-range-picker v-model:value="searchRangeDate" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="5" style="text-align: right">
+              <a-space :size="5">
+                <a-button type="primary" ghost html-type="submit" @click="getListDataByCondition()">
+                  <div class="flex-y-center gap-8px">
+                    <icon-ic-round-search class="text-icon" />
+                    <span>{{ $t('common.search') }}</span>
+                  </div>
+                </a-button>
+                <a-button style="margin: 1px" @click="resetSearchForm()">
+                  <div class="flex-y-center gap-8px">
+                    <icon-ic-round-refresh class="text-icon" />
+                    <span>{{ $t('common.reset') }}</span>
+                  </div>
+                </a-button>
+              </a-space>
+            </a-col>
+          </a-row>
+        </div>
+      </a-form>
+    </a-card>
+
+    <a-card :title="$t('common.list')">
+      <template #extra>
+        <a-button type="link" @click="showApplyDrawerModal('Create')">{{ $t('common.newApplyCreate') }}</a-button>
+      </template>
+      <a-table
+        :columns="columns"
+        :data-source="listDataSource"
+        :scroll="{ x: 1500 }"
+        class="table-list"
+        :loading="listTableLoading"
+        :pagination="listPagination"
+        @change="handleTableChange"
+      >
+        <!--语言切换时表头显示-->
+        <template #headerCell="{ column }">
+          <span>
+            {{ $tm(`${column.title}`) }}
+          </span>
+        </template>
+
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.key === 'operation'">
+            <a-button type="link" :loading="record.loading" @click="showApplyDrawerModal('Modify', record)">
+              {{ $t('common.viewDetail') }}
+            </a-button>
+          </template>
+
+          <template v-if="column.key === 'ba.CREATED_DATE'">
+            {{ dayjs(record.createdDate).format('YYYY-MM-DD') }}
+          </template>
+
+          <template v-if="column.key === 'status'">
+            <span>
+              <template v-if="record.status === 'Draft'">
+                <a-tag color="green">{{ record.status.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="record.status === 'Approved'">
+                <a-tag color="cyan">{{ record.status.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="record.status === 'Documented'">
+                <a-tag color="geekblue">{{ record.status.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="record.status === 'Rejected'">
+                <a-tag color="red">{{ record.status.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else-if="record.status === 'Cancelled'">
+                <a-tag color="orange">{{ record.status.toUpperCase() }}</a-tag>
+              </template>
+              <template v-else>
+                <a-tag color="volcano">{{ record.status.toUpperCase() }}</a-tag>
+              </template>
+            </span>
+          </template>
+        </template>
+      </a-table>
+    </a-card>
+
+    <!--取消 modal-->
+    <a-modal
+      v-model:open="openCancelModal"
+      width="500px"
+      centered
+      :title="$t('form.common.cancelReson')"
+      @ok="onSubmitCancel"
+    >
+      <a-form ref="hospCancelFormRef" :model="applyFormCancelModelRef" :rules="applyFormCancelRules">
+        <a-row :gutter="24">
+          <a-col span="24">
+            <a-form-item name="remark">
+              <a-textarea
+                v-model:value="applyFormCancelModelRef.remark"
+                :auto-size="{ minRows: 5, maxRows: 10 }"
+              ></a-textarea>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-modal>
+
+    <!--添加person modal-->
+    <a-modal
+      v-model:open="showAddPersonModal"
+      width="850px"
+      :title="$t('form.common.addPerson')"
+      @cancel="onCancelAddPerson"
+      @ok="onSubmitAddPerson"
+    >
+      <a-form
+        ref="addPersonModalFormRef"
+        :model="currentCompanyState"
+        :disabled="givingHospitalityFromStatus.disableStatus"
+      >
+        <template v-for="(person, index) in currentCompanyState.personList" :key="person.key">
+          <a-divider orientation="left" />
+
+          <template
+            v-if="userInfo.companyCode === '0813' || userInfo.companyCode === '2614' || userInfo.companyCode === '1391'"
+          >
+            <a-row :gutter="24">
+              <a-col :span="10">
+                <a-form-item
+                  :label="$t('page.givingHospitality.applyForm.gitfHospEmployeeIsGoSoc')"
+                  :name="['personList', index, 'isGoSoc']"
+                  :rules="{
+                    required: true,
+                    message: $t('form.common.select_validation'),
+                    trigger: 'change'
+                  }"
+                >
+                  <a-select v-model:value="person.isGoSoc">
+                    <a-select-option value="Yes">
+                      {{ $t('form.common.option_go_sco_Government_Official') }}
+                    </a-select-option>
+                    <a-select-option value="No">
+                      {{ $t('form.common.option_go_sco_Government_Non_Official') }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <template v-if="userInfo.companyCode === '2614' || userInfo.companyCode === '1391'">
+                <a-col :span="10">
+                  <a-form-item
+                    :label="$t('page.givingHospitality.applyForm.giftHospEmployeeIsBayerCustomer')"
+                    :name="['personList', index, 'isBayerCustomer']"
+                    :rules="{
+                      required: true,
+                      message: $t('form.common.select_validation'),
+                      trigger: 'change'
+                    }"
+                  >
+                    <a-select v-model:value="person.isBayerCustomer">
+                      <a-select-option value="Yes">{{ $t('form.common.option_yes') }}</a-select-option>
+                      <a-select-option value="No">{{ $t('form.common.option_no') }}</a-select-option>
+                      <a-select-option value="Not Applicable">
+                        {{ $t('form.common.option_not_Applicable') }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+              </template>
+            </a-row>
+          </template>
+          <template v-else>
+            <a-row :gutter="24">
+              <a-col :span="10">
+                <a-form-item
+                  :label="$t('page.givingHospitality.applyForm.gitfHospEmployeeIsGoSoc')"
+                  :name="['personList', index, 'isGoSoc']"
+                  :rules="{
+                    required: true,
+                    message: $t('form.common.select_validation'),
+                    trigger: 'change'
+                  }"
+                >
+                  <a-select v-model:value="person.isGoSoc">
+                    <a-select-option value="Yes">
+                      {{ $t('form.common.option_go_sco_Government_Official') }}
+                    </a-select-option>
+                    <a-select-option value="No">
+                      {{ $t('form.common.option_go_sco_Government_Non_Official') }}
+                    </a-select-option>
+                    <a-select-option value="HCP">
+                      {{ $t('form.common.option_go_sco_HCP') }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </template>
+
+          <a-row :gutter="24">
+            <a-col :span="10">
+              <a-form-item
+                :label="$t('page.givingHospitality.applyForm.giftHospEmployeeName')"
+                :dropdown-match-select-width="false"
+                :name="['personList', index, 'personName']"
+                :rules="{
+                  required: true,
+                  message: $t('page.givingHospitality.applyForm.giftHospEmployeeName_validation'),
+                  trigger: 'change'
+                }"
+              >
+                <a-input v-model:value="person.personName"></a-input>
+              </a-form-item>
+            </a-col>
+
+            <a-col :span="10">
+              <a-form-item
+                :label="$t('page.givingHospitality.applyForm.giftHospTitle')"
+                :name="['personList', index, 'positionTitle']"
+                :rules="{
+                  required: true,
+                  message: $t('page.givingHospitality.applyForm.giftHospTitle_validation'),
+                  trigger: 'change'
+                }"
+              >
+                <a-input v-model:value="person.positionTitle"></a-input>
+              </a-form-item>
+            </a-col>
+
+            <a-col :span="4">
+              &nbsp;
+              <PlusCircleOutlined class="dynamic-add-del-button" @click="addPerson" />
+              &nbsp;
+              <MinusCircleOutlined
+                v-if="checkFirstPerson()"
+                class="dynamic-add-del-button"
+                @click="removePerson(person)"
+              />
+            </a-col>
+          </a-row>
+        </template>
+      </a-form>
+    </a-modal>
+  </div>
+</template>
+
+<style scoped>
+.table_list {
+  overflow: hidden;
+}
+.table_list:hover {
+  overflow-x: scroll;
+}
+
+.ant-form-item-label {
+  word-wrap: break-word;
+  word-break: break-all;
+}
+.dynamic-add-del-button {
+  cursor: pointer;
+  position: relative;
+  top: 4px;
+  font-size: 24px;
+  color: #999;
+  transition: all 0.3s;
+}
+.dynamic-add-del-button:hover {
+  color: #777;
+}
+.dynamic-add-del-button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+</style>

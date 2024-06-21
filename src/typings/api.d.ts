@@ -82,6 +82,7 @@ declare namespace Api {
       isGoSoc: string;
       isBayerCustomer: string;
       personName: string;
+      positionType: string;
       positionTitle: string;
       description: string;
       unitValue: number | undefined;
@@ -129,6 +130,8 @@ declare namespace Api {
       giftsActivities: ReceivingActivity[];
       giftsRef: ReceivingGiftRef;
       companyList: GiftCompany[];
+      applyForUser: Api.Auth.UserInfo;
+      creatorUser: Api.Auth.UserInfo;
     }
 
     interface ReceivingActivity {
@@ -154,12 +157,48 @@ declare namespace Api {
       givingPerson: string;
     }
 
+    interface ReceivingHospitalityRef {
+      hospitalityType: string;
+      expensePerHead: number;
+      headCount: number;
+      hospitalityDate: string;
+      hospPlace: string;
+    }
+
     interface GivingHospitalityRef {
       hospitalityType: string;
       expensePerHead: number;
       headCount: number;
       hospitalityDate: string;
       hospPlace: string;
+    }
+
+    interface ReceivingHospitality {
+      applicationId: string;
+      sfUserAppliedFirstName: string;
+      sfUserAppliedLastName: string;
+      sfUserAppliedName: string;
+      sfUserAppliedCwid: string;
+      sfUserAppliedEmail: string;
+      sfUserIdAppliedFor: string;
+      sfUserIdCreator: string;
+      copyToUsers: unknown[];
+      costCenter: string;
+      createdDate: string;
+      department: string;
+      employeeLe: string;
+      reference: string;
+      unitValue: number;
+      volume: number;
+      remark: string;
+      reason: string;
+      reasonType: string;
+      status: string;
+      deptHeadGroup: GiftGroup;
+      hospRef: ReceivingHospitalityRef;
+      hospActivities: ReceivingHospitalityActivity[];
+      applyForUser: Api.Auth.UserInfo;
+      creatorUser: Api.Auth.UserInfo;
     }
 
     interface GivingHospitality {
@@ -184,10 +223,13 @@ declare namespace Api {
       reasonType: string;
       status: string;
       deptHeadGroup: GiftGroup;
+      countryHeadGroup: GiftGroup;
       companyList: GiftCompany[];
       fileAttach: FileAttach;
       hospRef: GivingHospitalityRef;
       hospActivities: GivingHospitalityActivity[];
+      applyForUser: Api.Auth.UserInfo;
+      creatorUser: Api.Auth.UserInfo;
     }
 
     interface GivingGifts {
@@ -215,10 +257,13 @@ declare namespace Api {
       status: string;
       totalValue: number;
       deptHeadGroup: GiftGroup;
+      countryHeadGroup: GiftGroup;
       companyList: GiftCompany[];
       fileAttach: FileAttach;
       giftsRef: GivingGiftRef;
       giftsActivities: GivingActivity[];
+      applyForUser: Api.Auth.UserInfo;
+      creatorUser: Api.Auth.UserInfo;
     }
 
     interface FileAttach {
@@ -246,6 +291,21 @@ declare namespace Api {
     }
 
     interface GivingActivity {
+      action: string;
+      appActivityDataId: number;
+      applicationId: number;
+      createdDate: string;
+      lastModifiedDate: string;
+      sfActivityInsId: number;
+      sfProcessInsId: number;
+      sfUserIdSubmitter: number;
+      userEmail: string;
+      userFirstName: string;
+      userLastName: string;
+      remark: string;
+    }
+
+    interface ReceivingHospitalityActivity {
       action: string;
       appActivityDataId: number;
       applicationId: number;

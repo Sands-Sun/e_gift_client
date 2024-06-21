@@ -37,6 +37,11 @@ declare module "@elegant-router/types" {
     "function_hide-child_two": "/function/hide-child/two";
     "function_multi-tab": "/function/multi-tab";
     "function_tab": "/function/tab";
+    "history": "/history";
+    "history_giving-gifts": "/history/giving-gifts";
+    "history_giving-hospitality": "/history/giving-hospitality";
+    "history_receving-gifts": "/history/receving-gifts";
+    "history_receving-hospitality": "/history/receving-hospitality";
     "home": "/home";
     "inbox": "/inbox";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat|admin-login)?";
@@ -68,7 +73,7 @@ declare module "@elegant-router/types" {
 
   /**
    * custom route key
-   */ 
+   */
   export type CustomRouteKey = Extract<
     RouteKey,
     | "root"
@@ -81,7 +86,7 @@ declare module "@elegant-router/types" {
 
   /**
    * the generated route key
-   */ 
+   */
   export type GeneratedRouteKey = Exclude<RouteKey, CustomRouteKey>;
 
   /**
@@ -95,6 +100,7 @@ declare module "@elegant-router/types" {
     | "about"
     | "apply"
     | "function"
+    | "history"
     | "home"
     | "inbox"
     | "login"
@@ -132,6 +138,10 @@ declare module "@elegant-router/types" {
     | "function_hide-child_two"
     | "function_multi-tab"
     | "function_tab"
+    | "history_giving-gifts"
+    | "history_giving-hospitality"
+    | "history_receving-gifts"
+    | "history_receving-hospitality"
     | "home"
     | "inbox"
     | "manage_function"
@@ -217,7 +227,7 @@ declare module "@elegant-router/types" {
         component: `view.${K}`;
       }
     : never;
-  
+
   /**
    * the center level route
    */
@@ -240,7 +250,7 @@ declare module "@elegant-router/types" {
         children: (CenterLevelRoute<GetChildRouteKey<K>> | LastLevelRoute<GetChildRouteKey<K>>)[];
       }
     : never;
-  
+
   /**
    * the custom first level route
    */

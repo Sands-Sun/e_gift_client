@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { $t } from '@/locales';
 import {
-  fetchGetUserInfoById,
   fetchTaskList,
   getGivingGiftsByApplicationId,
   getGivingHospitalityByApplicationId,
@@ -46,6 +45,7 @@ const { baseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
 const userState = reactive({ data: [] as any, value: [] as any, ccValue: [] as any, fetching: true });
 const giftCompanyPersonState = reactive({ data: [] as any, value: [] as any });
 const deptHeadGroupUserState = reactive({ data: [] as any, hidden: true });
+const countryHeadGroupUserState = reactive({ data: [] as any, hidden: true });
 const approvalModelRef = reactive({ comment: undefined, approve: '', processType: '', taskId: '', applicationId: '' });
 let currentCompanyState = reactive<{
   companyName: string;
@@ -88,8 +88,8 @@ const tableColumns: TableColumnsType = [
     title: 'form.applicateInfo.applyDate',
     sorter: true,
     width: 100,
-    dataIndex: 'applicationDate',
-    key: 'APPLICATION_DATE',
+    dataIndex: 'createdDate',
+    key: 'CREATED_DATE',
     fixed: 'left'
   },
   { title: 'form.common.reference', sorter: true, dataIndex: 'reference', key: 'REFERENCE', width: 120 },
@@ -116,6 +116,7 @@ const applyModelRef = reactive<{
   applyName: string;
   applyForId: number;
   deptHead: string;
+  countryHead: string | undefined;
   copyToUserEmails: string[];
   applyCCName: string[];
   reason: string;
@@ -148,6 +149,7 @@ const applyModelRef = reactive<{
   applyName: undefined as any,
   applyForId: undefined as any,
   deptHead: undefined as any,
+  countryHead: undefined as any,
   copyToUserEmails: [] as any,
   applyCCName: [],
   reason: '',
@@ -172,6 +174,10 @@ const applyModelRef = reactive<{
   remark: '',
   fileId: undefined
 });
+
+const getDeptHeadTooltip = () => {
+  return $t('form.applicateInfo.deptHead_tooltip', { emails: 'zhe.sun.ext@bayer.com, dengzhuo.wang.ext@bayer.com' });
+};
 
 const deptHeadGroupUserOptions = computed<SelectProps['options']>(() =>
   deptHeadGroupUserState.data.map((item: any) => ({
@@ -221,6 +227,7 @@ const showApplyGivingHosp = (data: any) => {
   applyModelRef.headCount = data.hospRef.headCount;
   applyModelRef.hospitalityType = data.hospRef.hospitalityType;
   applyModelRef.hospPlace = data.hospRef.hospPlace;
+  applyModelRef.estimatedTotalExpense = data.estimatedTotalExpense;
   applyModelRef.date = dayjs(data.hospRef.hospitalityDate);
   data.companyList.forEach(c => {
     const company = {
@@ -292,26 +299,26 @@ const showApplyGivingGift = (data: any) => {
   applyModelRef.giftsActivities = data.giftsActivities;
 };
 
-const fillInApplyUserInfo = async (applyUserId: string, creatorUserId: string) => {
-  // debugger;
-  console.info(`fill in apply user info: ${applyUserId} creator user: ${creatorUserId}`);
-  const applyUserData = await fetchGetUserInfoById(applyUserId);
-  if (!applyUserData.error) {
-    applyUserInfo.userInfo = applyUserData.data;
-    applyUserInfo.supervisor = applyUserData.data.supervisor;
-    if (applyUserId === creatorUserId) {
-      applyUserInfo.creatorUserInfo = applyUserData.data;
-    } else {
-      console.log('creator and apply user are not same...');
-      const creatorUserData = await fetchGetUserInfoById(creatorUserId, false);
-      if (!creatorUserData.error) {
-        applyUserInfo.creatorUserInfo = creatorUserData.data;
-      }
-    }
+// const fillInApplyUserInfo = async (applyUserId: string, creatorUserId: string) => {
+//   // debugger;
+//   console.info(`fill in apply user info: ${applyUserId} creator user: ${creatorUserId}`);
+//   const applyUserData = await fetchGetUserInfoById(applyUserId);
+//   if (!applyUserData.error) {
+//     applyUserInfo.userInfo = applyUserData.data;
+//     applyUserInfo.supervisor = applyUserData.data.supervisor;
+//     if (applyUserId === creatorUserId) {
+//       applyUserInfo.creatorUserInfo = applyUserData.data;
+//     } else {
+//       console.log('creator and apply user are not same...');
+//       const creatorUserData = await fetchGetUserInfoById(creatorUserId, false);
+//       if (!creatorUserData.error) {
+//         applyUserInfo.creatorUserInfo = creatorUserData.data;
+//       }
+//     }
 
-    console.log(`companycode:${userInfo.companyCode}`);
-  }
-};
+//     console.log(`companycode:${userInfo.companyCode}`);
+//   }
+// };
 
 // 清空记录
 const clearApplyModel = () => {
@@ -334,6 +341,8 @@ const clearApplyModel = () => {
   applyModelRef.headCount = undefined;
   applyModelRef.estimatedTotalExpense = 0;
   applyModelRef.remark = '';
+  deptHeadGroupUserState.hidden = true;
+  countryHeadGroupUserState.hidden = true;
 };
 
 const resetFromFields = () => {
@@ -359,57 +368,71 @@ const showApplyDrawerModal = async (item?: any) => {
 
     if (!error) {
       // debugger;
-      fillInApplyUserInfo(data.sfUserIdAppliedFor, data.sfUserIdCreator).then(() => {
-        applyModelRef.applicationId = data.applicationId;
-        applyModelRef.actionType = data.status;
-        applyModelRef.reference = data.reference;
-        applyModelRef.createDate = dayjs(data.createdDate).format('YYYY-MM-DD');
-        applyOptions.value.unshift({
-          label: `${data?.sfUserAppliedName} <${data?.sfUserAppliedEmail}>`,
-          value: data?.sfUserAppliedEmail,
-          userId: data?.sfUserIdAppliedFor
-        });
-        applyModelRef.applyName = applyOptions.value[0];
-        if (data?.copyToUsers) {
-          data.copyToUsers.forEach((user: any) => {
-            // 排除申请人信息
-            if (user.copytoEmail !== userInfo.email) {
-              ccApplyOptions.value.push({
-                label: `${user.copytoFirstName} ${user.copytoLastName} <${user.copytoEmail}>`,
-                value: user.copytoEmail,
-                userId: user.sfUserIdCopyTo
-              });
-            }
-          });
-        }
-        if (data.deptHeadGroup && data.deptHeadGroup.userToGroups.length > 0) {
-          const deptHeadUser = data.deptHeadGroup.userToGroups[0];
-          deptHeadGroupUserOptions.value.push({
-            label: `${deptHeadUser.userFirstName} ${deptHeadUser.userLastName} <${deptHeadUser.userEmail}>`,
-            value: deptHeadUser.userEmail
-          });
-          deptHeadGroupUserState.hidden = false;
-          applyModelRef.deptHead = deptHeadUser.userEmail;
-        }
-        if (data.fileAttach) {
-          const attach = data.fileAttach;
-          uploadFileList.value.push({
-            uid: attach.id,
-            name: attach.origFileName,
-            size: Number.parseInt(attach.fileSize, 2),
-            url: `${baseURL}/sys/download/file?fileId=${attach.id}`
-          });
-        }
-        applyModelRef.applyCCName = ccApplyOptions.value.map((v: any) => v.value);
-        if (item.requestType === 'Giving Gifts') {
-          showApplyGivingGift(data);
-        }
-        if (item.requestType === 'Giving Hospitality') {
-          showApplyGivingHosp(data);
-        }
-        item.loading = false;
-        openApplyDrawerModal.value = true;
+      applyModelRef.applicationId = data.applicationId;
+      applyModelRef.actionType = data.status;
+      applyModelRef.reference = data.reference;
+      applyModelRef.createDate = dayjs(data.createdDate).format('YYYY-MM-DD');
+      const applyUser = data.applyForUser;
+      applyUserInfo.userInfo = applyUser;
+      applyUserInfo.supervisor = applyUser.supervisor;
+      applyUserInfo.creatorUserInfo = data.creatorUser;
+      applyModelRef.applyName = applyUser.email;
+      applyOptions.value.unshift({
+        label: `${applyUser.firstName} ${applyUser.lastName} <${applyUser.email}>`,
+        value: applyUser.email,
+        userId: applyUser.sfUserId
       });
+      applyModelRef.applyName = applyOptions.value[0];
+      if (data?.copyToUsers) {
+        data.copyToUsers.forEach((user: any) => {
+          // 排除申请人信息
+          if (user.copytoEmail !== userInfo.email) {
+            ccApplyOptions.value.push({
+              label: `${user.copytoFirstName} ${user.copytoLastName} <${user.copytoEmail}>`,
+              value: user.copytoEmail,
+              userId: user.sfUserIdCopyTo
+            });
+          }
+        });
+      }
+      if (data.deptHeadGroup && data.deptHeadGroup.userToGroups.length > 0) {
+        const deptHeadUser = data.deptHeadGroup.userToGroups[0];
+        deptHeadGroupUserOptions.value.push({
+          label: `${deptHeadUser.userFirstName} ${deptHeadUser.userLastName} <${deptHeadUser.userEmail}>`,
+          value: deptHeadUser.userEmail
+        });
+        deptHeadGroupUserState.hidden = false;
+        applyModelRef.deptHead = deptHeadUser.userEmail;
+      }
+      if (
+        item.requestType === 'Giving Gifts' &&
+        data.countryHeadGroup &&
+        data.countryHeadGroup.userToGroups.length > 0
+      ) {
+        const countryHeadUser = data.countryHeadGroup.userToGroups[0];
+        // countryHeadGroupUserState.data = [{...data.countryHeadGroup}];
+        countryHeadGroupUserState.hidden = false;
+        applyModelRef.countryHead = `${countryHeadUser.userFirstName} ${countryHeadUser.userLastName} <${countryHeadUser.userEmail}>`;
+      }
+
+      if (data.fileAttach) {
+        const attach = data.fileAttach;
+        uploadFileList.value.push({
+          uid: attach.id,
+          name: attach.origFileName,
+          size: Number.parseInt(attach.fileSize, 2),
+          url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+        });
+      }
+      applyModelRef.applyCCName = ccApplyOptions.value.map((v: any) => v.value);
+      if (item.requestType === 'Giving Gifts') {
+        showApplyGivingGift(data);
+      }
+      if (item.requestType === 'Giving Hospitality') {
+        showApplyGivingHosp(data);
+      }
+      item.loading = false;
+      openApplyDrawerModal.value = true;
     }
   }
 };
@@ -519,7 +542,7 @@ onMounted(async () => {
   authStore = useAuthStore();
   userInfo = authStore.userInfo;
   console.log(`companycode:${userInfo.companyCode}`);
-  const listData = await fetchTaskList({ userId: authStore.userInfo.sfUserId });
+  const listData = await fetchTaskList({ userId: userInfo.sfUserId });
   listTableLoading.value = false;
   if (listData?.data?.list && listData.data.list.length > 0) {
     listDataSource.value = [];
@@ -763,8 +786,8 @@ onMounted(async () => {
             </a-form-item>
           </a-col>
         </a-row>
-        <template v-if="!deptHeadGroupUserState.hidden">
-          <a-row :gutter="24">
+        <a-row :gutter="24">
+          <template v-if="!deptHeadGroupUserState.hidden">
             <a-col span="10">
               <a-form-item
                 :label="$t('form.applicateInfo.deptHead')"
@@ -776,7 +799,7 @@ onMounted(async () => {
                   }
                 ]"
               >
-                <a-tooltip placement="rightTop" :title="$t('form.applicateInfo.deptHead_tooltip')">
+                <a-tooltip placement="rightTop" :title="getDeptHeadTooltip()">
                   <a-select
                     v-model:value="applyModelRef.deptHead"
                     :default-active-first-option="true"
@@ -789,8 +812,16 @@ onMounted(async () => {
                 </a-tooltip>
               </a-form-item>
             </a-col>
-          </a-row>
-        </template>
+          </template>
+
+          <template v-if="!countryHeadGroupUserState.hidden">
+            <a-col span="10">
+              <a-form-item :label="$t('form.applicateInfo.countryHead')">
+                <a-input v-model:value="applyModelRef.countryHead" disabled></a-input>
+              </a-form-item>
+            </a-col>
+          </template>
+        </a-row>
 
         <a-row justify="end">
           <a-col>
@@ -1328,7 +1359,7 @@ onMounted(async () => {
                 <a-form-item
                   :label-col="{ span: 10 }"
                   :wrapper-col="{ span: 14 }"
-                  :label="$t('page.receivingGifts.applyForm.giftGiverEmployeeName')"
+                  :label="$t('page.givingGifts.applyForm.giftGivingEmployeeName')"
                   :name="['personList', index, 'personName']"
                 >
                   <a-input v-model:value="person.personName"></a-input>
@@ -1339,7 +1370,7 @@ onMounted(async () => {
                 <a-form-item
                   :label-col="{ span: 12 }"
                   :wrapper-col="{ span: 12 }"
-                  :label="$t('page.receivingGifts.applyForm.giftGiverTitle_validation')"
+                  :label="$t('page.givingGifts.applyForm.giftGivingTitle')"
                   :name="['personList', index, 'positionTitle']"
                 >
                   <a-input v-model:value="person.positionTitle"></a-input>

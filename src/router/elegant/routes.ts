@@ -172,6 +172,53 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'history',
+    path: '/history',
+    component: 'layout.base',
+    meta: {
+      title: 'history',
+      i18nKey: 'route.history'
+    },
+    children: [
+      {
+        name: 'history_giving-gifts',
+        path: '/history/giving-gifts',
+        component: 'view.history_giving-gifts',
+        meta: {
+          title: 'history_giving-gifts',
+          i18nKey: 'route.history_giving-gifts'
+        }
+      },
+      {
+        name: 'history_giving-hospitality',
+        path: '/history/giving-hospitality',
+        component: 'view.history_giving-hospitality',
+        meta: {
+          title: 'history_giving-hospitality',
+          i18nKey: 'route.history_giving-hospitality'
+        }
+      },
+      {
+        name: 'history_receving-gifts',
+        path: '/history/receving-gifts',
+        component: 'view.history_receving-gifts',
+        meta: {
+          title: 'history_receving-gifts',
+          i18nKey: 'route.history_receving-gifts'
+        }
+      },
+      {
+        name: 'history_receving-hospitality',
+        path: '/history/receving-hospitality',
+        component: 'view.history_receving-hospitality',
+        meta: {
+          title: 'history_receving-hospitality',
+          i18nKey: 'route.history_receving-hospitality'
+        }
+      }
+    ]
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',

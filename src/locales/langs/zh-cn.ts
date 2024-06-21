@@ -143,6 +143,11 @@ const local: App.I18n.Schema = {
     'function_hide-child_one': '隐藏子菜单',
     'function_hide-child_two': '菜单二',
     'function_hide-child_three': '菜单三',
+    history: '历史',
+    'history_giving-gifts': '赠送礼品',
+    'history_receving-gifts': '接受礼品',
+    'history_giving-hospitality': '给予招待',
+    'history_receving-hospitality': '接受招待',
     apply: '申请',
     'apply_giving-gifts': '赠送礼品',
     'apply_receving-gifts': '接受礼品',
@@ -461,6 +466,35 @@ const local: App.I18n.Schema = {
         ]
       }
     },
+    receivingHospitality: {
+      applyForm: {
+        receivingHospitalityRequestTitle: '接受招待申请表',
+        remark: '备注',
+        remark_validation: '请输入招待备注信息',
+        receivingHospitalityInfo: '招待信息',
+        giftReason_label: '提供招待的原因',
+        giftReason_label_validation: '请输入提供招待的原因',
+        giftReceivingDate: '活动日期',
+        giftReceivingDate_validation: '请选择活动日期',
+        giftHospitalityType: '请描述招待活动',
+        giftHospitalityType_validation: '如：用餐、茶歇等',
+        giftExpensePerHead: '预估人均费用',
+        giftExpensePerHead_validation: '请输入人均费用',
+        giftHeadCount: '接受招待的人数 （包含拜耳员工）',
+        giftHeadCount_validation: '请输入受邀人人数',
+        giftEstimatedTotalExpense: '估计的总费用',
+        giftEstimatedTotalExpense_validation: '请输入估计的总费用',
+        giftHospPlace: '地点',
+        giftHospPlace_validation: '请输入地点',
+        giftHospEmployeeName: '接受招待者姓名',
+        giftHospEmployeeName_validation: '请输入接受招待者姓名',
+        gitfHospEmployeeIsGoSoc: '接受招待者类别',
+        giftHospEmployeeIsBayerCustomer: '接受招待者是否是拜耳的现有客户',
+        giftHospTitle: '接受招待者职位',
+        giftHospTitle_validation: '请输入接受招待者职位',
+        giftHospEmployeePop_HeadCount: '接受招待者'
+      }
+    },
     givingHospitality: {
       applyForm: {
         givingHospitalityRequestTitle: '给予招待申请表',
@@ -471,6 +505,8 @@ const local: App.I18n.Schema = {
         giftReason_label_validation: '请输入提供招待的原因',
         giftGivingDate: '活动日期',
         giftGivingDate_validation: '请选择活动日期',
+        giftGivingCompanyName: '接受者单位名称',
+        giftGivingCompanyName_validation: '请输入接受者单位名称',
         giftHospitalityType: '请描述招待活动',
         giftHospitalityType_validation: '如：用餐、茶歇等',
         giftExpensePerHead: '预估人均费用',
@@ -808,6 +844,8 @@ const local: App.I18n.Schema = {
         giftGivingTitle_validation: '请输入接受者职位',
         giftRecipientCategory: '礼品接受者的类别',
         giftIsBayerCustomer: '礼品接受者是否是拜耳现有客户',
+        givingDesc_type_CH_division_noticeContent:
+          '礼品类别： 推广OTC产品时面向HCP提供的推广辅助用品， 礼品金额 > 100元/人 或者 礼品类别： 采购风俗礼品（仅限于经销商，仅限于春节和中秋节） 礼品金额 > 200 元/人 请选择 “其他礼品” 申请',
         givingDesc_type_option_medicine_noticeTitle: '赠送药品提示',
         givingDesc_type_option_medicine_noticeContent:
           '禁止赠送处方药和甲类非处方药作为礼品。其他药品原则上不允许，极特殊情况需直线经理、部门经理（CMT成员）、合规部门事先评估批准后赠送。请在Remark中详述您的赠送原因。',
@@ -1069,6 +1107,7 @@ const local: App.I18n.Schema = {
       upload_file_success: '文件：{fileName} 上传成功！',
       upload_person_label: '附件(您能添加一个包含多个名字的文件)',
       upload_template: '模板下载',
+      user_manual: '用户手册下载',
       system_prompt: '系统提示',
       person_quantity_notMatch: '人员与数量不符',
       unitPrice: '单价',

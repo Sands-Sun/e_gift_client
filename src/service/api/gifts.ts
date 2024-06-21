@@ -38,9 +38,9 @@ export function exportFile(fileId: any) {
   });
 }
 
-export function getReceivingHospitalityByApplicationId(id: any) {
+export function getReceivingHospitalityHistoryByApplicationId(id: any) {
   return request<Api.Gifts.ReceivingHospitality>({
-    url: `hospitality/receiving/get/${id}`,
+    url: `hospitality/receiving/get/history/${id}`,
     method: 'get'
   });
 }

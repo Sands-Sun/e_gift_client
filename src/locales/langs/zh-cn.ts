@@ -3,6 +3,7 @@ const local: App.I18n.Schema = {
     title: 'E-Gift/Hospitality 管理系统'
   },
   common: {
+    language: 'zh-CN',
     tip: '提示',
     add: '添加',
     addSuccess: '添加成功',
@@ -283,6 +284,7 @@ const local: App.I18n.Schema = {
     receivingGifts: {
       applyForm: {
         acceptGiftRequestTitle: '接受礼品申请表',
+        upload_person_label: '批量上传接收者者名单',
         receivingGiftInfo: '接受礼品信息',
         remark: '备注',
         remark_validation: '请输入礼品备注信息',
@@ -469,6 +471,7 @@ const local: App.I18n.Schema = {
     receivingHospitality: {
       applyForm: {
         receivingHospitalityRequestTitle: '接受招待申请表',
+        upload_person_label: '批量上传接收者者名单',
         remark: '备注',
         remark_validation: '请输入招待备注信息',
         receivingHospitalityInfo: '招待信息',
@@ -498,6 +501,7 @@ const local: App.I18n.Schema = {
     givingHospitality: {
       applyForm: {
         givingHospitalityRequestTitle: '给予招待申请表',
+        upload_person_label: '批量上传接收者者名单',
         remark: '备注',
         remark_validation: '请输入招待备注信息',
         givingHospitalityInfo: '招待信息',
@@ -823,6 +827,7 @@ const local: App.I18n.Schema = {
     givingGifts: {
       applyForm: {
         givingGiftRequestTitle: '赠送礼品申请表',
+        upload_person_label: '批量上传接收者者名单',
         remark: '备注',
         remark_validation: '请输入礼品备注信息',
         givingGiftInfo: '赠送礼品信息',
@@ -1105,7 +1110,7 @@ const local: App.I18n.Schema = {
     common: {
       upload_file: '上传附件',
       upload_file_success: '文件：{fileName} 上传成功！',
-      upload_person_label: '附件(您能添加一个包含多个名字的文件)',
+      upload_person_label: '如果您有其他说明的情况，也可点击上传附件',
       upload_template: '模板下载',
       user_manual: '用户手册下载',
       system_prompt: '系统提示',

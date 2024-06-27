@@ -1026,7 +1026,7 @@ const fillInPrice = (newCompanyList: Api.Gifts.GiftCompany[]) => {
 
   applyModelRef.volume = totalVolume === 0 ? undefined : totalVolume;
   applyModelRef.unitValue = maxUnitValue;
-  applyModelRef.totalValue = totalValue === 0 ? undefined : totalValue;
+  applyModelRef.totalValue = totalValue === 0 ? undefined : Number.parseFloat(totalValue.toFixed(2));
 };
 
 // 隐藏department head, country head 下拉列表
@@ -1683,7 +1683,7 @@ watch(
 
         <a-row :gutter="24">
           <a-col span="12">
-            <a-form-item :label="$t('form.common.upload_person_label')">
+            <a-form-item :label="$t('page.givingGifts.applyForm.upload_person_label')">
               <a-upload
                 v-model:file-list="applyModelRef.attachFile"
                 :action="`${baseURL}/sys/upload/file?module=giving&type=CompanyPerson`"

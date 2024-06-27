@@ -14,11 +14,20 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue';
-let authStore: any;
-let userInfo: Api.Auth.UserInfo;
+const authStore = useAuthStore();
 // let supervisorInfo: Api.Auth.UserInfo;
-const applyUserInfo = ref<Api.Auth.UserInfo>();
-const applyUserSupervisorInfo = ref<Api.Auth.UserInfo>();
+const userInfo = authStore.userInfo;
+// const applyUserInfo = ref<Api.Auth.UserInfo>();
+// const applyUserSupervisorInfo = ref<Api.Auth.UserInfo>();
+const applyUserInfo = reactive<{
+  creatorUserInfo: Api.Auth.UserInfo | undefined;
+  userInfo: Api.Auth.UserInfo | undefined;
+  supervisor: Api.Auth.UserInfo | undefined;
+}>({
+  creatorUserInfo: undefined,
+  userInfo: undefined,
+  supervisor: undefined
+});
 const uploadFileList = ref([] as any);
 const openApplyDrawerModal = ref<boolean>(false);
 const expandSearchFields = ref(true);
@@ -358,6 +367,9 @@ const showApplyDrawerModal = async (item?: any) => {
       applyModelRef.reference = data.reference;
       const applyUser = data.applyForUser;
       userState.data = [{ ...applyUser }];
+      applyUserInfo.userInfo = applyUser;
+      applyUserInfo.supervisor = applyUser.supervisor;
+      applyUserInfo.creatorUserInfo = data.creatorUser;
       applyModelRef.applyName = applyUser.email;
       data.companyList.forEach(c => {
         const company = {
@@ -415,9 +427,9 @@ const showApplyDrawerModal = async (item?: any) => {
         uploadFileList.value.push({
           uid: attach.id,
           name: attach.origFileName,
-          // size: Number.parseInt(attach.fileSize, 2),
+          size: Number.parseInt(attach.fileSize, 2),
           // url: `${baseURL}/sys/download/file?fileId=${attach.id}`
-          url: attach.filePath
+          url: `${baseURL}/sys/download/file/path?url=${encodeURIComponent(attach.filePath)}`
         });
       }
 
@@ -453,14 +465,12 @@ const resetSearchForm = () => {
 };
 
 onMounted(async () => {
-  authStore = useAuthStore();
-  userInfo = authStore.userInfo;
-  // supervisorInfo = userInfo.supervisor;
-  applyUserInfo.value = authStore.userInfo;
-  applyUserSupervisorInfo.value = authStore.userInfo;
+  applyUserInfo.userInfo = userInfo;
+  applyUserInfo.creatorUserInfo = userInfo;
+  applyUserInfo.supervisor = userInfo.supervisor;
   console.log(`creator companycode:${userInfo.companyCode}`);
-  console.log(`apply user isDeptHead: ${applyUserInfo?.value?.isDeptHead}`);
-  console.log(`apply user isCountryHead: ${applyUserInfo?.value?.isCountryHead}`);
+  console.log(`apply user isDeptHead: ${applyUserInfo?.userInfo?.isDeptHead}`);
+  console.log(`apply user isCountryHead: ${applyUserInfo?.userInfo?.isCountryHead}`);
   loadDeptHeadGroupUserData();
   const listData = await fetchGivingHospitalityList({ userId: authStore.userInfo.sfUserId, newVersion: 'N' });
   listTableLoading.value = false;
@@ -474,7 +484,7 @@ onMounted(async () => {
 });
 
 // 重新加载申请人信息
-const fillInApplyUserInfo = async (newValue: string, oldValue: string) => {
+const reloadApplyUserInfo = async (newValue: string, oldValue: string) => {
   if (newValue !== oldValue) {
     // debugger;
     const applyOpt = userState.data.filter(a => a.email === applyModelRef.applyName);
@@ -483,18 +493,20 @@ const fillInApplyUserInfo = async (newValue: string, oldValue: string) => {
       const { data, error } = await fetchGetUserInfoById(applyOpt[0].sfUserId);
       if (!error) {
         // console.log(data);
-        applyUserInfo.value = data;
-        applyUserSupervisorInfo.value = data.supervisor;
+        applyUserInfo.userInfo = data;
+        applyUserInfo.supervisor = data.supervisor;
       }
     }
   }
 };
 
 const hideDeptHeadDropDown = (newPerHead: number, newHeadCount: number) => {
-  applyModelRef.estimatedTotalExpense = Number.isNaN(newPerHead * newHeadCount) ? undefined : newPerHead * newHeadCount;
+  applyModelRef.estimatedTotalExpense = Number.isNaN(newPerHead * newHeadCount)
+    ? undefined
+    : Number.parseFloat((newPerHead * newHeadCount).toFixed(2));
   // 隐藏部门经理下拉列表
   deptHeadGroupUserState.hidden = false;
-  if (applyUserInfo?.value?.isCountryHead || applyUserInfo?.value?.isDeptHead) {
+  if (applyUserInfo?.userInfo?.isCountryHead || applyUserInfo?.userInfo?.isDeptHead) {
     deptHeadGroupUserState.hidden = true;
   }
   if (!newPerHead || newPerHead <= 300) {
@@ -538,7 +550,7 @@ watch(
       value: user.email,
       sfUserId: user.sfUserId
     }));
-    fillInApplyUserInfo(newApplyName, oldApplyName).then(() => {
+    reloadApplyUserInfo(newApplyName, oldApplyName).then(() => {
       hideDeptHeadDropDown(newPerHead, newHeadCount);
     });
   }
@@ -556,7 +568,7 @@ watch(
     >
       <a-descriptions :title="$t('form.applicateInfo.formFillerInfoTitle')" :column="2">
         <a-descriptions-item :label="$t('form.applicateInfo.formFiller')">
-          {{ userInfo.firstName }} {{ userInfo.lastName }}
+          {{ applyUserInfo?.creatorUserInfo?.firstName }} {{ applyUserInfo?.creatorUserInfo?.lastName }}
         </a-descriptions-item>
         <a-descriptions-item :label="$t('form.applicateInfo.applyDate')">
           {{ applyModelRef.createDate }}
@@ -618,19 +630,19 @@ watch(
           </a-descriptions-item>
 -->
           <a-descriptions-item :label="$t('form.applicateInfo.employeeNo')">
-            {{ applyUserInfo?.employeeId }}
+            {{ applyUserInfo?.userInfo?.employeeId }}
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.applicateInfo.department')">
-            {{ applyUserInfo?.orgTxt }}
+            {{ applyUserInfo?.userInfo?.orgTxt }}
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.applicateInfo.supervisor')">
-            {{ applyUserSupervisorInfo?.firstName }} {{ applyUserSupervisorInfo?.lastName }}
+            {{ applyUserInfo?.supervisor?.firstName }} {{ applyUserInfo?.supervisor?.lastName }}
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.applicateInfo.costCenter')">
-            {{ applyUserInfo?.costCenter }}
+            {{ applyUserInfo?.userInfo?.costCenter }}
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.applicateInfo.division')">
-            {{ applyUserInfo?.division }}
+            {{ applyUserInfo?.userInfo?.division }}
           </a-descriptions-item>
         </a-descriptions>
         <a-row :gutter="24">
@@ -762,6 +774,7 @@ watch(
             </a-col>
           </a-row>
         </div>
+
         <a-row :gutter="24">
           <a-col span="12">
             <a-form-item :label="$t('form.common.upload_person_label')">
@@ -773,6 +786,7 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
+
         <a-row :gutter="24">
           <a-col span="24">
             <a-form-item :label="$t('page.givingHospitality.applyForm.remark')" name="remark">

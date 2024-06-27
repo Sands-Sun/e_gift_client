@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SelectProps } from '@ant-design/icons-vue';
-import type { FormInstance, TableColumnsType } from 'ant-design-vue';
+import type { FormInstance, TableColumnsType, UploadProps } from 'ant-design-vue';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
@@ -11,20 +11,32 @@ import {
   getReceivingHospitalityHistoryByApplicationId
 } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
+import { getServiceBaseURL } from '@/utils/service';
 import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 let authStore: any;
 let userInfo: Api.Auth.UserInfo;
 // let supervisorInfo: Api.Auth.UserInfo;
-const applyUserInfo = ref<Api.Auth.UserInfo>();
-const applyUserSupervisorInfo = ref<Api.Auth.UserInfo>();
+// const applyUserInfo = ref<Api.Auth.UserInfo>();
+// const applyUserSupervisorInfo = ref<Api.Auth.UserInfo>();
+const applyUserInfo = reactive<{
+  creatorUserInfo: Api.Auth.UserInfo | undefined;
+  userInfo: Api.Auth.UserInfo | undefined;
+  supervisor: Api.Auth.UserInfo | undefined;
+}>({
+  creatorUserInfo: undefined,
+  userInfo: undefined,
+  supervisor: undefined
+});
 const searchFormRef = ref();
 // const applyReceivingForm = Form.useForm;
-const uploadFileList = ref([] as any);
+const uploadFileList = ref<UploadProps['fileList']>([] as any);
 const listTableLoading = ref(true);
 const openApplyDrawerModal = ref<boolean>(false);
 const expandSearchFields = ref(true);
 const receivingGiftFromStatus = reactive({ disableStatus: false, descTypeHistory: false, actionStatus: '' });
 const listDataSource = ref([] as any);
+const isHttpProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'N';
+const { baseURL } = getServiceBaseURL(import.meta.env, isHttpProxy);
 const receivingGiftFormRef = ref<FormInstance>();
 const addPersonModalFormRef = ref<FormInstance>();
 const ccApplyOptions = ref<SelectProps['options']>([]);
@@ -207,7 +219,6 @@ const resetFromFields = () => {
 
 const showApplyDrawerModal = async (item?: any) => {
   resetFromFields();
-  // debugger;
   if (item && item.applicationId) {
     item.loading = true;
     console.log('item: {}', item);
@@ -219,6 +230,9 @@ const showApplyDrawerModal = async (item?: any) => {
       applyModelRef.reference = data.reference;
       const applyUser = data.applyForUser;
       userState.data = [{ ...applyUser }];
+      applyUserInfo.userInfo = applyUser;
+      applyUserInfo.supervisor = applyUser.supervisor;
+      applyUserInfo.creatorUserInfo = data.creatorUser;
       applyModelRef.applyName = applyUser.email;
 
       if (data.copyToUsers) {
@@ -242,6 +256,16 @@ const showApplyDrawerModal = async (item?: any) => {
         applyModelRef.deptHead = deptHeadUser.userEmail;
         deptHeadGroupUserState.data.push(deptHeadUser);
       }
+      // if (data.fileAttach) {
+      //   const attach = data.fileAttach;
+      //   uploadFileList?.value?.push({
+      //     uid: attach.id,
+      //     name: attach.origFileName,
+      //     size: Number.parseInt(attach.fileSize, 2),
+      //     url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+      //   });
+      // }
+
       applyModelRef.hospActivities = data.hospActivities;
       applyModelRef.expensePerHead = data.hospRef.expensePerHead;
       applyModelRef.headCount = data.hospRef.headCount;
@@ -264,7 +288,6 @@ const showApplyDrawerModal = async (item?: any) => {
 
 const closeApplyDrawerModal = () => {
   openApplyDrawerModal.value = false;
-  uploadFileList.value.length = 0;
   receivingGiftFromStatus.disableStatus = false;
   applyOptions.value.length = 0;
   ccApplyOptions.value.length = 0;
@@ -296,8 +319,9 @@ onMounted(async () => {
   authStore = useAuthStore();
   userInfo = authStore.userInfo;
   // supervisorInfo = userInfo.supervisor;
-  applyUserInfo.value = authStore.userInfo;
-  applyUserSupervisorInfo.value = authStore.userInfo;
+  applyUserInfo.userInfo = userInfo;
+  applyUserInfo.creatorUserInfo = userInfo;
+  applyUserInfo.supervisor = userInfo.supervisor;
   const listData = await fetchReceivingHospitalityList({ userId: userInfo.sfUserId, newVersion: 'N' });
   listTableLoading.value = false;
   if (listData?.data?.list && listData.data.list.length > 0) {
@@ -326,8 +350,8 @@ const reloadApplyUserInfo = async (newValue: string, oldValue: string) => {
       const { data, error } = await fetchGetUserInfoById(applyOpt[0].sfUserId);
       if (!error) {
         // console.log(data);
-        applyUserInfo.value = data;
-        applyUserSupervisorInfo.value = data.supervisor;
+        applyUserInfo.userInfo = data;
+        applyUserInfo.supervisor = data.supervisor;
       }
     }
   }
@@ -375,7 +399,7 @@ watch(
     >
       <a-descriptions :title="$t('form.applicateInfo.formFillerInfoTitle')" :column="2">
         <a-descriptions-item :label="$t('form.applicateInfo.formFiller')">
-          {{ userInfo.firstName }} {{ userInfo.lastName }}
+          {{ applyUserInfo?.creatorUserInfo?.firstName }} {{ applyUserInfo?.creatorUserInfo?.lastName }}
         </a-descriptions-item>
         <a-descriptions-item :label="$t('form.applicateInfo.applyDate')">
           {{ applyModelRef.createDate }}
@@ -427,19 +451,19 @@ watch(
           </a-descriptions-item>
 -->
           <a-descriptions-item :label="$t('form.applicateInfo.employeeNo')">
-            {{ applyUserInfo?.employeeId }}
+            {{ applyUserInfo?.userInfo?.employeeId }}
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.applicateInfo.department')">
-            {{ applyUserInfo?.orgTxt }}
+            {{ applyUserInfo?.userInfo?.orgTxt }}
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.applicateInfo.supervisor')">
-            {{ applyUserSupervisorInfo?.firstName }} {{ applyUserSupervisorInfo?.lastName }}
+            {{ applyUserInfo?.supervisor?.firstName }} {{ applyUserInfo?.supervisor?.lastName }}
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.applicateInfo.costCenter')">
-            {{ applyUserInfo?.costCenter }}
+            {{ applyUserInfo?.userInfo?.costCenter }}
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.applicateInfo.division')">
-            {{ applyUserInfo?.division }}
+            {{ applyUserInfo?.userInfo?.division }}
           </a-descriptions-item>
         </a-descriptions>
         <a-row :gutter="24">
@@ -513,6 +537,19 @@ watch(
             </a-form-item>
           </a-col>
         </a-row>
+        <!--
+        <a-row :gutter="24">
+          <a-col span="12">
+            <a-form-item :label="$t('form.common.upload_person_label')">
+              <a-upload
+                v-model:file-list="uploadFileList"
+                :action="`${baseURL}/sys/upload/file?module=receiving&type=CompanyPerson`"
+                :max-count="1"
+              ></a-upload>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        -->
         <a-row :gutter="24">
           <a-col span="24">
             <a-form-item :label="$t('page.givingHospitality.applyForm.remark')" name="remark">

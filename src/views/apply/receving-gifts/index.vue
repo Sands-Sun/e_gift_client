@@ -615,7 +615,6 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
 
 const closeApplyDrawerModal = () => {
   openApplyDrawerModal.value = false;
-  uploadFileList.value.length = 0;
   receivingGiftFromStatus.disableStatus = false;
   applyOptions.value.length = 0;
   ccApplyOptions.value.length = 0;
@@ -900,7 +899,7 @@ const fillInPrice = (newCompanyList: Api.Gifts.GiftCompany[]) => {
 
   applyModelRef.volume = totalVolume === 0 ? undefined : totalVolume;
   applyModelRef.unitValue = maxUnitValue;
-  applyModelRef.estimatedTotalValue = totalValue === 0 ? undefined : totalValue;
+  applyModelRef.estimatedTotalValue = totalValue === 0 ? undefined : Number.parseFloat(totalValue.toFixed(2));
 };
 
 // 重新加载申请人信息
@@ -1279,7 +1278,7 @@ watch(
 
         <a-row :gutter="24">
           <a-col span="12">
-            <a-form-item :label="$t('form.common.upload_person_label')">
+            <a-form-item :label="$t('page.receivingGifts.applyForm.upload_person_label')">
               <a-upload
                 v-model:file-list="uploadFileList"
                 :action="`${baseURL}/sys/upload/file?module=receiving&type=CompanyPerson`"

@@ -257,6 +257,7 @@ declare namespace App {
         title: string;
       };
       common: {
+        language: string;
         tip: string;
         add: string;
         addSuccess: string;
@@ -463,6 +464,7 @@ declare namespace App {
         receivingHospitality: {
           applyForm: {
             receivingHospitalityRequestTitle: string;
+            upload_person_label: string;
             remark: string;
             remark_validation: string;
             receivingHospitalityInfo: string;
@@ -492,6 +494,7 @@ declare namespace App {
         givingHospitality: {
           applyForm: {
             givingHospitalityRequestTitle: string;
+            upload_person_label: string;
             remark: string;
             remark_validation: string;
             givingHospitalityInfo: string;
@@ -533,6 +536,7 @@ declare namespace App {
         givingGifts: {
           applyForm: {
             givingGiftRequestTitle: string;
+            upload_person_label: string;
             remark: string;
             remark_validation: string;
             givingGiftInfo: string;
@@ -573,6 +577,7 @@ declare namespace App {
         receivingGifts: {
           applyForm: {
             acceptGiftRequestTitle: string;
+            upload_person_label: string;
             receivingGiftInfo: string;
             remark: string;
             remark_validation: string;

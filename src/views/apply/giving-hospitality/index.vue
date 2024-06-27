@@ -628,7 +628,7 @@ const perVerification = (): Promise<void> => {
     const allNoGeovPerson = personArr.every(p => p.isGoSoc !== 'Yes');
     console.log('allNoGeovPerson: ', allNoGeovPerson);
     if (allNoGeovPerson && applyModelRef.expensePerHead && applyModelRef.expensePerHead <= 300) {
-      applyModelRef.expensePerHead = 0;
+      applyModelRef.expensePerHead = undefined;
       Modal.warning({
         title: $t('form.common.system_prompt'),
         content: h('div', {}, [h('p', $t('page.givingHospitality.applyForm.gitfHospNoGovLessThanNotify_message'))]),
@@ -940,7 +940,9 @@ const reloadApplyUserInfo = async (newValue: string, oldValue: string) => {
 };
 
 const hideDeptHeadDropDown = (newPerHead: number, newHeadCount: number) => {
-  applyModelRef.estimatedTotalExpense = Number.isNaN(newPerHead * newHeadCount) ? undefined : newPerHead * newHeadCount;
+  applyModelRef.estimatedTotalExpense = Number.isNaN(newPerHead * newHeadCount)
+    ? undefined
+    : Number.parseFloat((newPerHead * newHeadCount).toFixed(2));
   // 隐藏部门经理下拉列表
   deptHeadGroupUserState.hidden = false;
   if (applyUserInfo?.userInfo?.isCountryHead || applyUserInfo?.userInfo?.isDeptHead) {
@@ -1345,7 +1347,7 @@ watch(
         </div>
         <a-row :gutter="24">
           <a-col span="12">
-            <a-form-item :label="$t('form.common.upload_person_label')">
+            <a-form-item :label="$t('page.givingHospitality.applyForm.upload_person_label')">
               <a-upload
                 v-model:file-list="uploadFileList"
                 :action="`${baseURL}/sys/upload/file?module=hospitality&type=CompanyPerson`"

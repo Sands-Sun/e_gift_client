@@ -377,7 +377,7 @@ onMounted(async () => {
     >
       <a-descriptions :title="$t('form.applicateInfo.formFillerInfoTitle')" :column="2">
         <a-descriptions-item :label="$t('form.applicateInfo.formFiller')">
-          {{ userInfo.firstName }} {{ userInfo.lastName }}
+          {{ applyUserInfo?.creatorUserInfo?.firstName }} {{ applyUserInfo?.creatorUserInfo?.lastName }}
         </a-descriptions-item>
         <a-descriptions-item :label="$t('form.applicateInfo.applyDate')">
           {{ applyModelRef.createDate }}

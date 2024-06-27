@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SelectProps } from '@ant-design/icons-vue';
-import { ExclamationCircleOutlined, UploadOutlined } from '@ant-design/icons-vue';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import type { FormInstance, TableColumnsType, UploadChangeParam, UploadProps } from 'ant-design-vue';
 import { Modal, Upload, message } from 'ant-design-vue';
 import type { Rule } from 'ant-design-vue/es/form';
@@ -824,7 +824,7 @@ watch(
     >
       <a-descriptions :title="$t('form.applicateInfo.formFillerInfoTitle')" :column="2">
         <a-descriptions-item :label="$t('form.applicateInfo.formFiller')">
-          {{ userInfo.firstName }} {{ userInfo.lastName }}
+          {{ applyUserInfo?.creatorUserInfo?.firstName }} {{ applyUserInfo?.creatorUserInfo?.lastName }}
         </a-descriptions-item>
         <a-descriptions-item :label="$t('form.applicateInfo.applyDate')">
           {{ applyModelRef.createDate }}
@@ -1078,6 +1078,7 @@ watch(
           </a-row>
         </div>
 
+        <!--
         <a-row :gutter="24">
           <a-col span="12">
             <a-form-item :label="$t('form.common.upload_person_label')">
@@ -1104,7 +1105,7 @@ watch(
             </a-button>
           </a-col>
         </a-row>
-
+        -->
         <a-row :gutter="24">
           <a-col span="24">
             <a-form-item :label="$t('page.receivingGifts.applyForm.remark')" name="remark">

@@ -197,6 +197,7 @@ declare namespace Api {
       deptHeadGroup: GiftGroup;
       hospRef: ReceivingHospitalityRef;
       hospActivities: ReceivingHospitalityActivity[];
+      fileAttach: FileAttach;
       applyForUser: Api.Auth.UserInfo;
       creatorUser: Api.Auth.UserInfo;
     }

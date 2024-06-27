@@ -3,6 +3,7 @@ const local: App.I18n.Schema = {
     title: 'E-Gift/Hospitality System'
   },
   common: {
+    language: 'en-US',
     tip: 'Tip',
     add: 'Add',
     addSuccess: 'Add Success',
@@ -283,6 +284,7 @@ const local: App.I18n.Schema = {
     receivingHospitality: {
       applyForm: {
         receivingHospitalityRequestTitle: 'New Receiving Hospitality Request Form',
+        upload_person_label: 'Upload the recipient list',
         remark: 'Remarks',
         remark_validation: 'Please fill in hospitality remarks',
         receivingHospitalityInfo: 'Receiving Hospitality Information',
@@ -313,6 +315,7 @@ const local: App.I18n.Schema = {
     givingHospitality: {
       applyForm: {
         givingHospitalityRequestTitle: 'New Giving Hospitality Request Form',
+        upload_person_label: 'Upload the recipient list',
         remark: 'Remarks',
         remark_validation: 'Please fill in hospitality remarks',
         givingHospitalityInfo: 'Giving Hospitality Information',
@@ -664,6 +667,7 @@ const local: App.I18n.Schema = {
     givingGifts: {
       applyForm: {
         givingGiftRequestTitle: 'Giving Gift Request Form',
+        upload_person_label: 'Upload the recipient list',
         remark: 'Remark',
         remark_validation: 'Please input remark',
         givingGiftInfo: 'Giving Gift Information',

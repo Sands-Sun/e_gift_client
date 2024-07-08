@@ -349,16 +349,26 @@ const local: App.I18n.Schema = {
         title: 'Policy Reminder',
         desc_1954: [
           {
-            label: 'Please note that this function is to register and record',
+            label: 'Remark',
             items: [
               {
                 value:
-                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding e-Gift/Hospitality application in the reimbursement system.',
+                  'Only external hospitality provided out of any promotional event shall be pre-applied in eHospitality system. Hospitalities provided in promotional events shall be applied in Opera system.',
                 items: []
               },
               {
                 value:
-                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding e-Gift/Hospitality record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                  'For hospitality ≤CNY 300 Yuan per capita (with no government official involved), no approval flow will be triggered in E-hospitality, the basic information input is just for document purpose.',
+                items: []
+              },
+              {
+                value:
+                  'If per person cost (with no government official involved), is more than RMB 300 but not more than RMB 500 (including RMB 500), pre-approvals from line manager and Department Head are needed. If per person cost is more than RMB 500, pre-approval from compliance BP is also needed.',
+                items: []
+              },
+              {
+                value:
+                  'For hospitality provided to government officials within RMB 300 per person (including RMB 300), pre-approval from line manager is needed. If above RMB 300, pre-approval from Department Head and Compliance BP are also needed.',
                 items: []
               }
             ]
@@ -368,29 +378,19 @@ const local: App.I18n.Schema = {
             items: [
               {
                 value:
-                  'Employees giving Hospitality to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                  'Employees giving Gift(s) to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
                 items: []
               },
               {
                 value:
-                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, association, clients, distributors suppliers, services providers and other business partners)',
                 items: []
               }
             ]
           },
           {
-            label: 'Requester should comply with below compliance regulations',
+            label: 'Applicants should also comply with the following compliance requirements',
             items: [
-              {
-                value:
-                  'Giving Hospitality to HCPs, Government Officials and Distributors, the Criteria is <= CNY 300 per person per time (including drinks and service charge)',
-                items: []
-              },
-              {
-                value:
-                  'Only on very rare occasions with appropriate reasons, the Hospitality provided to HCPs, Government Officials and Distributors may exceed CNY 300 per person, and requires upfront approval by the Head of Compliance China, or the China Head of Pharmaceuticals / Consumer Health, or the Regional Managing Directors for Pharmaceuticals or the Head of Field Sales for Consumer Health.',
-                items: []
-              },
               {
                 value:
                   'For meals with HCPs that are unconnected to an event and that are arranged by medical representatives, the total cost for one meal (incl. beverages) should not exceed CNY 2,000. If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
@@ -406,16 +406,26 @@ const local: App.I18n.Schema = {
         ],
         desc_1955: [
           {
-            label: 'Please note that this function is to register and record',
+            label: 'Remark',
             items: [
               {
                 value:
-                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding e-Gift/Hospitality application in the reimbursement system.',
+                  'Only external hospitality provided out of any promotional event shall be pre-applied in eHospitality system. Hospitalities provided in promotional events shall be applied in Opera system.',
                 items: []
               },
               {
                 value:
-                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding e-Gift/Hospitality record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                  'For hospitality ≤CNY 300 Yuan per capita (with no government official involved), no approval flow will be triggered in E-hospitality, the basic information input is just for document purpose.',
+                items: []
+              },
+              {
+                value:
+                  'If per person cost (with no government official involved), is more than RMB 300 but not more than RMB 500 (including RMB 500), pre-approvals from line manager and Department Head are needed. If per person cost is more than RMB 500, pre-approval from compliance BP is also needed.',
+                items: []
+              },
+              {
+                value:
+                  'For hospitality provided to government officials within RMB 300 per person (including RMB 300), pre-approval from line manager is needed. If above RMB 300, pre-approval from Department Head and Compliance BP are also needed.',
                 items: []
               }
             ]
@@ -425,29 +435,19 @@ const local: App.I18n.Schema = {
             items: [
               {
                 value:
-                  'Employees giving Hospitality to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                  'Employees giving Gift(s) to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
                 items: []
               },
               {
                 value:
-                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, association, clients, distributors suppliers, services providers and other business partners)',
                 items: []
               }
             ]
           },
           {
-            label: 'Requester should comply with below compliance regulations',
+            label: 'Applicants should also comply with the following compliance requirements',
             items: [
-              {
-                value:
-                  'Giving Hospitality to HCPs, Government Officials and Distributors, the Criteria is <= CNY 300 per person per time (including drinks and service charge)',
-                items: []
-              },
-              {
-                value:
-                  'Only on very rare occasions with appropriate reasons, the Hospitality provided to HCPs, Government Officials and Distributors may exceed CNY 300 per person, and requires upfront approval by the Head of Compliance China, or the China Head of Pharmaceuticals / Consumer Health, or the Regional Managing Directors for Pharmaceuticals or the Head of Field Sales for Consumer Health.',
-                items: []
-              },
               {
                 value:
                   'For meals with HCPs that are unconnected to an event and that are arranged by medical representatives, the total cost for one meal (incl. beverages) should not exceed CNY 2,000. If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
@@ -484,7 +484,10 @@ const local: App.I18n.Schema = {
               {
                 value: 'Approval flow:',
                 items: [
-                  { value: 'For hospitality ≤CNY 300 Yuan per capita, no need to apply in E-hospitality,' },
+                  {
+                    value:
+                      'For hospitality ≤CNY 300 Yuan per capita(with no government official involved), no approval flow will be triggered in E-hospitality, the basic information input is just for document purpose,'
+                  },
                   {
                     value:
                       'For hospitality between CNY 300 Yuan and 500 Yuan(included) per capita, the line manager and department head (CMT member or other equivalent management team members)’s pre-approval is needed,'
@@ -510,16 +513,26 @@ const local: App.I18n.Schema = {
         ],
         desc_0882: [
           {
-            label: 'Please note that this function is to register and record',
+            label: 'Remark',
             items: [
               {
                 value:
-                  'In exceptional cases during daily business, employees to provide Hospitality of meal to HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality requires special approval in advance by the authorized Approvers (Please select one in above "Approver"). When the approval is acquired and the Hospitality is completed, the Requester should claim reimbursement linking to the corresponding e-Gift/Hospitality application in the reimbursement system.',
+                  'Only external hospitality provided out of any promotional event shall be pre-applied in eHospitality system. Hospitalities provided in promotional events shall be applied in Opera system.',
                 items: []
               },
               {
                 value:
-                  'During daily business, employees to provide Hospitality of meal to any Third Party other than HCP, Government Officials and Distributors which exceeds CNY 300 per person per time (incl. beverages and service charge). Such kind of Hospitality does not require special approval. When the record is input and the Hospitality is completed, the Requester should apply for reimbursement linking to the corresponding e-Gift/Hospitality record in the reimbursement system. (For Hospitality provided to Third Party during daily business that is below or equal to CNY 300 per person per time (incl. beverages and service charge), employees can directly apply for reimbursement in the reimbursement system.)',
+                  'For hospitality ≤CNY 300 Yuan per capita (with no government official involved), no approval flow will be triggered in E-hospitality, the basic information input is just for document purpose.',
+                items: []
+              },
+              {
+                value:
+                  'If per person cost (with no government official involved), is more than RMB 300 but not more than RMB 500 (including RMB 500), pre-approvals from line manager and Department Head are needed. If per person cost is more than RMB 500, pre-approval from compliance BP is also needed.',
+                items: []
+              },
+              {
+                value:
+                  'For hospitality provided to government officials within RMB 300 per person (including RMB 300), pre-approval from line manager is needed. If above RMB 300, pre-approval from Department Head and Compliance BP are also needed.',
                 items: []
               }
             ]
@@ -529,29 +542,19 @@ const local: App.I18n.Schema = {
             items: [
               {
                 value:
-                  'Employees giving Hospitality to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
+                  'Employees giving Gift(s) to a Third Party, it required no Solicitation, no Inappropriate Influence Avoid Conflicts of Interest, no Cash or Cash Equivalents and no Private Benefit',
                 items: []
               },
               {
                 value:
-                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, association, clients, distributors suppliers, services providers and other business partners)',
                 items: []
               }
             ]
           },
           {
-            label: 'Requester should comply with below compliance regulations',
+            label: 'Applicants should also comply with the following compliance requirements',
             items: [
-              {
-                value:
-                  'Giving Hospitality to HCPs, Government Officials and Distributors, the Criteria is <= CNY 300 per person per time (including drinks and service charge)',
-                items: []
-              },
-              {
-                value:
-                  'Only on very rare occasions with appropriate reasons, the Hospitality provided to HCPs, Government Officials and Distributors may exceed CNY 300 per person, and requires upfront approval by the Head of Compliance China, or the China Head of Pharmaceuticals / Consumer Health, or the Regional Managing Directors for Pharmaceuticals or the Head of Field Sales for Consumer Health.',
-                items: []
-              },
               {
                 value:
                   'For meals with HCPs that are unconnected to an event and that are arranged by medical representatives, the total cost for one meal (incl. beverages) should not exceed CNY 2,000. If the meal is arranged by other Sales or Marketing employees (for example, by District or Regional Managers or Franchise Heads), the total cost for one meal (incl. beverages) should not exceed CNY 3,000.',
@@ -576,7 +579,7 @@ const local: App.I18n.Schema = {
               },
               {
                 value:
-                  'If per person cost does not exceed RMB 300 (no government official involved), no approval is needed under eHospitality system for reimbursement purpose.',
+                  'For hospitality ≤CNY 300 Yuan per capita (with no government official involved), no approval flow will be triggered in E-hospitality, the basic information input is just for document purpose.',
                 items: []
               },
               {
@@ -618,45 +621,44 @@ const local: App.I18n.Schema = {
             label: 'Note',
             items: [
               {
-                value: 'If total expense per head is less than RMB 300 no approval is required.',
+                value:
+                  'Only external hospitality provided out of any promotional event shall be pre-applied in eHospitality system. Hospitalities provided in promotional events shall be applied in Opera system.',
                 items: []
               },
               {
                 value:
-                  "If total expense per head is between RMB 300 and RMB 1000, line manager's prior approval is needed.",
+                  'For hospitality ≤CNY 300 Yuan per capita (with no government official involved), no approval flow will be triggered in E-hospitality, the basic information input is just for document purpose.',
                 items: []
               },
               {
                 value:
-                  'If total expense per head is more than RMB 1000 or the total expense for the group is more than RMB 6000, prior approval of line manager and subgroup compliance officer is needed.',
+                  'If per person cost is more than RMB 300 but not more than RMB 500 (including RMB 500), pre-approvals from line manager and Department Head are needed. If per person cost is more than RMB 500, pre-approval from compliance BP is also needed.',
                 items: []
               },
               {
                 value:
-                  'If invitee is government official or employee of state owned company, prior approval of line manager and subgroup compliance officer is needed.',
+                  'For hospitality provided to government officials within RMB 300 per person (including RMB 300), pre-approval from line manager is needed. If above RMB 300, pre-approval from Department Head and Compliance BP are also needed.',
                 items: []
               }
             ]
           },
           {
-            label: 'The hospitable activity shall fulfill all of the following criteria:',
+            label: 'The hospitality shall fulfill all of the following criteria',
             items: [
-              { value: 'Serving a Legitimate Purpose', items: [] },
-              { value: 'Consistent with Pre-Valuing Business Practice', items: [] },
-              { value: 'Reasonable and Appropriate', items: [] },
-              { value: 'Within the Expense Guidelines Stipulated', items: [] }
+              { value: 'Serving a legitimate purpose', items: [] },
+              { value: 'Consistent with common business practice pre-evaluated by applicant', items: [] },
+              { value: 'Reasonable and appropriate', items: [] }
             ]
           },
           {
-            label: ' The hospitable activity must NOT be',
+            label: 'The hospitality must NOT be',
             items: [
               { value: 'Lavish', items: [] },
               { value: 'Extravagant', items: [] },
-              { value: 'Located in or near illegal activity', items: [] },
-              { value: 'Attached to the giving of gifts not in accordance with this Guideline or Table', items: [] },
+              { value: 'Located in or near illegal place', items: [] },
+              { value: 'Breach any compliance policy on providing hospitalities', items: [] },
               {
-                value:
-                  'Provided in a place of ill-repute (eg strip club or in an inappropriate Bar) or of a similar nature',
+                value: 'Provided in an infamous place (e.g. strip club or inappropriate bar) or of a similar nature',
                 items: []
               }
             ]
@@ -702,22 +704,58 @@ const local: App.I18n.Schema = {
         title: 'Policy Reminder',
         desc_1954: [
           {
-            label: 'Please note that this function is to register and record',
+            label: 'Please note that this function is to register and record gifts provided for third parties.',
             items: [
               {
-                value:
-                  'Pharmaceuticals to provide any gifts allowed by Compliance policy other than Promotional Aids and Medical Utility Items to a Third Party. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general.',
-                items: []
+                value: 'For the promotion of prescription-only medicines:',
+                items: [
+                  {
+                    value:
+                      'Providing or offering Promotional Aids to HCPs in relation to the promotion of prescription-only medicines is prohibited (including but not limited to sticky notes, mouse pads, calendars, etc.)'
+                  },
+                  {
+                    value:
+                      'Pens and notepads can be provided to HCPs in the context of company organized or third-party events (e.g. Bayer’s satellite meeting) as long as they are branded with  Bayer name and/or logo only, of minimal value and only the necessary quantity for the purpose of the event'
+                  },
+                  {
+                    value:
+                      'In the second situation mentioned above, the approval of the line manager, the department head and the compliance BP shall be obtained in advance.'
+                  }
+                ]
               },
               {
                 value:
-                  'Consumer Health to provide any gifts allowed by Compliance policy other than Promotional Aids, Medical Utility Items, Consumer Gifts and Cultural Courtesy Gifts for distributors. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general. ',
-                items: []
+                  'For the promotion of over-the-counter medicines and the medical device under RAD department , Promotional Aids may be offered or provided to third parties when all the following conditions are met: ',
+                items: [
+                  { value: 'Of minimal value (≤ CNY 100 in value per item)' },
+                  { value: 'Related to the work of the recipient' },
+                  {
+                    value: 'Branded with Bayer logo/trademark/brand names of Pharmaceuticals/ Consumer Health products'
+                  },
+                  {
+                    value: 'The approval of the line manager shall be obtained in advance.'
+                  }
+                ]
               },
               {
                 value:
-                  'Consumer Health to provide Cultural Courtesy Gifts allowed by Compliance policy to its distributors under exceptional situations. (In the case of providing Cultural Courtesy Gifts to several distributors at one time, the Requester should make records in the eGift system by each distributor.)',
-                items: []
+                  'It is not allowed to provide Cultural Courtesy Gifts to Third Parties. As an exception to this rule, for Consumer Health, it is allowed to provide Cultural Courtesy Gifts to Consumer Health Distributors under the following conditions: ',
+                items: [
+                  { value: 'Upfront approvals by Heads of Consumer Health department' },
+                  { value: 'Inexpensive (≤ CNY 200 in value per person)' },
+                  {
+                    value:
+                      'On an exceptional basis (only on two particular official Chinese national holidays, i.e. the Spring Festival and the Mid-Autumn Festival)'
+                  },
+                  {
+                    value:
+                      'Acceptable items include food, tea, flowers, plants, crafts, or locally produced products that are normally associated with the relevant traditional holidays'
+                  },
+                  {
+                    value:
+                      'Unacceptable items include tobacco, alcohol, tickets of any kind of social or sporting activities, etc'
+                  }
+                ]
               }
             ]
           },
@@ -731,7 +769,7 @@ const local: App.I18n.Schema = {
               },
               {
                 value:
-                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, association, clients, distributors suppliers, services providers and other business partners)',
                 items: []
               }
             ]
@@ -739,22 +777,58 @@ const local: App.I18n.Schema = {
         ],
         desc_1955: [
           {
-            label: 'Please note that this function is to register and record',
+            label: 'Please note that this function is to register and record gifts provided for third parties.',
             items: [
               {
-                value:
-                  'Pharmaceuticals to provide any gifts allowed by Compliance policy other than Promotional Aids and Medical Utility Items to a Third Party. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general.',
-                items: []
+                value: 'For the promotion of prescription-only medicines:',
+                items: [
+                  {
+                    value:
+                      'Providing or offering Promotional Aids to HCPs in relation to the promotion of prescription-only medicines is prohibited (including but not limited to sticky notes, mouse pads, calendars, etc.)'
+                  },
+                  {
+                    value:
+                      'Pens and notepads can be provided to HCPs in the context of company organized or third-party events (e.g. Bayer’s satellite meeting) as long as they are branded with  Bayer name and/or logo only, of minimal value and only the necessary quantity for the purpose of the event'
+                  },
+                  {
+                    value:
+                      'In the second situation mentioned above, the approval of the line manager, the department head and the compliance BP shall be obtained in advance.'
+                  }
+                ]
               },
               {
                 value:
-                  'Consumer Health to provide any gifts allowed by Compliance policy other than Promotional Aids, Medical Utility Items, Consumer Gifts and Cultural Courtesy Gifts for distributors. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general. ',
-                items: []
+                  'For the promotion of over-the-counter medicines and the medical device under RAD department , Promotional Aids may be offered or provided to third parties when all the following conditions are met: ',
+                items: [
+                  { value: 'Of minimal value (≤ CNY 100 in value per item)' },
+                  { value: 'Related to the work of the recipient' },
+                  {
+                    value: 'Branded with Bayer logo/trademark/brand names of Pharmaceuticals/ Consumer Health products'
+                  },
+                  {
+                    value: 'The approval of the line manager shall be obtained in advance.'
+                  }
+                ]
               },
               {
                 value:
-                  'Consumer Health to provide Cultural Courtesy Gifts allowed by Compliance policy to its distributors under exceptional situations. (In the case of providing Cultural Courtesy Gifts to several distributors at one time, the Requester should make records in the eGift system by each distributor.)',
-                items: []
+                  'It is not allowed to provide Cultural Courtesy Gifts to Third Parties. As an exception to this rule, for Consumer Health, it is allowed to provide Cultural Courtesy Gifts to Consumer Health Distributors under the following conditions: ',
+                items: [
+                  { value: 'Upfront approvals by Heads of Consumer Health department' },
+                  { value: 'Inexpensive (≤ CNY 200 in value per person)' },
+                  {
+                    value:
+                      'On an exceptional basis (only on two particular official Chinese national holidays, i.e. the Spring Festival and the Mid-Autumn Festival)'
+                  },
+                  {
+                    value:
+                      'Acceptable items include food, tea, flowers, plants, crafts, or locally produced products that are normally associated with the relevant traditional holidays'
+                  },
+                  {
+                    value:
+                      'Unacceptable items include tobacco, alcohol, tickets of any kind of social or sporting activities, etc'
+                  }
+                ]
               }
             ]
           },
@@ -768,7 +842,7 @@ const local: App.I18n.Schema = {
               },
               {
                 value:
-                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners)',
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, association, clients, distributors suppliers, services providers and other business partners)',
                 items: []
               }
             ]
@@ -849,7 +923,7 @@ const local: App.I18n.Schema = {
               },
               {
                 value:
-                  'Do not give items with strong personal attributs (like cigarettes, alcohol, entertainment events, sports tickets ets.) or cash or cash equivalents.',
+                  'Do not give items with strong personal attributes (like cigarettes, alcohol, entertainment events, sports tickets etc.) or cash or cash equivalents.',
                 items: []
               },
               {
@@ -877,22 +951,58 @@ const local: App.I18n.Schema = {
         ],
         desc_0882: [
           {
-            label: 'Please note that this function is to register and record',
+            label: 'Please note that this function is to register and record gifts provided for third parties.',
             items: [
               {
-                value:
-                  'Pharmaceuticals to provide any gifts allowed by Compliance policy other than Promotional Aids and Medical Utility Items to a Third Party. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general.',
-                items: []
+                value: 'For the promotion of prescription-only medicines:',
+                items: [
+                  {
+                    value:
+                      'Providing or offering Promotional Aids to HCPs in relation to the promotion of prescription-only medicines is prohibited (including but not limited to sticky notes, mouse pads, calendars, etc.)'
+                  },
+                  {
+                    value:
+                      'Pens and notepads can be provided to HCPs in the context of company organized or third-party events (e.g. Bayer’s satellite meeting) as long as they are branded with  Bayer name and/or logo only, of minimal value and only the necessary quantity for the purpose of the event'
+                  },
+                  {
+                    value:
+                      'In the second situation mentioned above, the approval of the line manager, the department head and the compliance BP shall be obtained in advance.'
+                  }
+                ]
               },
               {
                 value:
-                  'Consumer Health to provide any gifts allowed by Compliance policy other than Promotional Aids, Medical Utility Items, Consumer Gifts and Cultural Courtesy Gifts for distributors. Such gifts can be permissible depending on the circumstances of the particular case (e.g. a symbolic, inexpensive Gift that is provided out of politeness) but requires the prior approval by the Head of Compliance China. Sales and Marketing team should not provide such gifts in general.',
-                items: []
+                  'For the promotion of over-the-counter medicines and the medical device under RAD department , Promotional Aids may be offered or provided to third parties when all the following conditions are met: ',
+                items: [
+                  { value: 'Of minimal value (≤ CNY 100 in value per item)' },
+                  { value: 'Related to the work of the recipient' },
+                  {
+                    value: 'Branded with Bayer logo/trademark/brand names of Pharmaceuticals/ Consumer Health products'
+                  },
+                  {
+                    value: 'The approval of the line manager shall be obtained in advance.'
+                  }
+                ]
               },
               {
                 value:
-                  'Consumer Health to provide Cultural Courtesy Gifts allowed by Compliance policy to its distributors under exceptional situations. (In the case of providing Cultural Courtesy Gifts to several distributors at one time, the Requester should make records in the eGift system by each distributor.) ',
-                items: []
+                  'It is not allowed to provide Cultural Courtesy Gifts to Third Parties. As an exception to this rule, for Consumer Health, it is allowed to provide Cultural Courtesy Gifts to Consumer Health Distributors under the following conditions: ',
+                items: [
+                  { value: 'Upfront approvals by Heads of Consumer Health department' },
+                  { value: 'Inexpensive (≤ CNY 200 in value per person)' },
+                  {
+                    value:
+                      'On an exceptional basis (only on two particular official Chinese national holidays, i.e. the Spring Festival and the Mid-Autumn Festival)'
+                  },
+                  {
+                    value:
+                      'Acceptable items include food, tea, flowers, plants, crafts, or locally produced products that are normally associated with the relevant traditional holidays'
+                  },
+                  {
+                    value:
+                      'Unacceptable items include tobacco, alcohol, tickets of any kind of social or sporting activities, etc'
+                  }
+                ]
               }
             ]
           },
@@ -906,7 +1016,7 @@ const local: App.I18n.Schema = {
               },
               {
                 value:
-                  '(Third Party/Parties include, but are not limited to HCPs, government officials, distributors and other business partners) ',
+                  '(Third Party/Parties include, but are not limited to HCPs, government officials, association, clients, distributors suppliers, services providers and other business partners)',
                 items: []
               }
             ]
@@ -917,6 +1027,7 @@ const local: App.I18n.Schema = {
     receivingGifts: {
       applyForm: {
         acceptGiftRequestTitle: 'Accpect Gift Request Form',
+        upload_person_label: 'Upload the recipient list',
         receivingGiftInfo: 'Receiving Gift Information',
         // remark: 'Remark (Please fill in with the detailed Gift name)',
         remark: 'Remark',

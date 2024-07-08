@@ -168,6 +168,9 @@ const applyModelRef = reactive<{
   remark: string;
   fileId: unknown;
   attachFile: UploadFile<any>[];
+
+  extraFileIds: unknown[];
+  extraAttachFiles: UploadFile<any>[];
 }>({
   actionType: '',
   applicationId: '',
@@ -194,7 +197,9 @@ const applyModelRef = reactive<{
   totalValue: undefined as any,
   remark: '',
   fileId: undefined,
-  attachFile: []
+  attachFile: [],
+  extraFileIds: [],
+  extraAttachFiles: []
 });
 
 const getDeptHeadTooltip = () => {
@@ -386,6 +391,24 @@ const customUpload = async (option: any) => {
   }
 };
 
+const handleUploadExtraChange = ({ file, fileList }: UploadChangeParam) => {
+  if (file.status === 'done') {
+    message.success(
+      $t('form.common.upload_file_success', {
+        fileName: `${file.name}`
+      })
+    );
+    applyModelRef.extraFileIds.push(file.response?.data?.id);
+    fileList.forEach(f => {
+      f.url = `${baseURL}/sys/download/file?fileId=${f.response?.data?.id}`;
+    });
+  } else if (file.status === 'error') {
+    message.error(`${file.name} file upload failed.`);
+  } else if (file.status === 'removed') {
+    applyModelRef.extraFileIds = applyModelRef.extraFileIds.filter(item => item !== file.response?.data?.id);
+  }
+};
+
 const handleUploadChange = ({ file, fileList }: UploadChangeParam) => {
   if (file.status === 'done') {
     message.success(
@@ -436,6 +459,7 @@ const clearApplyModel = () => {
   applyModelRef.remark = '';
   uploadFileList.value = [];
   applyModelRef.attachFile = [];
+  applyModelRef.extraAttachFiles = [];
   givingGiftFromStatus.disableStatus = false;
   deptHeadGroupUserState.hidden = true;
 };
@@ -530,19 +554,22 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
             uid: attach.id,
             name: attach.origFileName,
             status: 'done',
-            size: Number.parseInt(attach.fileSize, 2),
+            size: Number.parseInt(attach.fileSize, 10),
             url: `${baseURL}/sys/download/file?fileId=${attach.id}`
           }
         ];
-        // uploadFileList.value = [
-        //   {
-        //     uid: attach.id,
-        //     name: attach.origFileName,
-        //     status: 'done',
-        //     size: Number.parseInt(attach.fileSize, 2),
-        //     url: `${baseURL}/sys/download/file?fileId=${attach.id}`
-        //   }
-        // ];
+      }
+      if (data.extraAttachments) {
+        const extraAttach = data.extraAttachments;
+        extraAttach.forEach(attach => {
+          applyModelRef.extraAttachFiles.push({
+            uid: attach.id,
+            name: attach.origFileName,
+            status: 'done',
+            size: Number.parseInt(attach.fileSize, 10),
+            url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+          });
+        });
       }
 
       // applyModelRef.applyCCName = ccApplyOptions.value.map((v: any) => v.value);
@@ -1112,6 +1139,7 @@ watch(
       :title="$t('page.givingGifts.applyForm.givingGiftRequestTitle')"
       width="75%"
       size="large"
+      destroy-on-close="true"
       :open="openApplyDrawerModal"
       @close="closeApplyDrawerModal"
     >
@@ -1572,12 +1600,8 @@ watch(
                 ]
               }"
             >
-              <a-date-picker
-                v-model:value="applyModelRef.date"
-                :disabled-date="disabledAfterCurrentDate"
-                format="YYYY-MM-DD"
-                value-format="YYYY-MM-DD"
-              />
+              <!--:disabled-date="disabledAfterCurrentDate"  日期限制移除-->
+              <a-date-picker v-model:value="applyModelRef.date" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
             </a-form-item>
           </a-col>
           <a-col span="7">
@@ -1713,6 +1737,28 @@ watch(
           <a-col span="24">
             <a-form-item :label="$t('page.givingGifts.applyForm.remark')" name="remark">
               <a-textarea v-model:value="applyModelRef.remark" :rows="4" allow-clear />
+            </a-form-item>
+          </a-col>
+        </a-row>
+
+        <!--额外附件信息上传-->
+        <a-row :gutter="24">
+          <a-col span="12">
+            <a-form-item>
+              <template #label>
+                <p style="font-size: small">{{ $t('form.common.upload_person_label') }}</p>
+              </template>
+
+              <a-upload
+                v-model:file-list="applyModelRef.extraAttachFiles"
+                :action="`${baseURL}/sys/upload/file?module=giving&type=extraAttach`"
+                @change="handleUploadExtraChange"
+              >
+                <a-button size="small">
+                  <UploadOutlined></UploadOutlined>
+                  {{ $t('form.common.upload_file') }}
+                </a-button>
+              </a-upload>
             </a-form-item>
           </a-col>
         </a-row>

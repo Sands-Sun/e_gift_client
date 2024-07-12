@@ -819,6 +819,7 @@ watch(
       :title="$t('page.receivingGifts.applyForm.acceptGiftRequestTitle')"
       width="75%"
       size="large"
+      destroy-on-close="true"
       :open="openApplyDrawerModal"
       @close="closeApplyDrawerModal"
     >

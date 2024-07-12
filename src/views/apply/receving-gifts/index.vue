@@ -388,6 +388,8 @@ const clearApplyModel = () => {
   applyModelRef.volume = undefined;
   applyModelRef.estimatedTotalValue = 0;
   applyModelRef.remark = '';
+  applyModelRef.fileId = undefined;
+  applyModelRef.extraFileIds = [];
   applyModelRef.attachFile = [];
   applyModelRef.extraAttachFiles = [];
   receivingGiftFromStatus.disableStatus = false;
@@ -505,7 +507,10 @@ const handleUploadExtraChange = ({ file, fileList }: UploadChangeParam) => {
   } else if (file.status === 'error') {
     message.error(`${file.name} file upload failed.`);
   } else if (file.status === 'removed') {
-    applyModelRef.extraFileIds = applyModelRef.extraFileIds.filter(item => item !== file.response?.data?.id);
+    const index = applyModelRef.extraFileIds.indexOf(file.response?.data?.id || file.uid);
+    if (index > -1) {
+      applyModelRef.extraFileIds.splice(index, 1);
+    }
   }
 };
 
@@ -584,6 +589,7 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       }
       if (data.fileAttach) {
         const attach = data.fileAttach;
+        applyModelRef.fileId = attach.id;
         applyModelRef.attachFile = [
           {
             uid: attach.id,
@@ -597,6 +603,7 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       if (data.extraAttachments) {
         const extraAttach = data.extraAttachments;
         extraAttach.forEach(attach => {
+          applyModelRef.extraFileIds.push(attach.id);
           applyModelRef.extraAttachFiles.push({
             uid: attach.id,
             name: attach.origFileName,

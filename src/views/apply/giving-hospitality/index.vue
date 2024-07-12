@@ -45,7 +45,7 @@ const applyUserInfo = reactive<{
 });
 const hospCancelFormRef = ref();
 const openCancelModal = ref<boolean>(false);
-const uploadFileList = ref([] as any);
+// const uploadFileList = ref([] as any);
 const openApplyDrawerModal = ref<boolean>(false);
 const expandSearchFields = ref(true);
 const expandPolicyDescription = ref(true);
@@ -210,7 +210,8 @@ const clearApplyModel = () => {
   applyModelRef.headCount = undefined;
   applyModelRef.estimatedTotalExpense = 0;
   applyModelRef.remark = '';
-  // uploadFileList.value = [];
+  applyModelRef.fileId = undefined;
+  applyModelRef.extraFileIds = [];
   applyModelRef.attachFile = [];
   applyModelRef.extraAttachFiles = [];
   givingHospitalityFromStatus.disableStatus = false;
@@ -465,7 +466,10 @@ const handleUploadExtraChange = ({ file, fileList }: UploadChangeParam) => {
   } else if (file.status === 'error') {
     message.error(`${file.name} file upload failed.`);
   } else if (file.status === 'removed') {
-    applyModelRef.extraFileIds = applyModelRef.extraFileIds.filter(item => item !== file.response?.data?.id);
+    const index = applyModelRef.extraFileIds.indexOf(file.response?.data?.id || file.uid);
+    if (index > -1) {
+      applyModelRef.extraFileIds.splice(index, 1);
+    }
   }
 };
 
@@ -540,7 +544,7 @@ const closeCancelModal = () => {
 
 const closeApplyDrawerModal = () => {
   openApplyDrawerModal.value = false;
-  uploadFileList.value.length = 0;
+  // uploadFileList.value.length = 0;
   givingHospitalityFromStatus.disableStatus = false;
   applyOptions.value.length = 0;
   ccApplyOptions.value.length = 0;
@@ -724,6 +728,8 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       }
       if (data.fileAttach) {
         const attach = data.fileAttach;
+        applyModelRef.fileId = attach.id;
+        applyModelRef.extraFileIds.push(attach.id);
         applyModelRef.attachFile = [
           {
             uid: attach.id,
@@ -737,6 +743,7 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       if (data.extraAttachments) {
         const extraAttach = data.extraAttachments;
         extraAttach.forEach(attach => {
+          applyModelRef.extraFileIds.push(attach.id);
           applyModelRef.extraAttachFiles.push({
             uid: attach.id,
             name: attach.origFileName,

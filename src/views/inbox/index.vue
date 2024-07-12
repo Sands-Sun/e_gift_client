@@ -8,7 +8,7 @@ import {
 } from '@/service/api';
 import { useAuthStore } from '@/store/modules/auth';
 import { getServiceBaseURL } from '@/utils/service';
-import type { SelectProps } from '@ant-design/icons-vue';
+import type { SelectProps, UploadFile } from '@ant-design/icons-vue';
 import { ExclamationCircleOutlined, UploadOutlined } from '@ant-design/icons-vue';
 import type { FormInstance, TableColumnsType } from 'ant-design-vue';
 import { Modal } from 'ant-design-vue';
@@ -30,7 +30,7 @@ const expandSearchFields = ref(true);
 const expandPolicyDescription = ref(true);
 const openApplyDrawerModal = ref<boolean>(false);
 const openApproveModal = ref<boolean>(false);
-const uploadFileList = ref([] as any);
+// const uploadFileList = ref([] as any);
 const searchRangeDate = ref<[Dayjs, Dayjs]>();
 const searchFormRef = ref();
 const listTableLoading = ref(true);
@@ -139,6 +139,9 @@ const applyModelRef = reactive<{
   estimatedTotalExpense: number | undefined;
   remark: string;
   fileId: unknown;
+  attachFile: UploadFile<any>[];
+  extraFileIds: unknown[];
+  extraAttachFiles: UploadFile<any>[];
 }>({
   taskId: '',
   requestType: '',
@@ -172,7 +175,10 @@ const applyModelRef = reactive<{
   headCount: undefined as any, // 受邀人人数
   estimatedTotalExpense: undefined as any, // 估计的总费用
   remark: '',
-  fileId: undefined
+  fileId: undefined,
+  attachFile: [],
+  extraFileIds: [],
+  extraAttachFiles: []
 });
 
 const getDeptHeadTooltip = () => {
@@ -199,6 +205,18 @@ const applyOptions = computed<SelectProps['options']>(() =>
     value: user.email
   }))
 );
+
+const getTemplateUrl = () => {
+  let tempSuffix;
+  if (applyUserInfo?.userInfo?.companyCode === '0813') {
+    tempSuffix = '0813';
+  } else if (applyUserInfo?.userInfo?.companyCode === '2614' || applyUserInfo?.userInfo?.companyCode === '1391') {
+    tempSuffix = '2614_1391';
+  } else {
+    tempSuffix = '1954_1955_0882';
+  }
+  return `${baseURL}/sys/download/template?module=CompanyPerson&fileName=eHospCompanyPersonTemplate_${tempSuffix}.xlsx`;
+};
 
 // 搜索按钮
 const getListDataByCondition = async (currentPage = 1) => {
@@ -341,6 +359,8 @@ const clearApplyModel = () => {
   applyModelRef.headCount = undefined;
   applyModelRef.estimatedTotalExpense = 0;
   applyModelRef.remark = '';
+  applyModelRef.attachFile = [];
+  applyModelRef.extraAttachFiles = [];
   deptHeadGroupUserState.hidden = true;
   countryHeadGroupUserState.hidden = true;
 };
@@ -417,11 +437,26 @@ const showApplyDrawerModal = async (item?: any) => {
 
       if (data.fileAttach) {
         const attach = data.fileAttach;
-        uploadFileList.value.push({
-          uid: attach.id,
-          name: attach.origFileName,
-          size: Number.parseInt(attach.fileSize, 2),
-          url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+        applyModelRef.attachFile = [
+          {
+            uid: attach.id,
+            name: attach.origFileName,
+            status: 'done',
+            size: Number.parseInt(attach.fileSize, 2),
+            url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+          }
+        ];
+      }
+      if (data.extraAttachments) {
+        const extraAttach = data.extraAttachments;
+        extraAttach.forEach(attach => {
+          applyModelRef.extraAttachFiles.push({
+            uid: attach.id,
+            name: attach.origFileName,
+            status: 'done',
+            size: Number.parseInt(attach.fileSize, 2),
+            url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+          });
         });
       }
       applyModelRef.applyCCName = ccApplyOptions.value.map((v: any) => v.value);
@@ -439,7 +474,7 @@ const showApplyDrawerModal = async (item?: any) => {
 
 const closeApplyDrawerModal = () => {
   openApplyDrawerModal.value = false;
-  uploadFileList.value.length = 0;
+  // uploadFileList.value.length = 0;
   ccApplyOptions.value.length = 0;
   giftCompanyPersonState.data = [];
   userState.data = [];
@@ -694,6 +729,7 @@ onMounted(async () => {
       :title="showDrawerModalTitle()"
       width="75%"
       size="large"
+      destroy-on-close="true"
       :open="openApplyDrawerModal"
       @close="closeApplyDrawerModal"
     >
@@ -1099,9 +1135,9 @@ onMounted(async () => {
 
           <a-row :gutter="24">
             <a-col span="12">
-              <a-form-item :label="$t('form.common.upload_person_label')">
+              <a-form-item :label="$t('page.givingGifts.applyForm.upload_person_label')">
                 <a-upload
-                  v-model:file-list="uploadFileList"
+                  v-model:file-list="applyModelRef.attachFile"
                   :action="`${baseURL}/sys/upload/file?module=giving&type=CompanyPerson`"
                   :max-count="1"
                 >
@@ -1125,12 +1161,7 @@ onMounted(async () => {
           <a-row :gutter="24">
             <a-col span="24">
               <a-form-item :label="$t('page.givingGifts.applyForm.remark')" name="remark">
-                <a-textarea
-                  v-model:value="applyModelRef.remark"
-                  :rows="4"
-                  :placeholder="$t('page.givingGifts.applyForm.remark_validation')"
-                  allow-clear
-                />
+                <a-textarea v-model:value="applyModelRef.remark" :rows="4" allow-clear />
               </a-form-item>
             </a-col>
           </a-row>
@@ -1238,7 +1269,57 @@ onMounted(async () => {
               </a-col>
             </a-row>
           </div>
+          <a-row :gutter="24">
+            <a-col span="12">
+              <a-form-item :label="$t('page.givingHospitality.applyForm.upload_person_label')">
+                <a-upload
+                  v-model:file-list="applyModelRef.attachFile"
+                  :action="`${baseURL}/sys/upload/file?module=Hosp&type=CompanyPerson`"
+                  :max-count="1"
+                >
+                  <a-button>
+                    <UploadOutlined></UploadOutlined>
+                    {{ $t('form.common.upload_file') }}
+                  </a-button>
+                </a-upload>
+              </a-form-item>
+            </a-col>
+            <a-col span="4">
+              <a-button type="link" :href="getTemplateUrl()">
+                {{ $t('form.common.upload_template') }}
+              </a-button>
+            </a-col>
+          </a-row>
+
+          <a-row :gutter="24">
+            <a-col span="24">
+              <a-form-item :label="$t('page.givingHospitality.applyForm.remark')" name="remark">
+                <a-textarea v-model:value="applyModelRef.remark" :rows="4" allow-clear />
+              </a-form-item>
+            </a-col>
+          </a-row>
         </template>
+
+        <!--额外附件信息上传-->
+        <a-row :gutter="24">
+          <a-col span="12">
+            <a-form-item>
+              <template #label>
+                <p style="font-size: small">{{ $t('form.common.upload_person_label') }}</p>
+              </template>
+
+              <a-upload
+                v-model:file-list="applyModelRef.extraAttachFiles"
+                :action="`${baseURL}/sys/upload/file?module=Hosp&type=extraAttach`"
+              >
+                <a-button size="small">
+                  <UploadOutlined></UploadOutlined>
+                  {{ $t('form.common.upload_file') }}
+                </a-button>
+              </a-upload>
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-form>
 
       <!--显示历史操作记录-->

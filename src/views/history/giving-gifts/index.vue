@@ -372,6 +372,7 @@ onMounted(async () => {
       :title="$t('page.givingGifts.applyForm.givingGiftRequestTitle')"
       width="75%"
       size="large"
+      destroy-on-close="true"
       :open="openApplyDrawerModal"
       @close="closeApplyDrawerModal"
     >

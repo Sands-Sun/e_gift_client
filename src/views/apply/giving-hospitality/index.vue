@@ -22,7 +22,7 @@ import {
   PlusCircleOutlined,
   UploadOutlined
 } from '@ant-design/icons-vue';
-import type { FormInstance, TableColumnsType, UploadChangeParam, UploadProps } from 'ant-design-vue';
+import type { FormInstance, TableColumnsType, UploadChangeParam, UploadFile, UploadProps } from 'ant-design-vue';
 import { Modal, Upload, message } from 'ant-design-vue';
 import type { Rule } from 'ant-design-vue/es/form';
 import type { Dayjs } from 'dayjs';
@@ -45,7 +45,7 @@ const applyUserInfo = reactive<{
 });
 const hospCancelFormRef = ref();
 const openCancelModal = ref<boolean>(false);
-const uploadFileList = ref([] as any);
+// const uploadFileList = ref([] as any);
 const openApplyDrawerModal = ref<boolean>(false);
 const expandSearchFields = ref(true);
 const expandPolicyDescription = ref(true);
@@ -112,6 +112,9 @@ const applyModelRef = reactive<{
   estimatedTotalExpense: number | undefined;
   remark: string;
   fileId: unknown;
+  attachFile: UploadFile<any>[];
+  extraFileIds: unknown[];
+  extraAttachFiles: UploadFile<any>[];
 }>({
   actionType: '',
   applicationId: '',
@@ -138,7 +141,10 @@ const applyModelRef = reactive<{
   headCount: undefined as any, // 受邀人人数
   estimatedTotalExpense: undefined as any, // 估计的总费用
   remark: '',
-  fileId: undefined
+  fileId: undefined,
+  attachFile: [],
+  extraFileIds: [],
+  extraAttachFiles: []
 });
 
 const listPagination = ref({
@@ -204,7 +210,10 @@ const clearApplyModel = () => {
   applyModelRef.headCount = undefined;
   applyModelRef.estimatedTotalExpense = 0;
   applyModelRef.remark = '';
-  uploadFileList.value = [];
+  applyModelRef.fileId = undefined;
+  applyModelRef.extraFileIds = [];
+  applyModelRef.attachFile = [];
+  applyModelRef.extraAttachFiles = [];
   givingHospitalityFromStatus.disableStatus = false;
   deptHeadGroupUserState.hidden = true;
 };
@@ -443,6 +452,27 @@ const customUpload = async (option: any) => {
   }
 };
 
+const handleUploadExtraChange = ({ file, fileList }: UploadChangeParam) => {
+  if (file.status === 'done') {
+    message.success(
+      $t('form.common.upload_file_success', {
+        fileName: `${file.name}`
+      })
+    );
+    applyModelRef.extraFileIds.push(file.response?.data?.id);
+    fileList.forEach(f => {
+      f.url = `${baseURL}/sys/download/file?fileId=${f.response?.data?.id}`;
+    });
+  } else if (file.status === 'error') {
+    message.error(`${file.name} file upload failed.`);
+  } else if (file.status === 'removed') {
+    const index = applyModelRef.extraFileIds.indexOf(file.response?.data?.id || file.uid);
+    if (index > -1) {
+      applyModelRef.extraFileIds.splice(index, 1);
+    }
+  }
+};
+
 const handleUploadChange = ({ file, fileList }: UploadChangeParam) => {
   if (file.status === 'done') {
     message.success(
@@ -514,7 +544,7 @@ const closeCancelModal = () => {
 
 const closeApplyDrawerModal = () => {
   openApplyDrawerModal.value = false;
-  uploadFileList.value.length = 0;
+  // uploadFileList.value.length = 0;
   givingHospitalityFromStatus.disableStatus = false;
   applyOptions.value.length = 0;
   ccApplyOptions.value.length = 0;
@@ -625,6 +655,7 @@ const perVerification = (): Promise<void> => {
       reject(new Error('人员与数量不符'));
       return;
     }
+    /*
     const allNoGeovPerson = personArr.every(p => p.isGoSoc !== 'Yes');
     console.log('allNoGeovPerson: ', allNoGeovPerson);
     if (allNoGeovPerson && applyModelRef.expensePerHead && applyModelRef.expensePerHead <= 300) {
@@ -640,6 +671,7 @@ const perVerification = (): Promise<void> => {
       reject(new Error('非政府官员且人均小于 300'));
       return;
     }
+    */
     resolve();
   });
 };
@@ -696,11 +728,29 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       }
       if (data.fileAttach) {
         const attach = data.fileAttach;
-        uploadFileList.value.push({
-          uid: attach.id,
-          name: attach.origFileName,
-          size: Number.parseInt(attach.fileSize, 2),
-          url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+        applyModelRef.fileId = attach.id;
+        applyModelRef.extraFileIds.push(attach.id);
+        applyModelRef.attachFile = [
+          {
+            uid: attach.id,
+            name: attach.origFileName,
+            status: 'done',
+            size: Number.parseInt(attach.fileSize, 2),
+            url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+          }
+        ];
+      }
+      if (data.extraAttachments) {
+        const extraAttach = data.extraAttachments;
+        extraAttach.forEach(attach => {
+          applyModelRef.extraFileIds.push(attach.id);
+          applyModelRef.extraAttachFiles.push({
+            uid: attach.id,
+            name: attach.origFileName,
+            status: 'done',
+            size: Number.parseInt(attach.fileSize, 2),
+            url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+          });
         });
       }
       applyModelRef.expensePerHead = data.hospRef.expensePerHead;
@@ -1003,6 +1053,7 @@ watch(
       :title="$t('page.givingHospitality.applyForm.givingHospitalityRequestTitle')"
       width="75%"
       size="large"
+      destroy-on-close="true"
       :open="openApplyDrawerModal"
       @close="closeApplyDrawerModal"
     >
@@ -1253,12 +1304,8 @@ watch(
                 ]
               }"
             >
-              <a-date-picker
-                v-model:value="applyModelRef.date"
-                :disabled-date="disabledAfterCurrentDate"
-                format="YYYY-MM-DD"
-                value-format="YYYY-MM-DD"
-              />
+              <!--:disabled-date="disabledAfterCurrentDate"-->
+              <a-date-picker v-model:value="applyModelRef.date" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
             </a-form-item>
           </a-col>
           <a-col :flex="1">
@@ -1349,8 +1396,8 @@ watch(
           <a-col span="12">
             <a-form-item :label="$t('page.givingHospitality.applyForm.upload_person_label')">
               <a-upload
-                v-model:file-list="uploadFileList"
-                :action="`${baseURL}/sys/upload/file?module=hospitality&type=CompanyPerson`"
+                v-model:file-list="applyModelRef.attachFile"
+                :action="`${baseURL}/sys/upload/file?module=Hosp&type=CompanyPerson`"
                 :max-count="1"
                 :before-upload="beforeUpload"
                 :custom-request="customUpload"
@@ -1373,6 +1420,28 @@ watch(
           <a-col span="24">
             <a-form-item :label="$t('page.givingHospitality.applyForm.remark')" name="remark">
               <a-textarea v-model:value="applyModelRef.remark" :rows="4" allow-clear />
+            </a-form-item>
+          </a-col>
+        </a-row>
+
+        <!--额外附件信息上传-->
+        <a-row :gutter="24">
+          <a-col span="12">
+            <a-form-item>
+              <template #label>
+                <p style="font-size: small">{{ $t('form.common.upload_person_label') }}</p>
+              </template>
+
+              <a-upload
+                v-model:file-list="applyModelRef.extraAttachFiles"
+                :action="`${baseURL}/sys/upload/file?module=Hosp&type=extraAttach`"
+                @change="handleUploadExtraChange"
+              >
+                <a-button size="small">
+                  <UploadOutlined></UploadOutlined>
+                  {{ $t('form.common.upload_file') }}
+                </a-button>
+              </a-upload>
             </a-form-item>
           </a-col>
         </a-row>
@@ -1444,7 +1513,8 @@ watch(
               v-else-if="
                 givingHospitalityFromStatus.actionStatus === 'Cancelled' ||
                 givingHospitalityFromStatus.actionStatus === 'Rejected' ||
-                givingHospitalityFromStatus.actionStatus === 'Approved'
+                givingHospitalityFromStatus.actionStatus === 'Approved' ||
+                givingHospitalityFromStatus.actionStatus === 'Documented'
               "
             >
               <a-button type="primary" html-type="submit" @click.prevent="onModifyApply('Copy')">
@@ -1541,7 +1611,7 @@ watch(
                     <a-select-option value="For Subgroup Compliance Officer Approval">For SCO Approval</a-select-option>
                   </a-select-opt-group>
                   <a-select-opt-group :label="$t('form.common.option_complete')">
-                    <!-- <a-select-option value="Documented">Documented</a-select-option> -->
+                    <a-select-option value="Documented">Documented</a-select-option>
                     <a-select-option value="Approved">Approved</a-select-option>
                     <a-select-option value="Rejected">Rejected</a-select-option>
                     <a-select-option value="Cancelled">Cancelled</a-select-option>

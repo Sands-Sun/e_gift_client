@@ -563,6 +563,7 @@ watch(
       :title="$t('page.givingHospitality.applyForm.givingHospitalityRequestTitle')"
       width="75%"
       size="large"
+      destroy-on-close="true"
       :open="openApplyDrawerModal"
       @close="closeApplyDrawerModal"
     >

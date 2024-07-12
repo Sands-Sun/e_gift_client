@@ -127,6 +127,7 @@ declare namespace Api {
       reference: string;
       status: string;
       fileAttach: FileAttach;
+      extraAttachments: FileAttach[];
       giftsActivities: ReceivingActivity[];
       giftsRef: ReceivingGiftRef;
       companyList: GiftCompany[];
@@ -198,6 +199,7 @@ declare namespace Api {
       hospRef: ReceivingHospitalityRef;
       hospActivities: ReceivingHospitalityActivity[];
       fileAttach: FileAttach;
+      extraAttachments: FileAttach[];
       applyForUser: Api.Auth.UserInfo;
       creatorUser: Api.Auth.UserInfo;
     }
@@ -227,6 +229,7 @@ declare namespace Api {
       countryHeadGroup: GiftGroup;
       companyList: GiftCompany[];
       fileAttach: FileAttach;
+      extraAttachments: FileAttach[];
       hospRef: GivingHospitalityRef;
       hospActivities: GivingHospitalityActivity[];
       applyForUser: Api.Auth.UserInfo;
@@ -261,6 +264,7 @@ declare namespace Api {
       countryHeadGroup: GiftGroup;
       companyList: GiftCompany[];
       fileAttach: FileAttach;
+      extraAttachments: FileAttach[];
       giftsRef: GivingGiftRef;
       giftsActivities: GivingActivity[];
       applyForUser: Api.Auth.UserInfo;

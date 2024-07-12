@@ -6,7 +6,7 @@ import {
   PlusCircleOutlined,
   UploadOutlined
 } from '@ant-design/icons-vue';
-import type { FormInstance, TableColumnsType, UploadChangeParam, UploadProps } from 'ant-design-vue';
+import type { FormInstance, TableColumnsType, UploadChangeParam, UploadFile, UploadProps } from 'ant-design-vue';
 import { Modal, Upload, message } from 'ant-design-vue';
 import type { Rule } from 'ant-design-vue/es/form';
 import type { Dayjs } from 'dayjs';
@@ -48,7 +48,7 @@ const searchFormRef = ref();
 // const applyReceivingForm = Form.useForm;
 const applyReceivingCancelFormRef = ref();
 const openCancelModal = ref<boolean>(false);
-const uploadFileList = ref([] as any);
+// const uploadFileList = ref([] as any);
 const listTableLoading = ref(true);
 const openApplyDrawerModal = ref<boolean>(false);
 const showAddPersonModal = ref<boolean>(false);
@@ -162,6 +162,9 @@ const applyModelRef = reactive<{
   useCase: string;
   disableUseCase: boolean;
   fileId: unknown;
+  attachFile: UploadFile<any>[];
+  extraFileIds: unknown[];
+  extraAttachFiles: UploadFile<any>[];
 }>({
   actionType: '',
   applicationId: '',
@@ -186,7 +189,10 @@ const applyModelRef = reactive<{
   remark: '',
   useCase: '',
   disableUseCase: true,
-  fileId: undefined
+  fileId: undefined,
+  attachFile: [],
+  extraFileIds: [],
+  extraAttachFiles: []
 });
 
 const disabledAfterCurrentDate = (current: Dayjs) => {
@@ -291,14 +297,15 @@ const addCompany = () => {
     personList: [
       {
         id: -1,
+        personName: '',
+        positionType: '',
+        positionTitle: '',
         isGoSoc: '',
         isBayerCustomer: '',
-        personName: '',
-        positionTitle: '',
         description: '',
-        companyId: -1,
         unitValue: undefined,
         volume: undefined,
+        companyId: -1,
         key: Date.now()
       }
     ]
@@ -332,14 +339,15 @@ const addPerson = () => {
   }
   currentCompanyState.personList.push({
     id: -1,
+    personName: '',
+    positionType: '',
+    positionTitle: '',
     isGoSoc: '',
     isBayerCustomer: '',
-    personName: '',
-    positionTitle: '',
     description: '',
-    companyId: -1,
     unitValue: undefined,
     volume: undefined,
+    companyId: -1,
     key: Date.now()
   });
 };
@@ -380,7 +388,10 @@ const clearApplyModel = () => {
   applyModelRef.volume = undefined;
   applyModelRef.estimatedTotalValue = 0;
   applyModelRef.remark = '';
-  uploadFileList.value = [];
+  applyModelRef.fileId = undefined;
+  applyModelRef.extraFileIds = [];
+  applyModelRef.attachFile = [];
+  applyModelRef.extraAttachFiles = [];
   receivingGiftFromStatus.disableStatus = false;
   applyModelRef.disableUseCase = false;
 };
@@ -400,13 +411,14 @@ const resetFromFields = () => {
         {
           id: -1,
           personName: '',
+          positionType: '',
           positionTitle: '',
           isGoSoc: '',
           isBayerCustomer: '',
           description: '',
-          companyId: -1,
           unitValue: undefined,
           volume: undefined,
+          companyId: -1,
           key: Date.now()
         }
       ]
@@ -478,6 +490,27 @@ const customUpload = async (option: any) => {
       applyModelRef.companyList.push(company);
     });
     onSuccess({ data });
+  }
+};
+
+const handleUploadExtraChange = ({ file, fileList }: UploadChangeParam) => {
+  if (file.status === 'done') {
+    message.success(
+      $t('form.common.upload_file_success', {
+        fileName: `${file.name}`
+      })
+    );
+    applyModelRef.extraFileIds.push(file.response?.data?.id);
+    fileList.forEach(f => {
+      f.url = `${baseURL}/sys/download/file?fileId=${f.response?.data?.id}`;
+    });
+  } else if (file.status === 'error') {
+    message.error(`${file.name} file upload failed.`);
+  } else if (file.status === 'removed') {
+    const index = applyModelRef.extraFileIds.indexOf(file.response?.data?.id || file.uid);
+    if (index > -1) {
+      applyModelRef.extraFileIds.splice(index, 1);
+    }
   }
 };
 
@@ -556,11 +589,28 @@ const showApplyDrawerModal = async (type: string, item?: any) => {
       }
       if (data.fileAttach) {
         const attach = data.fileAttach;
-        uploadFileList.value.push({
-          uid: attach.id,
-          name: attach.origFileName,
-          size: Number.parseInt(attach.fileSize, 2),
-          url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+        applyModelRef.fileId = attach.id;
+        applyModelRef.attachFile = [
+          {
+            uid: attach.id,
+            name: attach.origFileName,
+            status: 'done',
+            size: Number.parseInt(attach.fileSize, 2),
+            url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+          }
+        ];
+      }
+      if (data.extraAttachments) {
+        const extraAttach = data.extraAttachments;
+        extraAttach.forEach(attach => {
+          applyModelRef.extraFileIds.push(attach.id);
+          applyModelRef.extraAttachFiles.push({
+            uid: attach.id,
+            name: attach.origFileName,
+            status: 'done',
+            size: Number.parseInt(attach.fileSize, 2),
+            url: `${baseURL}/sys/download/file?fileId=${attach.id}`
+          });
         });
       }
       applyModelRef.estimatedTotalValue = data.estimatedTotalValue;
@@ -957,6 +1007,7 @@ watch(
       :title="$t('page.receivingGifts.applyForm.acceptGiftRequestTitle')"
       width="75%"
       size="large"
+      destroy-on-close="true"
       :open="openApplyDrawerModal"
       @close="closeApplyDrawerModal"
     >
@@ -1163,11 +1214,11 @@ watch(
                 ]
               }"
             >
+              <!--:disabled-date="disabledAfterCurrentDate"-->
               <a-date-picker
                 v-model:value="applyModelRef.date"
                 format="YYYY-MM-DD"
                 value-format="YYYY-MM-DD"
-                :disabled-date="disabledAfterCurrentDate"
                 style="width: 140px"
               />
             </a-form-item>
@@ -1280,7 +1331,7 @@ watch(
           <a-col span="12">
             <a-form-item :label="$t('page.receivingGifts.applyForm.upload_person_label')">
               <a-upload
-                v-model:file-list="uploadFileList"
+                v-model:file-list="applyModelRef.attachFile"
                 :action="`${baseURL}/sys/upload/file?module=receiving&type=CompanyPerson`"
                 :max-count="1"
                 :before-upload="beforeUpload"
@@ -1326,6 +1377,27 @@ watch(
             </a-col>
           </a-row>
         </template>
+
+        <!--额外附件信息上传-->
+        <a-row :gutter="24">
+          <a-col span="12">
+            <a-form-item>
+              <template #label>
+                <p style="font-size: small">{{ $t('form.common.upload_person_label') }}</p>
+              </template>
+              <a-upload
+                v-model:file-list="applyModelRef.extraAttachFiles"
+                :action="`${baseURL}/sys/upload/file?module=receiving&type=extraAttach`"
+                @change="handleUploadExtraChange"
+              >
+                <a-button size="small">
+                  <UploadOutlined></UploadOutlined>
+                  {{ $t('form.common.upload_file') }}
+                </a-button>
+              </a-upload>
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-form>
 
       <!--显示历史操作记录-->
